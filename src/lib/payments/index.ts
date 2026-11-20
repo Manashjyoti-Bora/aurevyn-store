@@ -1,7 +1,12 @@
 import { isTestPaymentsAllowed } from '../env';
 import { logger } from '../logger';
 import { getSettings } from '../settings';
-import { resolveUpiConfig, upiUnavailableReason, type UpiConfig } from './config';
+import {
+  resolveUpiConfig,
+  upiUnavailableReason,
+  type UpiConfig,
+  type UpiSettingsSlice,
+} from './config';
 import { TestPaymentAdapter } from './test-provider';
 import { UpiQrAdapter } from './upi';
 import type { PaymentProviderAdapter } from './types';
@@ -26,9 +31,10 @@ export async function getPaymentProvider(): Promise<PaymentProviderAdapter | nul
   const settings = await getSettings().catch(() => null);
   const provider = providerFromConfig(resolveUpiConfig(settings?.payments));
   if (!provider) {
-    logger.error(
-      `No payment provider available: ${upiUnavailableReason(settings?.payments)} or enable PAYMENTS_TEST_MODE (non-production only)`
-    );
+    logger.error('No payment provider available', {
+      reason: upiUnavailableReason(settings?.payments),
+      testModeAllowed: isTestPaymentsAllowed(),
+    });
   }
   return provider;
 }
@@ -49,7 +55,7 @@ export interface PaymentStatusDescription {
  */
 export function describePaymentProvider(
   upi: UpiConfig | null,
-  settings?: Parameters<typeof upiUnavailableReason>[0]
+  settings?: UpiSettingsSlice | null
 ): PaymentStatusDescription {
   if (upi) {
     return {

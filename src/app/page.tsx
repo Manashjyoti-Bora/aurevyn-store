@@ -641,7 +641,7 @@ export default async function HomePage() {
                 {
                   n: '02',
                   t: 'Secure checkout',
-                  d: 'Pay online through the gateway or choose Cash on Delivery where enabled.',
+                  d: 'Pay by UPI QR from any UPI app, or choose Cash on Delivery where enabled.',
                 },
                 {
                   n: '03',

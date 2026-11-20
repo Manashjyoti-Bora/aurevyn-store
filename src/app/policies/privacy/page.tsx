@@ -73,11 +73,13 @@ export default async function PrivacyPolicyPage() {
                   order/tracking history.
                 </li>
                 <li>
-                  <strong>Payment references:</strong> gateway order/payment IDs and statuses.{' '}
+                  <strong>Payment references:</strong> the UPI transaction reference (UTR) you
+                  submit and the payment status.{' '}
                   <strong>
                     We never see or store card numbers, CVVs, UPI PINs or netbanking credentials
                   </strong>{' '}
-                  — those are entered only into the payment gateway&apos;s secure interface.
+                  — you pay inside your own UPI app, so no payment credential ever reaches this
+                  store.
                 </li>
                 <li>
                   <strong>Technical data:</strong> IP address and request metadata for security
@@ -117,7 +119,8 @@ export default async function PrivacyPolicyPage() {
               <p>
                 We rely on consent only where the law requires it — for example marketing email.
                 Nothing else here is optional: an order cannot be delivered without an address,
-                and payment cannot be processed without a gateway reference.
+                and a UPI payment cannot be matched to your order without the transaction
+                reference you submit.
               </p>
               <p className="mt-2">
                 You can withdraw consent at any time by replying to a marketing email, updating

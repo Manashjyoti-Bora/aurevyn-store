@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { readJson } from '@/lib/http';
 import { apiRoute, badRequest, jsonOk } from '@/lib/errors';
-import { requireAdmin } from '@/lib/auth/guards';
+import { requireAdminWrite } from '@/lib/auth/guards';
 import { bulkProcessSupplierProducts } from '@/lib/catalog/auto-import';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +13,7 @@ const bulkSchema = z.object({
 });
 
 export const POST = apiRoute(async (req: Request) => {
-  const admin = await requireAdmin();
+  const admin = await requireAdminWrite('supplier-products-bulk');
   const raw = (await readJson(req)) ?? {};
   const parsed = bulkSchema.safeParse(raw);
   if (!parsed.success) {

@@ -10,8 +10,8 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     description: settings.storeTagline || 'Quality products, delivered to you',
     start_url: '/',
     display: 'standalone',
-    background_color: '#F8F7F2',
-    theme_color: '#174B3A',
+    background_color: '#08080A',
+    theme_color: '#08080A',
     icons: [
       {
         src: '/icon-192x192.png',

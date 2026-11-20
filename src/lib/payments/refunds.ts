@@ -21,6 +21,9 @@ import type { OrderActorType, Prisma } from '@prisma/client';
 const dec = (paise: number) => (paise / 100).toFixed(2);
 type Tx = Prisma.TransactionClient;
 
+/** Shown on a refund that only the owner can settle (no provider refund API). */
+export const MANUAL_REFUND_NOTE = 'Awaiting manual payout: transfer by UPI/bank, then settle with the reference.';
+
 export interface CreateRefundInput {
   orderId: string;
   amountPaise: number;
@@ -37,7 +40,7 @@ export interface RefundReservation {
   orderId: string;
   paymentId: string | null;
   providerPaymentId: string | null;
-  provider: 'RAZORPAY' | 'TEST' | null;
+  provider: 'UPI' | 'TEST' | null;
   amountPaise: number;
   status: 'REQUESTED' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
   existing: boolean;
@@ -237,7 +240,9 @@ function keyedRefundReservationId(orderId: string, idempotencyKey: string): stri
  * Provider calls are never inside a DB transaction. If the call times out, its
  * outcome is ambiguous: keep PROCESSING (the balance remains reserved) and
  * require reconciliation instead of blindly retrying a potentially successful
- * refund. REQUESTED records without an eligible configured provider stay manual.
+ * refund. Providers with no refund API (UPI) return MANUAL, which parks the
+ * reservation in the admin queue. REQUESTED records without an eligible
+ * configured provider stay manual too.
  */
 export async function processRefundReservation(
   reservation: RefundReservation,
@@ -257,7 +262,7 @@ export async function processRefundReservation(
   // PROCESSING reservations are never retried here because the provider outcome
   // may be ambiguous.
 
-  const provider = getPaymentProvider();
+  const provider = await getPaymentProvider();
   if (!provider || provider.kind !== reservation.provider || !provider.isConfigured()) {
     const updated = await prisma.refund.updateMany({
       where: { id: current.id, status: 'REQUESTED' },
@@ -292,7 +297,18 @@ export async function processRefundReservation(
         data: { providerRefundId: result.providerRefundId },
       });
     }
-    if (result.status === 'COMPLETED' || result.status === 'FAILED') {
+    if (result.status === 'MANUAL') {
+      // UPI has no refund API. Nothing was submitted, so the reservation goes
+      // back to the human queue (REQUESTED) with an actionable note; it stays
+      // reserved so the same money can never be refunded twice.
+      await prisma.refund.updateMany({
+        where: { id: current.id, status: 'PROCESSING' },
+        data: {
+          status: 'REQUESTED',
+          failureReason: result.failureReason ?? MANUAL_REFUND_NOTE,
+        },
+      });
+    } else if (result.status === 'COMPLETED' || result.status === 'FAILED') {
       await settleRefund({
         refundId: current.id,
         status: result.status,
@@ -345,6 +361,8 @@ export async function settleRefund(params: {
   providerRefundId?: string;
   status: 'COMPLETED' | 'FAILED';
   failureReason?: string;
+  /** Admin note kept in the audit trail (e.g. the NEFT/UPI reference used). */
+  note?: string;
   actor?: OrderActorType;
   actorId?: string | null;
 }): Promise<boolean> {
@@ -440,7 +458,13 @@ export async function settleRefund(params: {
     action: params.status === 'COMPLETED' ? 'refund.completed' : 'refund.failed',
     entityType: 'Refund',
     entityId: changed.id,
-    data: { orderId: changed.orderId, amountPaise: toPaise(changed.amount), status: params.status },
+    data: {
+      orderId: changed.orderId,
+      amountPaise: toPaise(changed.amount),
+      status: params.status,
+      providerRefundId: params.providerRefundId ?? null,
+      ...(params.note ? { note: params.note } : {}),
+    },
   });
 
   if (params.status === 'COMPLETED') {

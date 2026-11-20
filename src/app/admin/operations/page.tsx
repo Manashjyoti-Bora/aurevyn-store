@@ -5,10 +5,10 @@ import { getSettings } from '@/lib/settings';
 import { getSessionUser } from '@/lib/auth/session';
 import { PERMISSION_LEVEL_LABELS, ACTION_MIN_LEVEL, permissionLevelOf, AUTOMATION_MAX_LEVEL } from '@/lib/auth/permissions';
 import { getAiStatus } from '@/lib/ai/provider';
-import { describePaymentProvider } from '@/lib/payments';
+import { describePaymentProvider, resolveUpiConfig } from '@/lib/payments';
 import { evaluateSupplierProductCandidate, getAllSupplierSyncReports } from '@/lib/catalog/auto-import';
 import { deriveLifecycleState, LIFECYCLE_LABELS, type SupplierProductLifecycleState } from '@/lib/catalog/lifecycle';
-import { env, isRazorpayConfigured } from '@/lib/env';
+import { env } from '@/lib/env';
 import { collectLaunchReadiness } from '@/lib/ops/launch-blockers';
 import { Badge } from '@/components/ui/badge';
 import { Alert, Card } from '@/components/ui/feedback';
@@ -162,7 +162,7 @@ export default async function OperationsPage() {
   const readiness = collectLaunchReadiness({
     settings,
     env,
-    razorpayConfigured: isRazorpayConfigured(),
+    paymentConfigured: resolveUpiConfig(settings.payments) !== null || settings.shipping.codEnabled,
     isProduction: env.NODE_ENV === 'production',
   });
 
@@ -170,7 +170,7 @@ export default async function OperationsPage() {
   const whCount = (s: string) => webhookStats24h.find((j) => j.status === s)?._count._all ?? 0;
   const ordersCount = (s: string) => ordersByStatus24h.find((j) => j.status === s)?._count._all ?? 0;
   const ai = getAiStatus();
-  const payments = describePaymentProvider();
+  const payments = describePaymentProvider(resolveUpiConfig(settings.payments), settings.payments);
   const bucketCount = Number(rateLimitBuckets[0]?.n ?? -1);
 
   return (

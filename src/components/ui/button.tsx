@@ -6,22 +6,24 @@ type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'succe
 type Size = 'sm' | 'md' | 'lg';
 
 const base =
-  'btn-press inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60';
+  'btn-press inline-flex items-center justify-center gap-2 rounded-full text-[13px] font-medium tracking-[0.01em] transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-50 disabled:cursor-not-allowed disabled:opacity-60';
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-brand-600 text-white shadow-soft hover:bg-brand-700 active:bg-brand-800',
-  secondary: 'bg-ink-900 text-cream-50 shadow-soft hover:bg-ink-800 active:bg-ink-950',
+  primary:
+    'btn-sheen bg-brand-700 text-cream-50 shadow-soft hover:bg-brand-500 active:bg-brand-400',
+  secondary:
+    'border border-white/[0.12] bg-cream-100 text-ink-900 hover:border-accent-400/40 hover:bg-cream-200',
   outline:
-    'border border-ink-900/15 bg-white text-ink-800 shadow-hair hover:border-ink-900/25 hover:bg-cream-50 active:bg-cream-100',
-  ghost: 'text-ink-500 hover:bg-ink-900/[0.04] hover:text-ink-900',
-  danger: 'bg-red-600 text-white shadow-soft hover:bg-red-700',
-  success: 'bg-emerald-600 text-white shadow-soft hover:bg-emerald-700',
+    'border border-white/[0.16] bg-transparent text-ink-800 hover:border-accent-400/55 hover:text-ink-950',
+  ghost: 'text-ink-400 hover:bg-white/[0.05] hover:text-ink-900',
+  danger: 'bg-danger-600 text-cream-50 shadow-soft hover:bg-danger-700',
+  success: 'bg-success-600 text-cream-50 shadow-soft hover:bg-success-700',
 };
 
 const sizes: Record<Size, string> = {
-  sm: 'px-2.5 py-1.5 text-xs',
-  md: 'px-4 py-2 text-sm',
-  lg: 'px-5 py-2.5 text-base',
+  sm: 'px-3 py-1.5 text-[11px] uppercase tracking-[0.14em]',
+  md: 'px-5 py-2.5 text-[11px] uppercase tracking-[0.14em]',
+  lg: 'px-7 py-3 text-[12px] uppercase tracking-[0.16em]',
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

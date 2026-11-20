@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db';
 import { getSettings, isPlaceholderEmail } from '@/lib/settings';
-import { describePaymentProvider } from '@/lib/payments';
-import { aiProviderConfig, env, isRazorpayConfigured } from '@/lib/env';
+import { describePaymentProvider, resolveUpiConfig } from '@/lib/payments';
+import { aiProviderConfig, env } from '@/lib/env';
 import { toPaise, type MoneyInput } from '@/lib/money';
 import { getAllSupplierSyncReports } from '@/lib/catalog/auto-import';
 import { collectLaunchReadiness } from '@/lib/ops/launch-blockers';
@@ -227,7 +227,8 @@ export async function loadAiCeoSnapshot(options: LoadSnapshotOptions = {}): Prom
     };
   }
 
-  const payments = describePaymentProvider();
+  const upiConfig = resolveUpiConfig(settings.payments);
+  const payments = describePaymentProvider(upiConfig, settings.payments);
   const business = settings.business;
   const identityParts = [business.legalName, business.gstin, business.addressLine, business.city, business.state];
   const identityFilled = identityParts.filter((part) => part && part.trim() !== '').length;
@@ -298,11 +299,13 @@ export async function loadAiCeoSnapshot(options: LoadSnapshotOptions = {}): Prom
         NODE_ENV: env.NODE_ENV,
         EMAIL_PROVIDER: env.EMAIL_PROVIDER,
         CRON_SECRET: env.CRON_SECRET,
-        RAZORPAY_WEBHOOK_SECRET: env.RAZORPAY_WEBHOOK_SECRET,
+        UPI_VPA: env.UPI_VPA,
         STORAGE_PROVIDER: env.STORAGE_PROVIDER,
         SUPPORT_EMAIL: env.SUPPORT_EMAIL,
+        EMAIL_FROM: env.EMAIL_FROM,
+        SMTP_HOST: env.SMTP_HOST,
       },
-      razorpayConfigured: isRazorpayConfigured(),
+      paymentConfigured: upiConfig !== null,
     }),
   };
 }

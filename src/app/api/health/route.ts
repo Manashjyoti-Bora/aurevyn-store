@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { env } from '@/lib/env';
-import { describePaymentProvider } from '@/lib/payments';
+import { loadPaymentStatus } from '@/lib/payments';
 import { getEmailProvider } from '@/lib/notifications/providers';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +19,7 @@ export async function GET(): Promise<Response> {
     db = false;
   }
 
-  const provider = describePaymentProvider();
+  const provider = await loadPaymentStatus();
   const emailProvider = getEmailProvider();
   const healthy = db;
 

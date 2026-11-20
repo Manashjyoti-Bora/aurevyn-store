@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { isSafeMediaUrl, UNSAFE_MEDIA_URL_MESSAGE } from '../images/url-safety';
+import { isSafeOutboundBaseUrl, UNSAFE_OUTBOUND_URL_MESSAGE } from '../net/host-guard';
 
 /**
  * Shared Zod validation schemas used by BOTH client forms (instant feedback)
@@ -57,6 +58,15 @@ export const changePasswordSchema = z.object({
   newPassword: passwordSchema,
 });
 
+/** Irreversible account erasure (DPDP right to erasure). */
+export const deleteAccountSchema = z.object({
+  password: z.string().min(1, 'Password is required').max(72),
+  confirm: z
+    .string()
+    .trim()
+    .refine((value) => value === 'DELETE', 'Type DELETE to confirm account deletion.'),
+});
+
 export const addressSchema = z.object({
   id: z.string().optional(),
   label: z.string().trim().max(40).optional().or(z.literal('')),
@@ -110,6 +120,16 @@ export const createPaymentSchema = z.object({
   email: emailSchema.optional(),
 });
 
+export const upiSubmitSchema = z.object({
+  orderNumber: z.string().min(4).max(40),
+  // UPI transaction reference (UTR/RRN) printed by the customer's UPI app.
+  utr: z
+    .string()
+    .trim()
+    .regex(/^[A-Za-z0-9]{8,22}$/, 'Enter the 8–22 character reference shown in your UPI app'),
+  email: emailSchema.optional(),
+});
+
 export const verifyPaymentSchema = z.object({
   orderNumber: z.string().min(4).max(40),
   providerOrderId: z.string().min(1).max(120),
@@ -149,6 +169,36 @@ export const contactSchema = z.object({
   email: emailSchema,
   subject: z.string().trim().max(120).optional().or(z.literal('')),
   message: z.string().trim().min(10, 'Message must be at least 10 characters').max(3000),
+});
+
+/**
+ * Storefront concierge message. Bounded so a single request can never carry a
+ * transcript-sized payload; history is optional and currently informational.
+ */
+/** Admin cofounder chat — bounded so one request cannot carry a transcript. */
+export const cofounderChatSchema = z.object({
+  message: z
+    .string()
+    .trim()
+    .min(2, 'Ask a question')
+    .max(400, 'Please keep the question under 400 characters'),
+});
+
+export const assistantChatSchema = z.object({
+  message: z
+    .string()
+    .trim()
+    .min(2, 'Please type a question')
+    .max(500, 'Please keep your message under 500 characters'),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string().trim().max(500),
+      })
+    )
+    .max(8)
+    .default([]),
 });
 
 // ---------------------------------------------------------------------------
@@ -366,7 +416,20 @@ export const supplierInputSchema = z.object({
   type: z.enum(['MANUAL', 'HTTP_REST', 'CJ', 'DEMO']).default('MANUAL'),
   contactEmail: emailSchema.optional().or(z.literal('')).nullable(),
   contactPhone: z.string().trim().max(32).optional().or(z.literal('')).nullable(),
-  baseUrl: z.string().trim().url().max(500).optional().or(z.literal('')).nullable(),
+  // Requested by the SERVER (see src/lib/net/outbound.ts): refuse private,
+  // loopback and intranet hosts at save time as well as at call time.
+  baseUrl: z
+    .string()
+    .trim()
+    .url()
+    .max(500)
+    .refine(
+      (v) => v === '' || isSafeOutboundBaseUrl(v),
+      UNSAFE_OUTBOUND_URL_MESSAGE
+    )
+    .optional()
+    .or(z.literal(''))
+    .nullable(),
   apiKeyEnvVar: z
     .string()
     .trim()

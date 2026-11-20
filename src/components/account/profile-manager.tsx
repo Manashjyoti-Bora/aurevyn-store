@@ -31,6 +31,11 @@ export function ProfileManager({
   const [pwBusy, setPwBusy] = useState(false);
   const [pwError, setPwError] = useState<string | null>(null);
 
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   async function saveProfile(e: FormEvent) {
     e.preventDefault();
     setProfileBusy(true);
@@ -56,6 +61,26 @@ export function ProfileManager({
       }
     } finally {
       setProfileBusy(false);
+    }
+  }
+
+  async function deleteMyAccount(e: FormEvent) {
+    e.preventDefault();
+    setDeleteError(null);
+    setDeleteBusy(true);
+    try {
+      await apiFetch('/api/account/delete', {
+        body: { password: deletePassword, confirm: deleteConfirm },
+      });
+      toast('Your account has been deleted', 'success');
+      router.push('/');
+      router.refresh();
+    } catch (err) {
+      setDeleteError(
+        err instanceof ApiClientError ? err.message : 'Could not delete the account. Try again.'
+      );
+    } finally {
+      setDeleteBusy(false);
     }
   }
 
@@ -195,6 +220,62 @@ export function ProfileManager({
           Update password
         </Button>
       </form>
+
+      {role === 'CUSTOMER' && (
+        <form
+          onSubmit={deleteMyAccount}
+          className="card h-fit space-y-4 border-red-200 p-5 lg:col-span-2"
+          noValidate
+          aria-labelledby="delete-account"
+        >
+          <h2 id="delete-account" className="text-base font-semibold text-red-700">
+            Delete my account
+          </h2>
+          <p className="text-sm leading-relaxed text-ink-500">
+            This erases your profile, saved addresses, cart, wishlist and sign-in from our store
+            immediately, and cannot be undone. Order, payment and tax records are kept for the
+            period the law requires — see the{' '}
+            <a href="/policies/privacy" className="link-primary">
+              Privacy Policy
+            </a>
+            .
+          </p>
+          {deleteError && <Alert tone="error">{deleteError}</Alert>}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Current password" required>
+              {(p) => (
+                <Input
+                  {...p}
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
+              )}
+            </Field>
+            <Field label="Type DELETE to confirm" required>
+              {(p) => (
+                <Input
+                  {...p}
+                  value={deleteConfirm}
+                  onChange={(e) => setDeleteConfirm(e.target.value)}
+                  autoComplete="off"
+                  required
+                />
+              )}
+            </Field>
+          </div>
+          <Button
+            type="submit"
+            variant="danger"
+            loading={deleteBusy}
+            disabled={!deletePassword || deleteConfirm.trim() !== 'DELETE'}
+          >
+            Permanently delete my account
+          </Button>
+        </form>
+      )}
     </div>
   );
 }

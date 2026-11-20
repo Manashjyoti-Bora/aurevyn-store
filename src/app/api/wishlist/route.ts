@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { readJson } from '@/lib/http';
+import { clientIp, readJson } from '@/lib/http';
+import { assertRateLimit } from '@/lib/rate-limit';
 import { apiRoute, badRequest, jsonOk } from '@/lib/errors';
 import { getCurrentUser } from '@/lib/auth/guards';
 import {
@@ -21,6 +22,10 @@ export const GET = apiRoute(async () => {
 });
 
 export const POST = apiRoute(async (req: Request) => {
+  await assertRateLimit(`wishlist:${clientIp(req) ?? 'local'}`, {
+    limit: 120,
+    windowMs: 60_000,
+  });
   const user = await getCurrentUser();
   const raw = (await readJson(req)) ?? {};
   const parsed = bodySchema.safeParse(raw);
@@ -34,6 +39,10 @@ export const POST = apiRoute(async (req: Request) => {
 });
 
 export const DELETE = apiRoute(async (req: Request) => {
+  await assertRateLimit(`wishlist:${clientIp(req) ?? 'local'}`, {
+    limit: 120,
+    windowMs: 60_000,
+  });
   const user = await getCurrentUser();
   const url = new URL(req.url);
   const queryProductId = url.searchParams.get('productId');

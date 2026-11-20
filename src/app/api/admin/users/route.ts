@@ -1,6 +1,6 @@
 import { apiRoute, jsonOk, badRequest, conflict } from '@/lib/errors';
 import { adminCreateUserSchema } from '@/lib/validation/schemas';
-import { requireAdmin } from '@/lib/auth/guards';
+import { requireAdminWrite } from '@/lib/auth/guards';
 import { hashPassword } from '@/lib/auth/password';
 import { prisma } from '@/lib/db';
 import { auditLog } from '@/lib/audit';
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 /** Create a staff/admin user (customer registration stays on /auth/register). */
 export const POST = apiRoute(async (req: Request) => {
-  const admin = await requireAdmin();
+  const admin = await requireAdminWrite('users');
   const raw = await readJson(req);
   if (!raw || typeof raw !== 'object') throw badRequest('Invalid request body');
   const body = adminCreateUserSchema.parse(raw);

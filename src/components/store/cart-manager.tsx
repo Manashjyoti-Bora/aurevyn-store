@@ -97,13 +97,17 @@ export function CartManager({
 
   if (cart.isEmpty) {
     return (
-      <div className="py-10 text-center">
-        <CartIcon className="mx-auto h-10 w-10 text-ink-300" aria-hidden="true" />
-        <h2 className="mt-3 text-lg font-semibold text-ink-900">Your cart is empty</h2>
-        <p className="mt-1 text-sm text-ink-400">Browse the catalog and add something you like.</p>
-        <div className="mt-5">
+      <div className="atelier-panel mt-8 px-6 py-14 text-center sm:py-20">
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] text-accent-400">
+          <CartIcon className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <h2 className="display mt-5 text-2xl">Your cart is empty</h2>
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-400">
+          Nothing has been added yet. Browse the catalogue and choose a piece to keep.
+        </p>
+        <div className="mt-7">
           <LinkButton href="/shop" size="lg">
-            Start shopping
+            Enter the catalogue
           </LinkButton>
         </div>
       </div>
@@ -122,99 +126,107 @@ export function CartManager({
       : 100;
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
+    <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px] lg:gap-10">
       <div className="space-y-4">
         {cart.freeShippingThresholdPaise > 0 && (
-          <div className="card border-ink-900/10 bg-cream-50/70 p-4">
-            <div className="flex items-center justify-between gap-3 text-xs">
-              <span className="inline-flex items-center gap-2 font-semibold text-ink-900">
+          <div className="atelier-panel p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2.5 text-[12px]">
                 {freeShippingRemaining === 0 ? (
                   <>
-                    <CheckIcon className="h-4 w-4 text-emerald-600" />
-                    <span className="text-emerald-800">
-                      Unlocked FREE shipping on this order!
-                    </span>
+                    <CheckIcon className="h-4 w-4 shrink-0 text-accent-300" />
+                    <span className="text-ink-800">Complimentary shipping unlocked</span>
                   </>
                 ) : (
-                  <span>
+                  <span className="text-ink-500">
                     Add{' '}
-                    <strong className="font-bold text-brand-700">
+                    <strong className="font-medium tabular-nums text-ink-900">
                       {formatINR(freeShippingRemaining)}
                     </strong>{' '}
-                    more for <strong className="font-semibold">FREE shipping</strong>
+                    more for complimentary shipping
                   </span>
                 )}
-              </span>
-              <span className="font-mono text-[11px] font-semibold tabular-nums text-ink-400">
+              </div>
+              <span className="shrink-0 text-[10px] tabular-nums tracking-[0.16em] text-accent-400">
                 {freeShippingProgress}%
               </span>
             </div>
             <div
-              className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-cream-200"
+              className="mt-3 h-[2px] w-full overflow-hidden bg-white/[0.08]"
               role="progressbar"
               aria-valuenow={freeShippingProgress}
               aria-valuemin={0}
               aria-valuemax={100}
-              aria-label="Free shipping progress"
+              aria-label="Complimentary shipping progress"
             >
               <div
-                className="h-full rounded-full bg-brand-600 transition-all duration-300 ease-zenvora"
+                className="h-full bg-gradient-to-r from-accent-500/60 to-accent-300 transition-all duration-300 ease-zenvora"
                 style={{ width: `${freeShippingProgress}%` }}
               />
             </div>
           </div>
         )}
+
         {unavailable.length > 0 && (
-          <Alert tone="warning" title="Some items changed">
+          <Alert
+            tone="warning"
+            title="Some items changed"
+            className="border-amber-400/20 bg-amber-400/[0.05] text-amber-800"
+          >
             {unavailable.map((l) => l.name).join(', ')} — stock is no longer sufficient. Adjust the
             quantity or remove the item to continue.
           </Alert>
         )}
-        <ul className="divide-y divide-ink-900/5 rounded-xl border border-ink-900/10 bg-white">
+
+        <ul className="atelier-panel divide-y divide-white/[0.06]">
           {cart.lines.map((line) => (
-            <li key={line.itemId} className="flex gap-3 p-4">
-              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-cream-100">
+            <li key={line.itemId} className="flex gap-4 p-4 sm:p-5">
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] sm:h-24 sm:w-24">
                 {line.image ? (
                   <Image
                     src={line.image}
                     alt={line.name}
                     fill
-                    sizes="80px"
+                    sizes="96px"
                     className="object-cover"
                     loading="lazy"
                   />
                 ) : (
                   <span
-                    className="flex h-full items-center justify-center text-2xl text-ink-300"
+                    className="flex h-full items-center justify-center text-ink-300"
                     aria-hidden="true"
                   >
                     <CartIcon className="h-6 w-6" />
                   </span>
                 )}
               </div>
+
               <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <Link
                       href={`/products/${line.slug}`}
-                      className="line-clamp-2 text-sm font-semibold text-ink-900 hover:text-brand-700"
+                      className="line-clamp-2 text-[13.5px] font-medium leading-snug text-ink-900 transition-colors hover:text-accent-300"
                     >
                       {line.name}
                     </Link>
                     {line.variantName && (
-                      <p className="mt-0.5 text-xs text-ink-400">{line.variantName}</p>
+                      <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-ink-400">
+                        {line.variantName}
+                      </p>
                     )}
-                    <p className="mt-0.5 text-xs tabular-nums text-ink-400">
+                    <p className="mt-1.5 text-[11px] tabular-nums text-ink-500">
                       {formatINR(line.unitPricePaise)} each
                     </p>
                   </div>
-                  <p className="shrink-0 text-sm font-bold tabular-nums text-ink-900">
+                  <p className="shrink-0 text-[14px] font-medium tabular-nums text-ink-900">
                     {formatINR(line.lineTotalPaise)}
                   </p>
                 </div>
-                <div className="mt-2.5 flex items-center gap-2">
+
+                <div className="mt-3 flex flex-wrap items-center gap-2.5">
                   {busyItem === line.itemId ? (
-                    <Spinner className="h-5 w-5 text-brand-600" />
+                    <Spinner className="h-5 w-5 text-accent-400" />
                   ) : (
                     <QuantityStepper
                       value={line.quantity}
@@ -228,12 +240,12 @@ export function CartManager({
                     type="button"
                     onClick={() => removeItem(line.itemId)}
                     disabled={busyItem === line.itemId}
-                    className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                    className="rounded-full px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-[0.14em] text-ink-500 transition-colors hover:bg-red-500/10 hover:text-red-300 disabled:opacity-40"
                   >
                     Remove
                   </button>
                   {!line.available && (
-                    <span className="text-xs font-medium text-amber-600">
+                    <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-amber-600">
                       Only {line.maxQuantity} available
                     </span>
                   )}
@@ -242,26 +254,38 @@ export function CartManager({
             </li>
           ))}
         </ul>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link href="/shop" className="text-sm font-medium text-brand-700 hover:text-brand-800">
+
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <Link
+            href="/shop"
+            className="link-underline inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.2em] text-ink-400 transition-colors hover:text-ink-900"
+          >
             ← Continue shopping
           </Link>
         </div>
       </div>
 
       {/* Summary */}
-      <aside className="h-fit space-y-4 lg:sticky lg:top-20" aria-label="Order summary">
-        <div className="card p-4 sm:p-5">
-          <h2 className="text-base font-semibold text-ink-900">Order summary</h2>
-          <dl className="mt-3 space-y-2 text-sm">
+      <aside className="h-fit space-y-4 lg:sticky lg:top-24" aria-label="Order summary">
+        <div className="atelier-panel p-5">
+          <div className="flex items-baseline justify-between gap-3 border-b border-white/[0.07] pb-4">
+            <h2 className="text-[10px] font-medium uppercase tracking-[0.24em] text-accent-400">
+              Order summary
+            </h2>
+            <span className="text-[10px] tabular-nums text-ink-400">
+              {cart.itemCount} item{cart.itemCount === 1 ? '' : 's'}
+            </span>
+          </div>
+
+          <dl className="mt-4 space-y-3 text-[12.5px]">
             <div className="flex justify-between gap-4">
-              <dt className="text-ink-400">
-                Subtotal ({cart.itemCount} item{cart.itemCount === 1 ? '' : 's'})
-              </dt>
-              <dd className="font-medium tabular-nums">{formatINR(cart.subtotalPaise)}</dd>
+              <dt className="text-ink-400">Subtotal</dt>
+              <dd className="font-medium tabular-nums text-ink-900">
+                {formatINR(cart.subtotalPaise)}
+              </dd>
             </div>
             {cart.coupon && (
-              <div className="flex justify-between gap-4 text-emerald-700">
+              <div className="flex justify-between gap-4 text-accent-300">
                 <dt>Coupon {cart.coupon.code}</dt>
                 <dd className="font-medium tabular-nums">
                   −{formatINR(cart.coupon.discountPaise)}
@@ -270,66 +294,67 @@ export function CartManager({
             )}
             <div className="flex justify-between gap-4">
               <dt className="text-ink-400">Shipping</dt>
-              <dd className="font-medium tabular-nums">
+              <dd className="font-medium tabular-nums text-ink-900">
                 {cart.shippingPaise === 0 ? (
-                  <span className="text-emerald-700">FREE</span>
+                  <span className="text-accent-300">Complimentary</span>
                 ) : (
                   formatINR(cart.shippingPaise)
                 )}
               </dd>
             </div>
-            {cart.freeShippingApplied && (
-              <p className="flex items-center justify-end gap-1 text-xs text-emerald-600"><CheckIcon className="h-3.5 w-3.5" />Free shipping applied</p>
-            )}
-            {!cart.freeShippingApplied && cart.freeShippingThresholdPaise > 0 && (
-              <p className="text-xs text-ink-400">
-                Add{' '}
-                {formatINR(
-                  cart.freeShippingThresholdPaise -
-                    (cart.subtotalPaise - (cart.coupon?.discountPaise ?? 0))
-                )}{' '}
-                more for free shipping
-              </p>
-            )}
-            <div className="flex justify-between gap-4 border-t border-ink-900/10 pt-3 text-base">
-              <dt className="font-semibold text-ink-900">Total</dt>
-              <dd className="font-bold tabular-nums">{formatINR(cart.grandTotalPaise)}</dd>
-            </div>
           </dl>
 
-          <div className="mt-4">
+          <div className="mt-4 border-t border-white/[0.08] pt-4">
+            <div className="flex items-end justify-between gap-4">
+              <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink-400">
+                Total
+              </span>
+              <span className="text-[1.8rem] leading-none tracking-[-0.04em] tabular-nums text-ink-900">
+                {formatINR(cart.grandTotalPaise)}
+              </span>
+            </div>
+            <p className="mt-2 text-right text-[10px] leading-relaxed text-ink-500">
+              Verified by the server at checkout
+            </p>
+          </div>
+
+          <div className="mt-5">
             <LinkButton href="/checkout" size="lg" className="w-full">
               Proceed to checkout
             </LinkButton>
             {!isLoggedIn && (
-              <p className="mt-2 text-center text-xs text-ink-400">
-                You can check out as a guest or{' '}
+              <p className="mt-2.5 text-center text-[10px] leading-relaxed text-ink-500">
+                Check out as a guest, or{' '}
                 <Link href="/auth/login?next=/checkout" className="link-primary">
                   log in
                 </Link>{' '}
-                for faster checkout.
+                for saved addresses.
               </p>
             )}
           </div>
         </div>
 
-        <div className="card p-4">
-          <h2 className="text-sm font-semibold text-ink-900">Have a coupon?</h2>
+        <div className="atelier-panel p-4 sm:p-5">
+          <h2 className="text-[10px] font-medium uppercase tracking-[0.24em] text-accent-400">
+            Coupon
+          </h2>
           {cart.coupon ? (
-            <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-emerald-50 px-3 py-2">
-              <p className="text-sm font-medium text-emerald-700">{cart.coupon.code} applied</p>
+            <div className="mt-3 flex items-center justify-between gap-2 rounded-full border border-accent-400/25 bg-accent-400/[0.06] px-3 py-1.5">
+              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-accent-200">
+                {cart.coupon.code} applied
+              </p>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={removeCoupon}
                 disabled={couponBusy}
-                className="text-emerald-700 hover:bg-emerald-100"
+                className="h-auto px-2 py-1 text-[10px] text-accent-200 hover:bg-white/[0.05]"
               >
                 Remove
               </Button>
             </div>
           ) : (
-            <div className="mt-2 space-y-2">
+            <div className="mt-3 space-y-2">
               <div className="flex gap-2">
                 <Input
                   value={couponInput}
@@ -351,7 +376,7 @@ export function CartManager({
                 </Button>
               </div>
               {couponError && (
-                <p role="alert" className="text-xs font-medium text-red-600">
+                <p role="alert" className="text-[11px] font-medium text-red-500">
                   {couponError}
                 </p>
               )}

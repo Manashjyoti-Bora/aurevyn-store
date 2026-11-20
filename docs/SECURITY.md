@@ -1,7 +1,8 @@
 # Security posture
 
-Last verified against code + live deployment: 2026-09-08 (see `docs/AUDIT_2026-09-05.md` for the
-route-by-route audit; this file is the summary that must stay true).
+Last verified against code + live deployment: 2026-11-18 (see `docs/AUDIT_2026-09-05.md` for the
+route-by-route audit; this file is the summary that must stay true). The 20-item pre-launch
+checklist below is the 2026-11-18 review.
 
 ## Authentication & authorization
 - Session cookies: httpOnly, sameSite, secure in production (`resellix_*` internal names kept
@@ -80,7 +81,42 @@ route-by-route audit; this file is the summary that must stay true).
 - `tailwindcss 3.x` dev chain (`postcss-selector-parser`, moderate, build-time only; fix is
   Tailwind 4 major) — accepted, not shipped to the browser.
 
+## Pre-launch security checklist (2026-11-18)
+
+| # | Item | Status | Evidence / control |
+|---|------|--------|--------------------|
+| 1 | SQL injection | Pass | Prisma models/queries are parameterised; the only raw SQL uses tagged templates (`Prisma.sql` / `` $queryRaw``) with bound values — no string interpolation (see `src/lib/rate-limit.ts`, `src/lib/orders/*`, `src/lib/admin/reports.ts`). |
+| 2 | XSS | Pass | React escapes by default; the only `dangerouslySetInnerHTML` sinks are JSON-LD through `jsonLdScript()`, which escapes `<`, `>` and `&`; CSP limits script sources to self + Razorpay. |
+| 3 | CSRF | Pass | Double-submit token (`resellix_csrf` cookie + `x-csrf-token`) enforced by `apiRoute` on every POST/PATCH/PUT/DELETE; session cookies are `httpOnly` + `SameSite=Lax`. Only signature-authenticated webhooks/cron opt out. |
+| 4 | Insecure file uploads | Pass | Admin-only, magic-byte sniffing (JPEG/PNG/WEBP/GIF/AVIF), 5 MB cap, server-generated random filename, extension content-type never trusted, served with `nosniff`; the local provider writes `path.basename(key)` only. |
+| 5 | IDOR / object-level authz | Pass | Every customer query is scoped by `userId`; `assertOwnerOrAdmin()` exists for shared resources; guest endpoints need order number **and** email and answer a uniform 404. |
+| 6 | Missing rate limiting | Pass | Public endpoints have per-IP/per-account limits; admin mutations now also carry a per-admin, per-action write budget (`requireAdminWrite()`), so a stolen session or a runaway client cannot hammer refunds, repricing or AI actions. |
+| 7 | Insecure JWT secrets | N/A | No JWT is issued. Sessions are opaque 256-bit random tokens; only `sha256(token)` is stored. |
+| 8 | Exposed API secrets | Pass | All secrets come from `src/lib/env.ts` (server only); the single `NEXT_PUBLIC_` value is the Razorpay **key id**, which is designed to be public. `npm audit`-style literal scans of the repo find no live keys. |
+| 9 | Weak password hashing | Pass | bcrypt cost 12 (`src/lib/auth/password.ts`), 72-byte cap, policy (length/letter/digit/common-password list) applied on register and reset. |
+| 10 | Multi-factor authentication | **Gap (not implemented)** | No TOTP/WebAuthn second factor yet. Compensating controls: admin panel is server-guarded + `noindex`, login is throttled per IP and per account, no default credentials can exist in production (`ADMIN_*` is only used to bootstrap the first admin), sessions are revocable per user, and every admin mutation is audited. Adding TOTP for ADMIN/STAFF is the recommended next hardening step — it is a feature addition (enrolment UI, recovery codes, two-step login), not a bug fix. |
+| 11 | Overly permissive CORS | Pass | No CORS headers are emitted anywhere and there is no `*` origin; the app is same-origin only. |
+| 12 | Auth tokens in local storage | Pass | The session lives in an `httpOnly` cookie. `localStorage` holds only recently-viewed products, recent searches and the cookie choice; `sessionStorage` holds only the checkout idempotency key. |
+| 13 | Client-side-only permissions | Pass | `/admin` layout calls `getCurrentUser()`/role check server-side and every admin API calls `requireAdmin*()`; hiding UI is never the boundary. |
+| 14 | Row-level security | **Not enabled (documented)** | PostgreSQL RLS is not used: the app connects as one Prisma role, and the pooling configuration (`pgbouncer=true`) cannot keep a per-request `SET LOCAL` session variable. Enforcement is application-level and centralised (`guards.ts` + `userId`-scoped queries). Compensating control: the database is never exposed to the browser, and there is a single server runtime. Enabling RLS requires a non-pooled role per request or a DB proxy — tracked, not pretended. |
+| 15 | Unverified webhook signatures | Pass | Razorpay webhooks verify HMAC-SHA256 over the raw body before any state change; supplier webhooks verify `X-Supplier-Signature` with a constant-time compare. CJ sends no signature, so its endpoint is trigger-only and never trusts payload fields. |
+| 16 | SSRF | Pass (added 2026-11-18) | Admin-supplied supplier `baseUrl` is now validated at save time (`supplierInputSchema` → https + public host) and at call time (`src/lib/net/outbound.ts`): scheme allow-list, no embedded credentials, DNS resolution must be public on **every** address, and redirects are followed manually with each hop re-validated. |
+| 17 | Exposed source maps | Pass | `productionBrowserSourceMaps: false` is explicit; no `.map` files are shipped. |
+| 18 | Default credentials | Pass | `.env.example` ships empty `ADMIN_EMAIL`/`ADMIN_PASSWORD`; the seeder only creates an admin when none exists; production refuses Razorpay test keys and demo supplier/test-payment modes. |
+| 19 | Sensitive data in logs | Pass | `sanitizeForLog()` redacts password/token/secret/signature/card/cookie keys recursively before console and DB persistence; client errors are generic with an error id; no token is logged. |
+| 20 | Vulnerable dependencies | Pass | `npm audit` → 0 vulnerabilities (2026-11-18, after updating the typescript-eslint chain). |
+
+## Outbound requests (SSRF)
+- Every server-side fetch to a configurable URL goes through `src/lib/net/outbound.ts`
+  (`assertSafeOutboundUrl` / `fetchWithSafeRedirects`). Loopback, RFC1918, CGNAT,
+  link-local (including `169.254.169.254` cloud metadata), ULA/link-local IPv6 and intranet
+  hostnames are refused, and a redirect to such an address is refused rather than followed.
+
 ## Known open items (honest list)
+- **Multi-factor authentication is not implemented** (checklist item 10). Recommended before
+  handing admin access to anyone beyond the founder.
+- **PostgreSQL row-level security is not enabled** (checklist item 14); isolation is enforced in
+  application code, which is audited but is not a database-level guarantee.
 - Real email delivery requires SMTP configuration (until then: console provider, marked as not sent).
 - Persistent uploads require S3/Cloudinary configuration on serverless hosts.
 - Payments require Razorpay keys; until configured the store honestly reports

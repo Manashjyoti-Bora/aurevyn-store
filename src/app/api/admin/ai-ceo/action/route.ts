@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { apiRoute, jsonOk, ApiError, badRequest } from '@/lib/errors';
-import { requireAdmin } from '@/lib/auth/guards';
+import { requireAdminWrite } from '@/lib/auth/guards';
 import { readJson } from '@/lib/http';
 import { executeAiCeoAction } from '@/lib/ai-ceo/action-executor';
 
@@ -37,7 +37,7 @@ const STATUS_BY_CODE: Record<string, number> = {
  * pricing, refunds and settings changes stay in their own admin screens.
  */
 export const POST = apiRoute(async (req: Request) => {
-  const admin = await requireAdmin();
+  const admin = await requireAdminWrite('ai-ceo-action');
   const raw = await readJson(req, { maxBytes: 20_000 });
   const parsed = bodySchema.safeParse(raw);
   if (!parsed.success) {

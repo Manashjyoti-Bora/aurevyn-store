@@ -47,8 +47,9 @@ export default async function AdminRefundsPage({
       <header>
         <h1>Refunds</h1>
         <p className="mt-1 text-sm text-ink-400">
-          All refund records. Gateway refunds are issued automatically via the provider API; TEST
-          and manual refunds are settled here once money actually moves.
+          Every refund record. UPI refunds are paid out by you: send the money, then press{' '}
+          <em>Settle manually</em> with the payout reference. Marking it completed updates the
+          order&apos;s payment status and profit.
         </p>
       </header>
 
@@ -86,7 +87,7 @@ export default async function AdminRefundsPage({
               <Th>Order</Th>
               <Th>Amount</Th>
               <Th className="hidden md:table-cell">Reason</Th>
-              <Th className="hidden lg:table-cell">Provider refund</Th>
+              <Th className="hidden lg:table-cell">Payout reference</Th>
               <Th>Status</Th>
               <Th className="hidden md:table-cell">Initiated</Th>
               <Th className="hidden md:table-cell">When</Th>

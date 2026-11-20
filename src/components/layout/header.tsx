@@ -16,7 +16,7 @@ export async function Header() {
   const pathname = (await headers()).get('x-pathname') ?? '';
   const under = (active: boolean) =>
     active
-      ? 'relative font-semibold text-ink-900 after:absolute after:-bottom-1.5 after:left-0 after:h-[2px] after:w-full after:rounded-full after:bg-accent-300'
+      ? 'relative text-ink-900 after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:bg-accent-400'
       : '';
   const isShop = pathname === '/shop' || pathname.startsWith('/shop/');
   const isTrack = pathname === '/track' || pathname.startsWith('/track/');
@@ -47,43 +47,45 @@ export async function Header() {
           >
             <span
               aria-hidden="true"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-700 text-sm font-black text-accent-300 ring-1 ring-accent-400/30 transition-transform duration-200 ease-zenvora [@media(hover:hover)]:group-hover:-rotate-6"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-700 text-[13px] font-semibold text-cream-50 transition-transform duration-500 ease-zenvora [@media(hover:hover)]:group-hover:rotate-[18deg]"
             >
               {settings.storeName.slice(0, 1).toUpperCase()}
             </span>
-            <span className="max-w-[130px] truncate text-sm font-extrabold uppercase tracking-[0.14em] text-ink-900 sm:max-w-none sm:text-base sm:tracking-[0.18em]">
+            <span className="max-w-[130px] truncate text-xs font-medium uppercase tracking-[0.26em] text-ink-900 sm:max-w-none sm:text-sm sm:tracking-[0.3em]">
               {settings.storeName}
             </span>
           </Link>
 
-          <nav aria-label="Main navigation" className="hidden flex-1 items-center gap-5 lg:flex">
+          <nav aria-label="Main navigation" className="hidden min-w-0 flex-1 items-center gap-5 overflow-hidden pl-4 lg:flex">
             <Link
               href="/shop"
               aria-current={isShop ? 'page' : undefined}
-              className={`text-sm font-semibold text-ink-800 transition-colors hover:text-brand-700 ${under(isShop)}`}
+              className={`shrink-0 whitespace-nowrap text-[12.5px] font-medium tracking-wide text-ink-400 transition-colors hover:text-ink-900 ${under(isShop)}`}
             >
               Shop
             </Link>
-            {categories.slice(0, 5).map((c) => (
-              <Link
-                key={c.slug}
-                href={`/categories/${c.slug}`}
-                aria-current={catActive(c.slug) ? 'page' : undefined}
-                className={`text-sm text-ink-700 transition-colors hover:text-brand-700 ${under(catActive(c.slug))}`}
-              >
-                {c.name}
-              </Link>
-            ))}
+            <div className="hidden items-center gap-5 2xl:flex">
+              {categories.slice(0, 4).map((c) => (
+                <Link
+                  key={c.slug}
+                  href={`/categories/${c.slug}`}
+                  aria-current={catActive(c.slug) ? 'page' : undefined}
+                  className={`shrink-0 whitespace-nowrap text-[12.5px] text-ink-400 transition-colors hover:text-ink-900 ${under(catActive(c.slug))}`}
+                >
+                  {c.name}
+                </Link>
+              ))}
+            </div>
             <Link
               href="/track"
               aria-current={isTrack ? 'page' : undefined}
-              className={`text-sm text-ink-700 transition-colors hover:text-brand-700 ${under(isTrack)}`}
+              className={`shrink-0 whitespace-nowrap text-[12.5px] text-ink-400 transition-colors hover:text-ink-900 ${under(isTrack)}`}
             >
               Track order
             </Link>
           </nav>
 
-          <div className="ml-auto hidden max-w-xs flex-1 md:block">
+          <div className="ml-auto hidden w-full max-w-[15rem] flex-1 md:block lg:max-w-[13rem] xl:max-w-xs">
             <SearchForm />
           </div>
 
@@ -92,7 +94,7 @@ export async function Header() {
 
             <Link
               href="/wishlist"
-              className="btn-press relative flex h-10 w-10 items-center justify-center rounded-lg text-ink-800 transition-colors hover:bg-ink-900/5 hover:text-ink-950"
+              className="btn-press relative flex h-10 w-10 items-center justify-center rounded-full text-ink-600 transition-colors hover:bg-white/[0.06] hover:text-ink-950"
               aria-label={`Wishlist, ${wishlist.count} saved item${wishlist.count === 1 ? '' : 's'}`}
             >
               <svg
@@ -118,7 +120,7 @@ export async function Header() {
 
             <Link
               href="/cart"
-              className="btn-press relative flex h-10 w-10 items-center justify-center rounded-lg text-ink-800 transition-colors hover:bg-ink-900/5 hover:text-ink-950"
+              className="btn-press relative flex h-10 w-10 items-center justify-center rounded-full text-ink-600 transition-colors hover:bg-white/[0.06] hover:text-ink-950"
               aria-label={`Cart, ${cartCount} item${cartCount === 1 ? '' : 's'}`}
             >
               <svg

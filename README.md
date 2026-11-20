@@ -3,13 +3,13 @@
 > Store brand: **Zenvora** (set via `APP_NAME` / Admin → Settings). Internal code identifiers (package name, `resellix_*` cookie names, `RX-` order prefix) remain `resellix` — cosmetic only; see USER_INPUT_REQUIRED.md §E.
 
 A complete, production-oriented e-commerce platform for the reselling/dropshipping
-business model: **supplier cost → your price/margin → customer pays via gateway →
-order auto-sent to supplier → supplier ships → tracking to customer → real profit
-accounting in the admin panel.**
+business model: **supplier cost → your price/margin → customer pays by UPI QR or
+cash on delivery → order auto-sent to supplier → supplier ships → tracking to
+customer → real profit accounting in the admin panel.**
 
 Built for the Indian market: INR pricing (integer paise arithmetic), GST-inclusive
-tax model, Razorpay payments, Indian PIN/address validation, Indian order-number
-format, mobile-first UI.
+tax model, direct UPI QR payments (no gateway), Indian PIN/address validation,
+Indian order-number format, mobile-first UI.
 
 > **Honesty rules this codebase follows**
 >
@@ -65,12 +65,14 @@ format, mobile-first UI.
   backoff retries, max attempts) driving supplier fulfilment, status sync,
   cancellations and notification emails; in-process kick + authenticated cron
   endpoint (`/api/cron/jobs`).
-- **Payments**: Razorpay via official SDK (order creation → Checkout.js →
-  server-side signature verification → webhook with HMAC verification and
-  idempotent event processing); refunds full/partial via gateway API; COD with
-  fee handling and admin "cash collected" settlement; TEST provider for dev
-  (clearly labelled, production-disabled); every attempt/fee/refund persisted.
-  No card data ever touches this server.
+- **Payments**: **UPI QR** (the QR encodes an NPCI intent paying the store's own
+  VPA for the server-computed amount; the customer submits the UTR and an admin
+  matches it against the bank statement before the order is marked paid) plus
+  **Cash on Delivery** with fee handling and admin "cash collected" settlement.
+  No gateway, no gateway keys, and no card data ever touches this server; a
+  browser can never mark its own order paid. Refunds are recorded manually by an
+  admin. A clearly-labelled TEST provider exists for development only and is
+  hard-disabled in production builds.
 - **Supplier layer**: adapter abstraction (see `docs/SUPPLIER_API.md`), generic
   HTTP-REST adapter configurable per supplier via JSON (auth styles, endpoint
   paths, response field mapping, status mapping), signed supplier webhooks
@@ -98,25 +100,25 @@ format, mobile-first UI.
 
 ### B. Integration-ready (code complete, needs your accounts/config to go live)
 
-- Razorpay live payments + webhooks (works today with test-mode keys).
+- UPI QR payments (set `UPI_VPA`; admin confirms each UTR against the bank).
 - SMTP email delivery (works today with console provider for dev).
 - Real HTTP-REST suppliers (config-driven; contract in `docs/SUPPLIER_API.md`).
 - Cron-driven job runner safety net (`/api/cron/jobs`).
 
 ### C. Requires action from you (cannot be coded for you)
 
-See **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** — database, admin account,
-Razorpay account/KYC/keys/webhook, SMTP credentials, real supplier onboarding,
+See **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** — database, admin account, the
+store's own UPI ID (`UPI_VPA`), SMTP credentials, real supplier onboarding,
 domain + deployment, GSTIN/legal review, replacing demo catalog, turning
 demoMode off.
 
 ### D. Not possible from this environment
 
 - Deploying to your domain (needs your host/accounts).
-- Razorpay KYC, business GST registration, legal review of policy pages —
-  these are between you, your CA/lawyer and the providers. **Nothing in this
-  repo is legal or tax advice.**
-- Anything requiring your third-party accounts: Razorpay KYC/keys, CJ wallet
+- Business GST registration and legal review of policy pages — these are
+  between you, your CA/lawyer and the providers. **Nothing in this repo is legal
+  or tax advice.**
+- Anything requiring your third-party accounts: UPI VPA/bank account, CJ wallet
   funding, SMTP credentials, S3/Cloudinary credentials — exact list in
   `USER_INPUT_REQUIRED.md` and `docs/ENVIRONMENT.md`.
 
@@ -125,7 +127,7 @@ demoMode off.
 ## Tech stack
 
 Next.js 15 (App Router, TypeScript strict) · React 19 · Tailwind CSS ·
-Prisma 6 + PostgreSQL · zod · bcryptjs · Razorpay SDK · nodemailer · vitest ·
+Prisma 6 + PostgreSQL · zod · bcryptjs · qrcode · nodemailer · vitest ·
 ESLint 9 (flat) + Prettier.
 
 Money is handled as **integer paise** everywhere; `Decimal(14,2)` only at the DB
@@ -171,7 +173,7 @@ src/lib/           all business logic (framework-agnostic, unit-testable)
   pricing/         pricing engine + rule resolution
   checkout/        totals, shipping, coupon evaluation
   orders/          creation, state machine, finance (actual profit), returns
-  payments/        Razorpay adapter, TEST adapter, verification, webhooks, refunds
+  payments/        UPI QR adapter, TEST adapter, confirmation pipeline, refunds
   suppliers/       adapter abstraction, HTTP-REST adapter, DEMO simulator, webhooks
   jobs/            queue (dedupe/backoff) + runner
   notifications/   templates + providers (console/SMTP)
@@ -187,7 +189,7 @@ docs/AUTOMATION.md       what is automated vs needs configuration (5-label map)
 docs/ENVIRONMENT.md      every env var: required?, secret?, where to get it
 docs/SECURITY.md         security posture + verified controls
 docs/SUPPLIER_SETUP.md   CJ / manual / HTTP-REST supplier onboarding
-docs/PAYMENT_SETUP.md    Razorpay + COD + refunds
+docs/PAYMENT_SETUP.md    UPI QR + COD + refunds
 docs/DEPLOYMENT.md       Vercel + Neon deploy + post-deploy checks
 docs/TROUBLESHOOTING.md  symptom → cause → fix
 docs/SUPPLIER_API.md     supplier integration contract
@@ -204,8 +206,8 @@ FINAL_STATUS.md          final status in the required vocabulary (CODE/TEST/DEPL
 - Policy pages (returns, shipping, terms, privacy) are starting-point templates —
   review and adapt them to your business and current Indian consumer-protection
   and e-commerce rules before accepting orders.
-- KYC (Razorpay, supplier agreements, business registration) is between you and
-  those providers.
+- KYC (merchant current account for UPI, supplier agreements, business
+  registration) is between you and those providers.
 
 ## License / authorship
 

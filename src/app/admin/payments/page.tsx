@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db';
 import { toPaise, formatINR } from '@/lib/money';
 import { TableWrap, Th, Td, Pagination } from '@/components/ui/table';
 import { Badge, GatewayPaymentStatusBadge } from '@/components/ui/badge';
+import { ConfirmUpiPayment } from '@/components/admin/confirm-upi-payment';
 import type { PaymentStatus } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +22,7 @@ export default async function AdminPaymentsPage({
   const page = Math.max(1, parseInt(sp.page ?? '1', 10) || 1);
   const where = {
     ...(sp.status ? { status: sp.status as PaymentStatus } : {}),
-    ...(sp.provider ? { provider: sp.provider as 'RAZORPAY' | 'TEST' } : {}),
+    ...(sp.provider ? { provider: sp.provider as 'UPI' | 'TEST' } : {}),
   };
 
   const [payments, total] = await Promise.all([
@@ -70,7 +71,7 @@ export default async function AdminPaymentsPage({
           aria-label="Filter by provider"
         >
           <option value="">Any provider</option>
-          <option value="RAZORPAY">Razorpay</option>
+          <option value="UPI">UPI QR</option>
           <option value="TEST">TEST</option>
         </select>
         <button
@@ -97,6 +98,7 @@ export default async function AdminPaymentsPage({
               <Th>Amount</Th>
               <Th>Fee</Th>
               <Th>Status</Th>
+              <Th className="hidden lg:table-cell">UPI reference</Th>
               <Th className="hidden md:table-cell">When</Th>
             </tr>
           </thead>
@@ -137,6 +139,11 @@ export default async function AdminPaymentsPage({
                 </Td>
                 <Td>
                   <GatewayPaymentStatusBadge status={p.status} />
+                  {p.provider === 'UPI' && p.status === 'CREATED' && p.providerPaymentId && (
+                    <span className="mt-1 block">
+                      <ConfirmUpiPayment paymentId={p.id} />
+                    </span>
+                  )}
                   {p.failureReason && (
                     <span
                       className="mt-0.5 block max-w-[180px] truncate text-[10px] text-red-500"
@@ -145,6 +152,9 @@ export default async function AdminPaymentsPage({
                       {p.failureReason}
                     </span>
                   )}
+                </Td>
+                <Td className="hidden font-mono text-[11px] text-ink-400 lg:table-cell">
+                  {p.provider === 'UPI' && p.providerPaymentId ? p.providerPaymentId : '—'}
                 </Td>
                 <Td className="hidden text-[11px] text-ink-400 md:table-cell">
                   {fmt(p.createdAt)}

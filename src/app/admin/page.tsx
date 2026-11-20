@@ -15,7 +15,7 @@ import { OrderStatusBadge, PaymentStatusBadge } from '@/components/ui/badge';
 import { LinkButton } from '@/components/ui/button';
 import { ReceiptIcon } from '@/components/ui/icons';
 import { getSettings } from '@/lib/settings';
-import { describePaymentProvider } from '@/lib/payments';
+import { loadPaymentStatus } from '@/lib/payments';
 import { prisma } from '@/lib/db';
 import { evaluateSupplierProductCandidate } from '@/lib/catalog/auto-import';
 import { getFulfilmentReadinessReport } from '@/lib/catalog/fulfilment-readiness';
@@ -52,7 +52,7 @@ export default async function AdminDashboard({
     dashboardAlerts(),
     recentOrdersForAdmin(8),
     getSettings(),
-    Promise.resolve(describePaymentProvider()),
+    loadPaymentStatus(),
     getFulfilmentReadinessReport({ includeDrafts: true }),
     prisma.product.groupBy({
       by: ['status'],

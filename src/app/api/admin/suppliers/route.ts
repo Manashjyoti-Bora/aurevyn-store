@@ -1,6 +1,6 @@
 import { apiRoute, jsonOk, badRequest, conflict } from '@/lib/errors';
 import { supplierInputSchema } from '@/lib/validation/schemas';
-import { requireAdmin } from '@/lib/auth/guards';
+import { requireAdminWrite } from '@/lib/auth/guards';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 import { slugify, safeJsonParse } from '@/lib/utils';
@@ -19,7 +19,7 @@ function parseSupplierConfig(
 }
 
 export const POST = apiRoute(async (req: Request) => {
-  const admin = await requireAdmin();
+  const admin = await requireAdminWrite('suppliers');
   const raw = await readJson(req);
   if (!raw || typeof raw !== 'object') throw badRequest('Invalid request body');
   const body = supplierInputSchema.parse(raw);

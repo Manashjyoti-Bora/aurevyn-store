@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth/guards';
 import { AdminNav } from '@/components/admin/admin-nav';
@@ -5,6 +6,12 @@ import { getSettings } from '@/lib/settings';
 import { MenuIcon } from '@/components/ui/icons';
 
 export const dynamic = 'force-dynamic';
+
+/** Never indexed: the panel is protected by its layout guard, not by obscurity. */
+export const metadata: Metadata = {
+  title: 'Admin console',
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();

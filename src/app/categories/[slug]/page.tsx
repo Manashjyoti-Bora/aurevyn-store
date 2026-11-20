@@ -82,7 +82,7 @@ export default async function CategoryPage({
           { label: category.name },
         ]}
       />
-      <header className="mb-6 rounded-2xl border border-ink-900/10 bg-gradient-to-br from-cream-100/80 via-white to-cream-50 p-5 shadow-hair sm:p-6">
+      <header className="mb-6 rounded-2xl border border-ink-900/10 bg-gradient-to-br from-cream-100 via-cream-50 to-cream-100 p-5 shadow-hair sm:p-6">
         <p className="eyebrow">{category.parent ? 'Subcategory' : 'Category'}</p>
         <h1 className="display mt-1.5">{category.name}</h1>
         {category.description && (

@@ -12,18 +12,19 @@ const imageRemoteHosts = resolveImageRemoteHosts(process.env);
 // CSP notes:
 // - 'unsafe-inline' for scripts is required by Next.js unless nonce-based CSP is wired
 //   through middleware; it still blocks loading of unapproved external scripts.
-// - checkout.razorpay.com / api.razorpay.com are allowlisted for the Razorpay Checkout.js flow.
+// - UPI QR payments are rendered server-side as an inline data image, so no
+//   third-party payment origin needs to be allowlisted.
 const productionSecurityHeaders = [
   {
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com",
+      "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com https://checkout.razorpay.com",
-      "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com",
+      "connect-src 'self'",
+      "frame-src 'self'",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -43,11 +44,28 @@ const baseSecurityHeaders = [
     key: 'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()',
   },
+  // No Flash/PDF cross-domain policy files may grant access to this origin.
+  { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
+  // Isolate the browsing context from cross-origin openers; the UPI intent is
+  // a top-level navigation to the customer's UPI app, not an opener.
+  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+];
+
+// /admin and /account are reachable by URL, so "hidden" is not protection:
+// authentication is enforced server-side in their layouts. These headers stop
+// a crawler from advertising the addresses when a session-less hit is served
+// a login redirect or an error page.
+const privateAreaHeaders = [
+  { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
+  { key: 'Cache-Control', value: 'private, no-store' },
 ];
 
 const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  // Explicit, not implicit: browser source maps would publish readable
+  // server/client source (including internal route names) to every visitor.
+  productionBrowserSourceMaps: false,
   headers: async () => [
     {
       source: '/:path*',
@@ -55,6 +73,10 @@ const nextConfig = {
         ? [...baseSecurityHeaders, ...productionSecurityHeaders]
         : baseSecurityHeaders,
     },
+    { source: '/admin', headers: privateAreaHeaders },
+    { source: '/admin/:path*', headers: privateAreaHeaders },
+    { source: '/account', headers: privateAreaHeaders },
+    { source: '/account/:path*', headers: privateAreaHeaders },
     {
       // Uploaded files must never be interpreted as HTML.
       source: '/uploads/:path*',

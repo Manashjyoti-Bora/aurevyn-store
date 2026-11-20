@@ -104,7 +104,8 @@ function recommendations(ctx: BuildContext): Recommendation[] {
         description:
           'Owner action: complete provider KYC, add live keys to the production environment, then run one low-value real transaction and refund it.',
       },
-      verification: 'describePaymentProvider() reports RAZORPAY (not test) in production, and one real payment appears with paymentStatus = PAID.',
+      verification:
+        'describePaymentProvider() reports UPI (not test) in production, and one real payment appears with paymentStatus = PAID.',
       priority: 1,
     });
   }

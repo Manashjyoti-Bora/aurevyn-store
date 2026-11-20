@@ -2,11 +2,16 @@ import { apiRoute, jsonOk, badRequest } from '@/lib/errors';
 import { updateCartItemSchema } from '@/lib/validation/schemas';
 import { removeCartItem, updateCartItemQuantity } from '@/lib/cart/service';
 import { getCurrentUser } from '@/lib/auth/guards';
-import { readJson } from '@/lib/http';
+import { clientIp, readJson } from '@/lib/http';
+import { assertRateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
 export const PATCH = apiRoute(async (req: Request) => {
+  await assertRateLimit(`cart:item:${clientIp(req) ?? 'local'}`, {
+    limit: 120,
+    windowMs: 60_000,
+  });
   const raw = await readJson(req);
   if (!raw || typeof raw !== 'object') throw badRequest('Invalid request body');
   const body = updateCartItemSchema.parse(raw);
@@ -21,6 +26,10 @@ export const PATCH = apiRoute(async (req: Request) => {
 });
 
 export const DELETE = apiRoute(async (req: Request) => {
+  await assertRateLimit(`cart:item:${clientIp(req) ?? 'local'}`, {
+    limit: 120,
+    windowMs: 60_000,
+  });
   const raw = await readJson(req);
   if (!raw || typeof raw !== 'object') throw badRequest('Invalid request body');
   const parsed = updateCartItemSchema.partial().parse(raw);

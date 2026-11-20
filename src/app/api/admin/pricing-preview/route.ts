@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { apiRoute, jsonOk, badRequest } from '@/lib/errors';
-import { requireAdmin } from '@/lib/auth/guards';
+import { requireAdminWrite } from '@/lib/auth/guards';
 import { resolvePricing } from '@/lib/pricing/resolve';
 import { readJson } from '@/lib/http';
 import { assertRateLimit } from '@/lib/rate-limit';
@@ -30,7 +30,7 @@ const previewSchema = z.object({
  * what the engine will compute.
  */
 export const POST = apiRoute(async (req: Request) => {
-  const admin = await requireAdmin();
+  const admin = await requireAdminWrite('pricing-preview');
   await assertRateLimit(`pricing-preview:${admin.id}`, { limit: 120, windowMs: 5 * 60_000 });
 
   const raw = await readJson(req);

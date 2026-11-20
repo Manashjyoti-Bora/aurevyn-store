@@ -52,9 +52,9 @@ export async function generateMetadata({ params }: Ctx): Promise<Metadata> {
       card: 'summary_large_image',
       title,
       description,
-      images: product.images.slice(0, 1).map((i) =>
-        i.url.startsWith('http') ? i.url : `${env.APP_URL}${i.url}`
-      ),
+      images: product.images
+        .slice(0, 1)
+        .map((i) => (i.url.startsWith('http') ? i.url : `${env.APP_URL}${i.url}`)),
     },
   };
 }
@@ -85,8 +85,7 @@ export default async function ProductPage({ params }: Ctx) {
         isActive: v.isActive,
         // Supplier-synced products hold no per-variant merchant stock: their
         // purchasability follows the fresh supplier report, not a zero counter.
-        purchasable:
-          product.stockMode === 'LOCAL' ? v.stock > 0 : availability.purchasable,
+        purchasable: product.stockMode === 'LOCAL' ? v.stock > 0 : availability.purchasable,
       }))
     : [];
 
@@ -164,45 +163,56 @@ export default async function ProductPage({ params }: Ctx) {
       />
       <Breadcrumbs items={crumbs} />
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <ProductGallery images={images} name={product.name} />
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-12">
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <ProductGallery images={images} name={product.name} />
+        </div>
 
         <div className="space-y-5">
-          <div className="card space-y-5 p-5 sm:p-6">
-          <div>
-            {product.category && (
-              <Link href={`/categories/${product.category.slug}`}>
-                <Badge tone="neutral">{product.category.name}</Badge>
-              </Link>
-            )}
-            <h1 className="mt-2 text-2xl sm:text-3xl">{product.name}</h1>
-            {product.brand && <p className="mt-1 text-sm text-ink-400">Brand: {product.brand}</p>}
-            {product.shortDescription && (
-              <p className="mt-2 text-sm leading-relaxed text-ink-500">
-                {product.shortDescription}
-              </p>
-            )}
+          <div className="lux-frame relative space-y-5 rounded-2xl border border-white/[0.07] bg-[#0B0B0E] p-5 sm:p-7">
+            <div>
+              {product.category && (
+                <Link href={`/categories/${product.category.slug}`}>
+                  <Badge tone="neutral">{product.category.name}</Badge>
+                </Link>
+              )}
+              <h1 className="mt-2.5 text-[1.7rem] leading-[1.1] tracking-[-0.03em] text-ink-900 sm:text-[2.2rem]">
+                {product.name}
+              </h1>
+              {product.brand && <p className="mt-1 text-sm text-ink-400">Brand: {product.brand}</p>}
+              {product.shortDescription && (
+                <p className="mt-2 text-sm leading-relaxed text-ink-500">
+                  {product.shortDescription}
+                </p>
+              )}
+            </div>
+
+            <div id="buybox" className="scroll-mt-28">
+              <ProductBuyBox
+                productId={product.id}
+                basePricePaise={basePricePaise}
+                baseCompareAtPaise={
+                  product.compareAtPrice != null ? toPaise(product.compareAtPrice) : null
+                }
+                baseStock={baseStock}
+                variants={buyBoxVariants}
+                availability={availability}
+                lowStockThreshold={product.lowStockThreshold}
+              />
+            </div>
           </div>
 
-          <div id="buybox" className="scroll-mt-28">
-            <ProductBuyBox
-              productId={product.id}
-              basePricePaise={basePricePaise}
-              baseCompareAtPaise={
-                product.compareAtPrice != null ? toPaise(product.compareAtPrice) : null
-              }
-              baseStock={baseStock}
-              variants={buyBoxVariants}
-              availability={availability}
-              lowStockThreshold={product.lowStockThreshold}
-            />
-          </div>
-          </div>
-
-          <dl className="grid grid-cols-1 gap-2 rounded-xl border border-ink-900/10 bg-white p-4 text-sm sm:grid-cols-2">
+          <dl className="grid grid-cols-1 gap-2 rounded-xl border border-white/[0.07] bg-[#0B0B0E] p-4 text-sm sm:grid-cols-2">
             <div className="flex items-center gap-2">
               <dt className="flex items-center gap-2 text-ink-400">
-                <svg className="h-4 w-4 flex-none text-brand-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} aria-hidden="true">
+                <svg
+                  className="h-4 w-4 flex-none text-brand-700"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.7}
+                  aria-hidden="true"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M1.5 6.5h13v9h-13z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M14.5 9.5h4l3 3v3h-7z" />
                   <circle cx="6" cy="17.5" r="1.6" />
@@ -216,7 +226,14 @@ export default async function ProductPage({ params }: Ctx) {
             </div>
             <div className="flex items-center gap-2">
               <dt className="flex items-center gap-2 text-ink-400">
-                <svg className="h-4 w-4 flex-none text-brand-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} aria-hidden="true">
+                <svg
+                  className="h-4 w-4 flex-none text-brand-700"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.7}
+                  aria-hidden="true"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 12a8 8 0 1 1 2.6 5.9" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 19v-5h5" />
                 </svg>
@@ -232,13 +249,19 @@ export default async function ProductPage({ params }: Ctx) {
               </dd>
             </div>
             <div className="flex items-center gap-2">
-              <dt className="flex items-center gap-1.5 text-ink-400"><CreditCardIcon className="h-4 w-4" />Payment</dt>
+              <dt className="flex items-center gap-1.5 text-ink-400">
+                <CreditCardIcon className="h-4 w-4" />
+                Payment
+              </dt>
               <dd className="font-medium text-ink-900">
                 Online{settings.shipping.codEnabled ? ' + COD' : ''}
               </dd>
             </div>
             <div className="flex items-center gap-2">
-              <dt className="flex items-center gap-1.5 text-ink-400"><ReceiptIcon className="h-4 w-4" />Prices</dt>
+              <dt className="flex items-center gap-1.5 text-ink-400">
+                <ReceiptIcon className="h-4 w-4" />
+                Prices
+              </dt>
               <dd className="font-medium text-ink-900">
                 {settings.tax.pricesIncludeTax ? 'Inclusive of taxes' : 'Taxes added at checkout'}
               </dd>
@@ -262,7 +285,7 @@ export default async function ProductPage({ params }: Ctx) {
         </div>
         <div>
           <h2 className="text-lg font-semibold text-ink-900">Specifications</h2>
-          <dl className="mt-3 divide-y divide-ink-900/5 rounded-xl border border-ink-900/10 bg-white text-sm">
+          <dl className="mt-3 divide-y divide-white/[0.06] rounded-xl border border-white/[0.07] bg-[#0B0B0E] text-sm">
             {[
               ['Brand', product.brand],
               ['SKU', product.sku],
@@ -324,44 +347,55 @@ export default async function ProductPage({ params }: Ctx) {
       </p>
 
       {/* Mobile sticky buy bar — real price, real stock state, no fabricated urgency */}
-      <RecentlyViewedRecorder 
-        product={{ 
-          slug: product.slug, 
-          name: product.name, 
-          price: formatINR(basePricePaise), 
-          imageUrl: images[0]?.url || null 
-        }} 
+      <RecentlyViewedRecorder
+        product={{
+          slug: product.slug,
+          name: product.name,
+          price: formatINR(basePricePaise),
+          imageUrl: images[0]?.url || null,
+        }}
       />
       <RecentlyViewedCarousel currentSlug={product.slug} />
 
-      <div className="glass-floating-control fixed inset-x-0 bottom-0 border-x-0 border-b-0 px-3 pt-2 safe-bottom lg:hidden">
+      <div className="glass-floating-control safe-bottom fixed inset-x-0 bottom-0 border-x-0 border-b-0 px-3 pt-2 lg:hidden">
         <div className="mx-auto flex max-w-lg items-center gap-3">
           {images[0]?.url ? (
             <span className="relative h-11 w-11 flex-none overflow-hidden rounded-lg bg-cream-100">
-              <Image src={images[0].url} alt="" width={44} height={44} className="h-full w-full object-cover" />
+              <Image
+                src={images[0].url}
+                alt=""
+                width={44}
+                height={44}
+                className="h-full w-full object-cover"
+              />
             </span>
           ) : null}
           <span className="min-w-0 flex-1">
             <span className="block truncate text-xs font-medium text-ink-500">{product.name}</span>
             <span className="block text-sm font-bold tabular-nums text-ink-900">
               {formatINR(basePricePaise)}
-              {product.compareAtPrice != null && toPaise(product.compareAtPrice) > basePricePaise && (
-                <span className="ml-1.5 text-xs font-medium text-ink-400 line-through">
-                  {formatINR(toPaise(product.compareAtPrice))}
-                </span>
-              )}
+              {product.compareAtPrice != null &&
+                toPaise(product.compareAtPrice) > basePricePaise && (
+                  <span className="ml-1.5 text-xs font-medium text-ink-400 line-through">
+                    {formatINR(toPaise(product.compareAtPrice))}
+                  </span>
+                )}
             </span>
           </span>
           {product.hasVariants ? (
             <a
               href="#buybox"
-              className="btn-press inline-flex flex-none items-center justify-center rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow-soft transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 hover:bg-brand-700 active:bg-brand-800"
+              className="btn-press inline-flex flex-none items-center justify-center rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow-soft transition-colors hover:bg-brand-700 focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 active:bg-brand-800"
             >
               Select options
             </a>
           ) : (
             <span className="flex-none">
-              <AddToCartButton productId={product.id} disabled={!availability.purchasable} compact />
+              <AddToCartButton
+                productId={product.id}
+                disabled={!availability.purchasable}
+                compact
+              />
             </span>
           )}
         </div>

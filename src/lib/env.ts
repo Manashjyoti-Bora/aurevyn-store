@@ -7,6 +7,12 @@ import { z } from 'zod';
  * except for keys explicitly prefixed with NEXT_PUBLIC_.
  */
 
+/**
+ * NPCI-style VPA shape: `handle@psp`. Shared by the environment schema and the
+ * admin-editable store setting so one definition decides what is payable.
+ */
+export const UPI_VPA_PATTERN = /^[a-zA-Z0-9.\-_]{2,64}@[a-zA-Z]{2,64}$/;
+
 const boolStr = z
   .union([z.boolean(), z.enum(['true', 'false', '1', '0'])])
   .transform((v) => (typeof v === 'boolean' ? v : v === 'true' || v === '1'))
@@ -30,10 +36,22 @@ const envSchema = z.object({
   ADMIN_PASSWORD: optionalNonEmpty(z.string().min(8)),
 
   PAYMENTS_TEST_MODE: boolStr,
-  RAZORPAY_KEY_ID: optionalNonEmpty(z.string()),
-  RAZORPAY_KEY_SECRET: optionalNonEmpty(z.string()),
-  NEXT_PUBLIC_RAZORPAY_KEY_ID: optionalNonEmpty(z.string()),
-  RAZORPAY_WEBHOOK_SECRET: optionalNonEmpty(z.string()),
+  /**
+   * Store-owned UPI Virtual Payment Address (e.g. `zenvora@okhdfcbank`).
+   * The customer scans a QR that pays THIS address directly; money never
+   * passes through a third-party gateway and no gateway credentials exist.
+   * Absent = UPI QR is unavailable and checkout honestly falls back to COD.
+   */
+  UPI_VPA: z.preprocess(
+    (v) => (typeof v === 'string' && v.trim() === '' ? undefined : v),
+    z
+      .string()
+      .max(120)
+      .regex(UPI_VPA_PATTERN, 'UPI_VPA must look like name@bank')
+      .optional()
+  ),
+  /** Payee name shown in the customer's UPI app (defaults to APP_NAME). */
+  UPI_PAYEE_NAME: optionalNonEmpty(z.string().max(80)),
 
   SUPPLIER_DEMO_MODE: boolStr,
   SUPPLIER_WEBHOOK_SECRET: optionalNonEmpty(z.string()),
@@ -104,32 +122,27 @@ export const isTest = env.NODE_ENV === 'test';
 export const isDev = env.NODE_ENV === 'development';
 
 /**
- * Razorpay is usable only when both key id and secret are present AND the key
- * prefix matches the environment:
- *  - TEST keys (rzp_test_…) are refused in production, so a live store can
- *    never route real customers through the sandbox by misconfiguration.
- *  - LIVE keys (rzp_live_…) are refused outside production, so real money can
- *    never move from development/test runs.
- * Returns null when the configuration is usable, otherwise the reason.
+ * UPI QR payments need exactly one thing: the store's own UPI VPA. There are
+ * no API keys, no gateway account and no webhook for this flow — the customer
+ * pays the VPA directly and quotes the UTR, which an admin verifies against
+ * the bank statement before the order is marked paid.
+ * Returns null when usable, otherwise the reason (safe to show to an admin).
  */
-export function razorpayConfigIssue(): string | null {
-  const keyId = env.RAZORPAY_KEY_ID;
-  const secret = env.RAZORPAY_KEY_SECRET;
-  if (!keyId || !secret) {
-    return 'Razorpay keys are not configured (RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET)';
-  }
-  if (isProduction && keyId.startsWith('rzp_test_')) {
-    return 'RAZORPAY_KEY_ID is a TEST key (rzp_test_…) while NODE_ENV=production — production refuses test credentials';
-  }
-  if (!isProduction && keyId.startsWith('rzp_live_')) {
-    return 'RAZORPAY_KEY_ID is a LIVE key (rzp_live_…) while NODE_ENV is not production — live keys are refused outside production';
+export function upiConfigIssue(): string | null {
+  if (!env.UPI_VPA) {
+    return 'UPI_VPA is not configured — set the store UPI ID to enable QR payments';
   }
   return null;
 }
 
-/** Razorpay is usable only when both key id and secret are present. */
-export function isRazorpayConfigured(): boolean {
-  return razorpayConfigIssue() === null;
+/** True when the store can show a payable UPI QR. */
+export function isUpiConfigured(): boolean {
+  return upiConfigIssue() === null;
+}
+
+/** Display name encoded in the UPI intent (never a secret). */
+export function upiPayeeName(): string {
+  return env.UPI_PAYEE_NAME ?? env.APP_NAME;
 }
 
 /**

@@ -5,99 +5,104 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ── Zenvora palette (Petrol & Porcelain, 2026-10) ────────────────
-        // Chosen after a measured comparison of two directions (see
-        // docs/DESIGN_SYSTEM.md §2): the existing app icon is already a deep
-        // petrol-green field with a champagne "Z", so this direction keeps the
-        // brand recognisable while measuring better than the violet system.
+        // ── ZENVORA "NOIR ATELIER" palette (2026-11) ─────────────────────
+        // One monochrome direction: obsidian canvas, porcelain type, a single
+        // muted champagne metallic for hairlines and rare emphasis. No second
+        // accent hue — restraint is the luxury signal.
         //
-        // Midnight Ink     #111820 — primary text, branding / dark surfaces
-        // Porcelain Mist   #F6F5F0 — shopping canvas
-        // Deep Petrol      #174A50 — primary actions, links (9.9:1 on white)
-        // Iridescent Teal  #77C9C1 — rare accent; on dark surfaces only (never
-        //                             text on light: 1.9:1 on white)
-        // Muted Champagne  #C6AD7A — decorative rule / icon on dark (8.2:1 on
-        //                             Midnight; 2.2:1 on white → never text)
-        // Slate Text       #59636B — secondary text (5.6:1 on Porcelain)
-        // Pale Sage        #E2ECE5 — success / calm surfaces, never text
-        // Success #347455 (5.6:1) · Error #B33A42 (5.8:1) · Border #DCE1DE
+        // Obsidian         #08080A — page canvas
+        // Lacquer          #0E0E11 — cards, raised surfaces
+        // Porcelain        #F5F3EC — primary type
+        // Smoke            #8E8E96 — secondary type (5.4:1 on Lacquer)
+        // Champagne        #C6AD7A — metallic rule / micro-accent only
+        //
+        // The `brand` ramp is the LIGHT action/link ramp: every value is an
+        // ivory step, because the surrounding canvas is near-black. Fills built
+        // from it carry near-black type (see the `.on-light-fill` guard rules
+        // at the end of globals.css).
         brand: {
-          50:  '#F0F8F7',
-          100: '#E1F2F0',
-          200: '#C9EAE6',
-          300: '#A6DCD6',
-          400: '#77C9C1',   // Iridescent Teal — accent on dark surfaces / focus on dark
-          500: '#1F5A60',   // focus ring on light surfaces, large UI text (7.9:1)
-          600: '#174A50',   // Deep Petrol — primary action fill (white text 9.9:1)
-          700: '#113C41',   // link / eyebrow text on light surfaces
-          800: '#0F363B',
-          900: '#0B282C',
-          950: '#071A1D',
+          50:  '#121210',
+          100: '#1A1A17',
+          200: '#3A372C',
+          300: '#C9BFA6',
+          400: '#DBD1B8',
+          500: '#E7DFCA',
+          600: '#EFE8D5',
+          700: '#F5F1E6',
+          800: '#FAF8F1',
+          900: '#FFFDF7',
+          950: '#FFFFFF',
         },
         // ── Muted Champagne (warm metallic, used sparingly) ──
         accent: {
-          50:  '#FCFAF3',
-          100: '#F6F0DF',
-          200: '#ECE0BE',
-          300: '#DECB97',
-          400: '#C6AD7A',   // Muted Champagne
-          500: '#AD925A',
-          600: '#917745',
-          700: '#745F36',
-          800: '#5B4A2B',
-          900: '#453820',
+          50:  '#12110C',
+          100: '#1B1810',
+          200: '#2E2A1C',
+          300: '#D9C7A2',
+          400: '#C6AD7A',
+          500: '#B79B63',
+          600: '#A98B50',
+          700: '#8E7440',
+          800: '#6E5A32',
+          900: '#4A3C21',
         },
-        // ── Ink palette (Midnight neutrals) ──
+        // ── Ink palette (porcelain ramp — text on the obsidian canvas) ──
         ink: {
-          50:  '#F3F4F5',
-          100: '#E6E8EA',
-          200: '#CDD1D5',
-          300: '#A1A8AE',
-          400: '#59636B',   // Slate Text (5.6:1 on Porcelain)
-          500: '#48515A',
-          600: '#38404A',
-          700: '#283039',
-          800: '#1B222B',
-          900: '#111820',   // Midnight Ink — primary text / dark surfaces
-          950: '#0B1016',
+          50:  '#17171A',
+          100: '#202024',
+          200: '#2E2E34',
+          300: '#55555D',
+          400: '#8E8E96',   // Smoke — secondary type (5.4:1 on Lacquer)
+          500: '#A6A6AD',
+          600: '#C2C1BE',
+          700: '#D8D6CE',
+          800: '#EAE7DE',
+          900: '#F5F3EC',   // Porcelain — primary type
+          950: '#FFFDF8',
         },
-        // ── Porcelain surfaces ──
+        // ── Obsidian surfaces ──
         cream: {
-          50:  '#F6F5F0',   // Porcelain Mist — primary background
-          100: '#F0EFE9',
-          200: '#DCE1DE',   // Subtle Border
-          300: '#CBD1CD',
-          400: '#AEB5B0',
-          500: '#8C938E',
+          50:  '#08080A',   // Obsidian — page canvas
+          100: '#0E0E11',   // Lacquer — cards / raised
+          200: '#1B1B20',   // hairline border / skeleton
+          300: '#2A2A31',
+          400: '#3C3C44',
+          500: '#52525A',
         },
         // ── Brass alias (legacy class names → Muted Champagne) ──
         brass: {
-          50:  '#FCFAF3',
-          100: '#F6F0DF',
-          200: '#ECE0BE',
-          300: '#DECB97',
+          50:  '#12110C',
+          100: '#1B1810',
+          200: '#2E2A1C',
+          300: '#D9C7A2',
           400: '#C6AD7A',
-          500: '#AD925A',
-          600: '#917745',
-          700: '#745F36',
+          500: '#B79B63',
+          600: '#A98B50',
+          700: '#8E7440',
         },
-        // ── Pale Sage (success / calm surfaces; not for text contrast) ──
+        // ── Sage (success / calm surfaces on dark) ──
         sage: {
-          50:  '#F0F6F2',
-          100: '#E2ECE5',   // Pale Sage — surface
-          200: '#C8DCCF',
-          300: '#A7C8B3',
-          400: '#7FAD92',
-          500: '#578C6E',
-          600: '#347455',   // success text/icon (5.6:1 on white)
+          50:  '#0F1613',
+          100: '#132019',
+          200: '#1B2C22',
+          300: '#2A4535',
+          400: '#4E7A5F',
+          500: '#6FA383',
+          600: '#8FD3A9',
         },
-        // ── Semantic text/icon colours. Existing components use Tailwind's
-        //    emerald/red scales; the 600/700 steps are re-pointed to the
-        //    semantic tokens so success/error read consistently store-wide.
-        success: { 50: '#F0F6F2', 600: '#347455', 700: '#2A5E45' },
-        danger:  { 50: '#FBEFF0', 600: '#B33A42', 700: '#942F36' },
-        emerald: { 600: '#347455', 700: '#2A5E45' },
-        red:     { 600: '#B33A42', 700: '#942F36' },
+        // ── Semantic tones, retuned for a near-black canvas. The 600/700
+        //    steps are readable TYPE colours; solid fills use them with
+        //    near-black type via the on-light-fill guard.
+        success: { 50: '#0F1A14', 600: '#8FD3A9', 700: '#A9E5C1' },
+        danger:  { 50: '#1D1113', 600: '#F0888F', 700: '#F7A3A8' },
+        // Neutral ramp overrides for the state hues actually used by existing
+        // panels: the 50/100 steps are tinted DARK (so a notice panel reads as
+        // a soft wash on the obsidian canvas) and the 600+ steps are light
+        // enough to stay legible AS TYPE on those tints.
+        emerald: { 50: '#0F1A14', 100: '#132019', 200: '#1B2C22', 600: '#8FD3A9', 700: '#A9E5C1' },
+        red:     { 50: '#1D1113', 100: '#2A1518', 200: '#3A1C20', 500: '#E9707A', 600: '#F0888F', 700: '#F7A3A8' },
+        amber:   { 50: '#1A1409', 100: '#241C0D', 200: '#332815', 400: '#C6AD7A', 500: '#D9BE8A', 600: '#E0C894', 700: '#EBD6A9', 800: '#F2E3C2', 900: '#F8EEDB' },
+        blue:    { 50: '#0D1420', 100: '#13202F', 500: '#7FA9DC', 600: '#8FB6E8', 700: '#A6C7F0', 800: '#C2D8F5', 900: '#D7E6FA' },
       },
       fontFamily: {
         sans: [
@@ -115,24 +120,23 @@ const config: Config = {
         ],
       },
       fontSize: {
-        // Refined heading scale with tight tracking for editorial feel
-        'display-xl': ['3.35rem',  { lineHeight: '1.06', letterSpacing: '-0.028em', fontWeight: '800' }],
-        'display-lg': ['2.5rem',   { lineHeight: '1.1',  letterSpacing: '-0.026em', fontWeight: '800' }],
-        'display':    ['1.85rem',  { lineHeight: '1.12', letterSpacing: '-0.024em', fontWeight: '800' }],
+        'display-xl': ['4.5rem', { lineHeight: '0.94', letterSpacing: '-0.042em', fontWeight: '600' }],
+        'display-lg': ['3.25rem', { lineHeight: '0.98', letterSpacing: '-0.036em', fontWeight: '600' }],
+        'display':    ['2.15rem', { lineHeight: '1.04', letterSpacing: '-0.03em', fontWeight: '600' }],
       },
       letterSpacing: {
-        display: '-0.024em',
-        eyebrow: '0.14em',
+        display: '-0.032em',
+        eyebrow: '0.22em',
         tight:   '-0.02em',
         snug:    '-0.01em',
       },
       boxShadow: {
-        hair:  'inset 0 0 0 1px rgba(17, 24, 32, 0.06)',
-        soft:  '0 1px 2px rgba(17, 24, 32, 0.04), 0 6px 16px -6px rgba(17, 24, 32, 0.08)',
-        lift:  '0 2px 6px rgba(17, 24, 32, 0.05), 0 18px 32px -12px rgba(17, 24, 32, 0.14)',
-        glow:  '0 0 0 1px rgba(198, 173, 122, 0.3), 0 14px 36px -12px rgba(17, 24, 32, 0.3)',
-        card:  '0 1px 3px rgba(17, 24, 32, 0.04), 0 8px 24px -8px rgba(17, 24, 32, 0.1)',
-        focus: '0 0 0 3px rgba(31, 90, 96, 0.35)',
+        hair:  'inset 0 0 0 1px rgba(245, 243, 236, 0.08)',
+        soft:  '0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px -10px rgba(0, 0, 0, 0.8)',
+        lift:  '0 2px 10px rgba(0, 0, 0, 0.55), 0 28px 60px -24px rgba(0, 0, 0, 0.9)',
+        glow:  '0 0 0 1px rgba(198, 173, 122, 0.25), 0 24px 70px -28px rgba(198, 173, 122, 0.35)',
+        card:  '0 1px 2px rgba(0, 0, 0, 0.45), 0 12px 32px -16px rgba(0, 0, 0, 0.85)',
+        focus: '0 0 0 3px rgba(231, 223, 202, 0.3)',
       },
       transitionDuration: {
         micro: '120ms',
@@ -160,12 +164,37 @@ const config: Config = {
           from: { transform: 'translateX(-100%)' },
           to:   { transform: 'translateX(100%)' },
         },
+        marquee: {
+          from: { transform: 'translate3d(0, 0, 0)' },
+          to:   { transform: 'translate3d(-50%, 0, 0)' },
+        },
+        aurora: {
+          '0%, 100%': { transform: 'translate3d(-2%, -1%, 0) scale(1)' },
+          '50%':      { transform: 'translate3d(3%, 2%, 0) scale(1.12)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translate3d(0, 0, 0)' },
+          '50%':      { transform: 'translate3d(0, -10px, 0)' },
+        },
+        'pulse-ring': {
+          '0%':   { transform: 'scale(0.85)', opacity: '0.9' },
+          '100%': { transform: 'scale(2.1)', opacity: '0' },
+        },
+        'sheen-pan': {
+          from: { backgroundPosition: '200% 0' },
+          to:   { backgroundPosition: '-100% 0' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
         'fade-up': 'fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both',
         'scale-in': 'scale-in 0.18s cubic-bezier(0.22, 1, 0.36, 1)',
         shimmer: 'shimmer 1.6s linear infinite',
+        marquee: 'marquee 42s linear infinite',
+        aurora: 'aurora 22s ease-in-out infinite',
+        float: 'float 9s ease-in-out infinite',
+        'pulse-ring': 'pulse-ring 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite',
+        'sheen-pan': 'sheen-pan 3.2s linear infinite',
       },
     },
   },

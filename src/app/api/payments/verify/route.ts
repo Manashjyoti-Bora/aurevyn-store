@@ -5,21 +5,18 @@ import { getCurrentUser } from '@/lib/auth/guards';
 import { getPaymentProvider } from '@/lib/payments';
 import { confirmPaymentResult } from '@/lib/payments/confirm';
 import { prisma } from '@/lib/db';
-import { toPaise } from '@/lib/money';
-import { kickJobRunner } from '@/lib/jobs/queue';
 import { assertRateLimit } from '@/lib/rate-limit';
 import { clientIp, readJson } from '@/lib/http';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Server-side payment verification after the browser checkout returns.
+ * Automated payment verification.
  *
- * The browser result is NEVER trusted: this route re-verifies with the
- * provider (gateway fetch and/or HMAC signature) before anything is
- * confirmed. The Razorpay webhook performs the same confirmation
- * independently; the pipeline is idempotent, so whichever arrives first wins
- * and the second is a recorded no-op.
+ * UPI QR payments have no gateway to verify against, so this endpoint refuses
+ * them outright: a customer can never mark their own order paid. Only an
+ * admin, after matching the UTR against the bank statement, can confirm.
+ * The TEST provider keeps its isolated simulator.
  */
 export const POST = apiRoute(async (req: Request) => {
   const ip = clientIp(req) ?? 'local';
@@ -42,7 +39,13 @@ export const POST = apiRoute(async (req: Request) => {
     return jsonOk({ status: 'PAID', redirect: `/order/${order.orderNumber}/confirmation` });
   }
 
-  const provider = getPaymentProvider();
+  if (payment.provider === 'UPI') {
+    throw conflict(
+      'UPI payments are confirmed by the store after your transaction reference is verified against the bank statement. Nothing else is needed from you.'
+    );
+  }
+
+  const provider = await getPaymentProvider();
   if (!provider || provider.kind !== payment.provider) {
     throw conflict(
       payment.provider === 'TEST'
@@ -55,43 +58,7 @@ export const POST = apiRoute(async (req: Request) => {
     providerOrderId: body.providerOrderId,
     providerPaymentId: body.providerPaymentId ?? payment.providerPaymentId ?? undefined,
     signature: body.signature,
-    expectedAmountPaise: toPaise(order.grandTotal),
   });
-
-  if (verification.outcome === 'PAID') {
-    const gatewayAmount =
-      typeof verification.raw?.amount === 'number' ? (verification.raw.amount as number) : null;
-    const confirm = await confirmPaymentResult({
-      orderId: order.id,
-      provider: payment.provider,
-      providerOrderId: body.providerOrderId,
-      providerPaymentId: verification.providerPaymentId ?? body.providerPaymentId,
-      outcome: 'PAID',
-      amountPaise: gatewayAmount,
-      method: verification.method ?? null,
-      feePaise: verification.feePaise ?? null,
-      verifiedVia: verification.verifiedVia,
-      raw: verification.raw ?? null,
-      actorType: 'PAYMENT_PROVIDER',
-    });
-    kickJobRunner();
-    if (confirm.outcome === 'REJECTED_AMOUNT_MISMATCH') {
-      throw conflict('Payment amount could not be verified. Support has been notified.');
-    }
-    if (
-      confirm.outcome === 'CAPTURED_REQUIRES_REFUND' ||
-      (confirm.outcome === 'DUPLICATE' &&
-        ['CANCELLED', 'REFUND_PENDING', 'REFUNDED'].includes(order.status))
-    ) {
-      return jsonOk({
-        status: 'RECOVERY_REQUIRED',
-        message:
-          'The provider confirmed a capture, but this order is cancelled or mismatched. Support will reconcile it; do not retry payment.',
-        redirect: `/order/${order.orderNumber}/confirmation`,
-      });
-    }
-    return jsonOk({ status: 'PAID', redirect: `/order/${order.orderNumber}/confirmation` });
-  }
 
   if (verification.outcome === 'FAILED') {
     await confirmPaymentResult({

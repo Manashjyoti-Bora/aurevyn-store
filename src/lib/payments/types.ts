@@ -5,7 +5,7 @@
  * this interface and registering it in `index.ts` - nothing else changes.
  */
 
-export type PaymentProviderKind = 'RAZORPAY' | 'TEST';
+export type PaymentProviderKind = 'UPI' | 'TEST';
 
 export interface CreatePaymentOrderInput {
   orderId: string;
@@ -15,7 +15,7 @@ export interface CreatePaymentOrderInput {
   customer?: { name?: string; email?: string; phone?: string };
 }
 
-export type CheckoutMode = 'razorpay-checkout-js' | 'test-simulator' | 'unconfigured';
+export type CheckoutMode = 'upi-qr' | 'test-simulator' | 'unconfigured';
 
 export interface CreatePaymentOrderResult {
   provider: PaymentProviderKind;
@@ -23,8 +23,8 @@ export interface CreatePaymentOrderResult {
   amountPaise: number;
   currency: string;
   checkoutMode: CheckoutMode;
-  /** Public key id needed by Razorpay Checkout.js (safe for browsers). */
-  keyId?: string;
+  /** NPCI UPI deep link the QR encodes (public payment details only). */
+  upiUri?: string;
   notes?: Record<string, string>;
 }
 
@@ -79,7 +79,12 @@ export interface VerifyPaymentResult {
   feePaise?: number | null;
   failureReason?: string;
   /** How the verification was established (audit trail). */
-  verifiedVia: 'gateway-fetch+signature' | 'gateway-fetch' | 'signature';
+  verifiedVia:
+    | 'gateway-fetch+signature'
+    | 'gateway-fetch'
+    | 'signature'
+    | 'upi-utr'
+    | 'manual-admin';
   raw?: Record<string, unknown>;
 }
 
@@ -93,7 +98,12 @@ export interface RefundInput {
 
 export interface RefundResult {
   providerRefundId: string | null;
-  status: 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  /**
+   * MANUAL means the store settles this refund itself (UPI has no refund API):
+   * the reservation stays parked for an admin instead of being treated as an
+   * ambiguous gateway outcome.
+   */
+  status: 'MANUAL' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
   failureReason?: string;
   raw?: Record<string, unknown>;
 }
@@ -118,7 +128,7 @@ export interface PaymentProviderAdapter {
 export class PaymentsNotConfiguredError extends Error {
   constructor() {
     super(
-      'No payment provider is configured. Set RAZORPAY_KEY_ID/RAZORPAY_KEY_SECRET (production) or enable PAYMENTS_TEST_MODE (development). See SETUP_CHECKLIST.md.'
+      'No payment provider is configured. Set UPI_VPA (production) or enable PAYMENTS_TEST_MODE (development only). See docs/PAYMENT_SETUP.md.'
     );
     this.name = 'PaymentsNotConfiguredError';
   }

@@ -3,136 +3,168 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ZENVORA DESIGN SYSTEM — Premium Indian E-Commerce
-   Obsidian Black · Pearl White · Champagne Gold · Electric Violet · Sage Mint
-   Palette scales live in tailwind.config.ts; runtime tokens live here.
+   ZENVORA — "NOIR ATELIER" DESIGN SYSTEM
+   Obsidian canvas · Porcelain type · Muted Champagne hairline · one accent.
+
+   Direction: a monochrome atelier. Everything is ink, paper and light —
+   photography, type and negative space do the talking. Motion is physics,
+   not decoration: entrances translate + fade, hovers lift, metallics sweep.
+
+   Tailwind scales (tailwind.config.ts) carry the semantics:
+     cream-50  → Obsidian canvas        ink-900  → Porcelain type
+     cream-100 → Lacquer card surface   ink-400  → Smoke secondary type
+     brand-*   → LIGHT ivory action/link ramp (near-black type on its fills)
+     accent-*  → Muted Champagne metallic (rules, badges, rare emphasis)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @layer base {
   :root {
     /* ── Core palette ── */
-    --color-midnight:  #111820;
-    --color-obsidian:  #111820;   /* legacy alias */
-    --color-porcelain: #F6F5F0;
-    --color-pearl:     #F6F5F0;   /* legacy alias */
-    --color-champagne: #C6AD7A;
-    --color-gold:      #C6AD7A;   /* legacy alias */
-    --color-petrol:    #174A50;
-    --color-teal:      #77C9C1;
-    --color-sage:      #E2ECE5;
+    --color-obsidian: #08080a;
+    --color-midnight: #08080a;
+    --color-lacquer: #0e0e11;
+    --color-porcelain: #f5f3ec;
+    --color-champagne: #c6ad7a;
+    --color-smoke: #8e8e96;
 
     /* ── Surfaces ── */
-    --surface-canvas:  #F6F5F0;   /* Porcelain — shopping surfaces */
-    --surface-subtle:  #F0EFE9;
-    --surface-muted:   #DCE1DE;
-    --surface-card:    #FFFFFF;
-    --surface-ink:     #111820;   /* Midnight — branding / dark surfaces */
-    --surface-sage:    #E2ECE5;   /* success surfaces only, never text contrast */
+    --surface-canvas: #08080a; /* Obsidian — page */
+    --surface-subtle: #0b0b0e;
+    --surface-muted: #101014;
+    --surface-card: #0e0e11; /* Lacquer — cards */
+    --surface-raised: #141418;
+    --surface-ink: #f5f3ec; /* inverse (light) surface, used rarely */
+    --surface-denim: #0e0e11; /* legacy alias */
 
     /* ── Semantic text / state ── */
-    --color-text:          #111820;
-    --color-text-muted:    #59636B;   /* 5.6:1 on Porcelain */
-    --color-success:       #347455;   /* 5.6:1 on white */
-    --color-error:         #B33A42;   /* 5.8:1 on white */
-    --color-border:        #DCE1DE;
-    --color-focus:         #1F5A60;   /* light surfaces */
-    --color-focus-on-dark: #77C9C1;   /* Midnight / petrol surfaces */
+    --color-text: #f5f3ec;
+    --color-text-muted: #8e8e96; /* 5.4:1 on Lacquer */
+    --color-text-faint: #55555d;
+    --color-text-inverse: #08080a; /* type placed on ivory fills */
+    --color-success: #8fd3a9;
+    --color-error: #f0888f;
+    --color-border: #1b1b20;
+    --color-focus: #e7dfca;
+    --color-focus-on-dark: #e7dfca;
 
-    /* ── Hairline Border Tokens ── */
-    --border-hairline: rgba(17, 24, 32, 0.07);
-    --border-strong:   rgba(17, 24, 32, 0.15);
+    /* ── Hairline borders (light on dark) ── */
+    --border-hairline: rgba(245, 243, 236, 0.08);
+    --border-strong: rgba(245, 243, 236, 0.16);
+    --border-gold: rgba(198, 173, 122, 0.28);
 
     /* ── Motion tokens ──
-       Micro-interactions 120–240 ms; entrances ≤ 450 ms; transform/opacity
-       only (never blur, box-shadow or layout properties). */
-    --ease-zenvora:    cubic-bezier(0.22, 1, 0.36, 1);
-    --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
-    --duration-micro:  120ms;  /* hover tint, press */
-    --duration-fast:   160ms;  /* toggles, chips */
-    --duration-normal: 220ms;  /* dropdowns, toasts, drawers */
-    --duration-slow:   240ms;  /* dialogs */
-    --duration-enter:  450ms;  /* one-shot section reveal */
+       Micro-interactions 120–240 ms; entrances ≤ 620 ms; transform/opacity
+       only (never animated blur, box-shadow or layout properties). */
+    --ease-zenvora: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-silk: cubic-bezier(0.65, 0, 0.35, 1);
+    --duration-micro: 120ms;
+    --duration-fast: 160ms;
+    --duration-normal: 220ms;
+    --duration-slow: 240ms;
+    --duration-enter: 620ms;
 
-    /* ── Layer (z-index) tokens — one ladder for the whole app ──
-       page content < sticky bars < floating controls < popovers < dialogs
-       < consent banner < toasts < skip link. Tailwind classes used today map
-       to this ladder (z-30/z-40/z-50/z-[60]/z-[70]/z-[80]). */
+    /* ── z-index ladder ── */
     --z-floating: 30;
-    --z-sticky:   40;
-    --z-popover:  50;
-    --z-dialog:   50;
-    --z-banner:   60;
-    --z-toast:    70;
-    --z-skip:     80;
+    --z-sticky: 40;
+    --z-popover: 50;
+    --z-dialog: 50;
+    --z-banner: 60;
+    --z-toast: 70;
+    --z-skip: 80;
 
-    /* ── Liquid-Glass tokens ──
+    /* ── Liquid-Glass (dark materials only) ──
        Allowed on: header, search overlays, floating nav, dialogs, drawers,
-       filter panels, toasts. NOT on: product photos, prices, checkout forms,
-       admin tables (those stay crisp, opaque, high-contrast). */
-    --glass-bg:            rgba(255, 255, 255, 0.72);
-    --glass-bg-strong:     rgba(255, 255, 255, 0.9);
-    --glass-bg-dark:       rgba(17, 24, 32, 0.72);
-    --glass-bg-dark-strong:rgba(17, 24, 32, 0.92);
-    --glass-border:        rgba(17, 24, 32, 0.08);
-    --glass-border-dark:   rgba(246, 245, 240, 0.12);
-    --glass-highlight:     inset 0 1px 0 rgba(255, 255, 255, 0.55);
-    --glass-blur:          14px;
-    --glass-blur-bar:      10px;
-    --glass-saturate:      140%;
+       filter panels, toasts. NOT on product photos, prices, checkout forms,
+       admin tables. Opaque fallback first; blur is a STATIC property. */
+    --glass-bg: rgba(10, 10, 13, 0.72);
+    --glass-bg-strong: rgba(10, 10, 13, 0.96);
+    --glass-bg-dark: rgba(8, 8, 10, 0.82);
+    --glass-bg-dark-strong: rgba(8, 8, 10, 0.97);
+    --glass-border: rgba(245, 243, 236, 0.09);
+    --glass-border-dark: rgba(245, 243, 236, 0.12);
+    --glass-highlight: inset 0 1px 0 rgba(245, 243, 236, 0.06);
+    --glass-blur: 18px;
+    --glass-blur-bar: 14px;
+    --glass-saturate: 120%;
 
-    /* ── Brand Colors (runtime access) ── */
-    --color-brand-primary: #174A50;   /* action fill, white text 9.9:1 */
-    --color-brand-deep:    #113C41;
-    --color-accent:        #C6AD7A;
+    /* ── Brand (runtime access) ── */
+    --color-brand-primary: #efe8d5;
+    --color-brand-deep: #faf8f1;
+    --color-accent: #c6ad7a;
 
     /* ── Typography ──
-       Inter is self-hosted: the woff2 files ship inside
-       @fontsource-variable/inter (imported in src/app/layout.tsx) and are
-       bundled by Next. Previously this came from `next/font/google`, which
-       fetched the font from fonts.googleapis.com at BUILD time. Self-hosting
-       removes that dependency while rendering the identical typeface, and it
-       satisfies the production CSP (`font-src 'self'`). */
-    --font-inter: 'Inter Variable', 'Inter', ui-sans-serif, system-ui,
-      -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+       Inter is self-hosted (woff2 inside @fontsource-variable/inter, bundled
+       by Next). Never loaded from fonts.googleapis.com: builds stay offline
+       and this satisfies the production CSP `font-src 'self'`. */
+    --font-inter:
+      'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+      'Helvetica Neue', Arial, sans-serif;
   }
 
   html {
     -webkit-text-size-adjust: 100%;
-    /* Smooth in-page anchor scrolling only; never scripted scroll hijacking.
-       Disabled under prefers-reduced-motion below. */
     scroll-behavior: smooth;
     text-rendering: optimizeLegibility;
+    color-scheme: dark;
+    background-color: var(--surface-canvas);
   }
 
   body {
     @apply bg-cream-50 text-ink-900 antialiased;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
+    /* Two static atmosphere washes — printed-light, not a gradient toy. */
+    background-image:
+      radial-gradient(64rem 40rem at 78% -12%, rgba(198, 173, 122, 0.055), transparent 62%),
+      radial-gradient(52rem 34rem at -6% 22%, rgba(245, 243, 236, 0.035), transparent 60%);
+    background-attachment: fixed, fixed;
   }
 
   ::selection {
-    @apply bg-brand-600 text-white;
+    @apply bg-brand-600 text-ink-950;
   }
 
-  /* Visible, consistent focus states across all interactive elements (WCAG 2.4.7) */
+  /* Visible, consistent focus states (WCAG 2.4.7) */
   :focus-visible {
     @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-cream-50;
   }
 
-  /* ── Heading Hierarchy (editorial, tight tracking) ── */
+  /* Scrollbar — thin, monochrome, atelier. */
+  * {
+    scrollbar-color: rgba(245, 243, 236, 0.16) transparent;
+    scrollbar-width: thin;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(245, 243, 236, 0.14);
+    border-radius: 9999px;
+    border: 3px solid var(--surface-canvas);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(198, 173, 122, 0.45);
+  }
+
+  /* ── Heading hierarchy (editorial, light weights, tight tracking) ── */
   h1 {
-    @apply text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl;
-    letter-spacing: -0.024em;
+    @apply text-2xl font-medium tracking-tight text-ink-900 sm:text-3xl;
+    letter-spacing: -0.028em;
   }
   h2 {
-    @apply text-xl font-bold tracking-tight text-ink-900;
-    letter-spacing: -0.02em;
+    @apply text-xl font-medium tracking-tight text-ink-900;
+    letter-spacing: -0.026em;
   }
   h3 {
-    @apply text-lg font-semibold text-ink-900;
-    letter-spacing: -0.01em;
+    @apply text-lg font-medium text-ink-900;
+    letter-spacing: -0.018em;
   }
   h4 {
-    @apply text-base font-semibold text-ink-900;
+    @apply text-base font-medium text-ink-900;
   }
 }
 
@@ -141,28 +173,52 @@
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
-  /* ── Card System ── */
+  /* ── Card System ─────────────────────────────────────────────────────── */
   .card {
-    @apply rounded-xl border border-ink-900/[0.06] bg-white shadow-card;
+    @apply relative rounded-2xl border bg-cream-100;
+    border-color: var(--border-hairline);
+    box-shadow:
+      0 1px 0 rgba(245, 243, 236, 0.03) inset,
+      0 24px 50px -30px rgba(0, 0, 0, 0.9);
   }
 
   .card-inset {
-    @apply rounded-xl border border-ink-900/[0.06] bg-sage-100/60 shadow-hair;
+    @apply rounded-2xl border bg-cream-50;
+    border-color: var(--border-hairline);
+  }
+
+  /* ── Atelier Plate ───────────────────────────────────────────────────── */
+  /* The transaction surface: one lacquer plate, one hairline, no glass.
+     Used by cart, checkout, order summary and payment panels. */
+  .atelier-panel {
+    @apply relative overflow-hidden rounded-2xl border;
+    background:
+      linear-gradient(180deg, rgba(245, 243, 236, 0.025), rgba(245, 243, 236, 0) 38%),
+      var(--surface-card);
+    border-color: rgba(245, 243, 236, 0.075);
+    box-shadow:
+      0 1px 0 rgba(245, 243, 236, 0.035) inset,
+      0 30px 60px -42px rgba(0, 0, 0, 0.95);
   }
 
   .card-hover {
     transition:
       transform var(--duration-normal) var(--ease-zenvora),
-      box-shadow var(--duration-normal) var(--ease-zenvora),
-      border-color var(--duration-normal) var(--ease-zenvora);
+      border-color var(--duration-normal) var(--ease-zenvora),
+      box-shadow var(--duration-normal) var(--ease-zenvora);
   }
   @media (hover: hover) {
     .card-hover:hover {
-      @apply -translate-y-0.5 border-ink-900/15 shadow-lift;
+      transform: translateY(-3px);
+      border-color: var(--border-gold);
+      box-shadow:
+        0 1px 0 rgba(245, 243, 236, 0.05) inset,
+        0 34px 70px -32px rgba(0, 0, 0, 0.95),
+        0 0 0 1px rgba(198, 173, 122, 0.08);
     }
   }
 
-  /* ── Button System ── */
+  /* ── Button System ───────────────────────────────────────────────────── */
   .btn-press {
     transition:
       transform var(--duration-fast) var(--ease-zenvora),
@@ -173,187 +229,402 @@
     @apply active:translate-y-px active:scale-[0.985];
   }
 
-  /* ── Form Controls ── */
+  /* Metallised sheen sweep for primary CTAs: one pseudo-element, transform
+     only, runs once per hover and never on touch (hover:hover gated). */
+  .btn-sheen {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .btn-sheen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      100deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.55) 48%,
+      transparent 76%
+    );
+    transform: translateX(-130%);
+    pointer-events: none;
+  }
+  @media (hover: hover) {
+    .btn-sheen:hover::after {
+      animation: sheen 780ms var(--ease-out);
+    }
+  }
+  @keyframes sheen {
+    from {
+      transform: translateX(-130%);
+    }
+    to {
+      transform: translateX(130%);
+    }
+  }
+
+  /* ── Form Controls ───────────────────────────────────────────────────── */
   .label-text {
     @apply block text-sm font-medium text-ink-700;
   }
 
   .input-base {
-    /* text-base (16px) at ALL breakpoints: iOS Safari auto-zooms on focus for
-       inputs below 16px - includes landscape. */
-    @apply block w-full rounded-lg border border-ink-900/15 bg-white px-3.5 py-2 text-base text-ink-900 shadow-sm transition-colors duration-150 placeholder:text-ink-300 hover:border-ink-900/25 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:bg-cream-100 disabled:text-ink-400;
+    /* text-base (16px) at ALL breakpoints: iOS Safari auto-zooms below 16px. */
+    @apply block w-full rounded-xl border bg-cream-50 px-3.5 py-2 text-base text-ink-900 transition-colors duration-150 placeholder:text-ink-300 focus:outline-none disabled:cursor-not-allowed disabled:bg-cream-100 disabled:text-ink-300;
+    border-color: var(--border-strong);
+    box-shadow: inset 0 1px 0 rgba(245, 243, 236, 0.03);
+  }
+  .input-base:hover {
+    border-color: rgba(245, 243, 236, 0.26);
+  }
+  .input-base:focus {
+    border-color: var(--color-champagne);
+    box-shadow: 0 0 0 3px rgba(198, 173, 122, 0.16);
+  }
+  .input-base::placeholder {
+    color: #55555d;
   }
 
   .link-primary {
-    @apply font-medium text-brand-700 underline decoration-brand-300/60 underline-offset-4 transition-colors duration-150 hover:text-brand-800 hover:decoration-brand-600;
+    @apply font-medium text-brand-700 underline decoration-brand-200 underline-offset-4 transition-colors duration-150 hover:text-brand-900 hover:decoration-accent-400;
   }
 
-  /* ── Table System ── */
+  /* ── Table System ────────────────────────────────────────────────────── */
   .table-base {
-    @apply w-full min-w-full divide-y divide-ink-900/[0.06] text-left text-sm;
+    @apply w-full min-w-full divide-y text-left text-sm;
+    border-color: var(--border-hairline);
   }
   .table-th {
-    @apply whitespace-nowrap bg-cream-50/90 px-3.5 py-3 text-[11px] font-semibold uppercase tracking-wider text-ink-400;
+    @apply whitespace-nowrap bg-cream-50/70 px-3.5 py-3 text-[10px] font-semibold uppercase tracking-eyebrow text-ink-400;
   }
   .table-td {
     @apply px-3.5 py-3 align-middle text-ink-600;
   }
 
-  /* ── Typography Identity ── */
+  /* ── Typography Identity ─────────────────────────────────────────────── */
   .eyebrow {
-    @apply text-[11px] font-semibold uppercase tracking-eyebrow text-brand-700;
+    @apply text-[10px] font-semibold uppercase text-accent-400;
+    letter-spacing: 0.22em;
   }
   .display {
-    @apply font-extrabold tracking-display;
+    @apply font-medium tracking-display;
+  }
+  /* Porcelain → champagne type treatment for hero words. */
+  .text-sheen {
+    background-image: linear-gradient(
+      100deg,
+      #fffdf8 0%,
+      #f5f3ec 34%,
+      #c6ad7a 52%,
+      #f5f3ec 70%,
+      #fffdf8 100%
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: text-sheen-pan 9s linear infinite;
+  }
+  @keyframes text-sheen-pan {
+    from {
+      background-position: 180% 0;
+    }
+    to {
+      background-position: -80% 0;
+    }
   }
 
-  /* ── Interactive Elements ── */
+  /* ── Interactive Elements ────────────────────────────────────────────── */
   .pill-tab {
     @apply btn-press inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors;
   }
 
-  /* ── Skeleton Shimmer ── */
+  /* Underline that draws itself from the left — navigation & inline links. */
+  .link-underline {
+    position: relative;
+  }
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    height: 1px;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: left;
+    background: linear-gradient(90deg, var(--color-champagne), rgba(198, 173, 122, 0));
+    transition: transform 320ms var(--ease-zenvora);
+  }
+  .link-underline:hover::after,
+  .link-underline[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+
+  /* ── Skeleton Shimmer ────────────────────────────────────────────────── */
   .skeleton {
     @apply relative overflow-hidden rounded-md bg-cream-200;
   }
   .skeleton::after {
-    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/70 to-transparent;
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
     content: '';
+    background: linear-gradient(
+      90deg,
+      rgba(245, 243, 236, 0) 0%,
+      rgba(245, 243, 236, 0.07) 50%,
+      rgba(245, 243, 236, 0) 100%
+    );
   }
 
-  /* ── Image Zoom (desktop fine pointer only) ── */
+  /* ── Image Zoom (desktop fine pointer only) ──────────────────────────── */
   .zoom-hover {
     cursor: zoom-in;
-    transition: transform var(--duration-slow) var(--ease-zenvora);
+    transition: transform 600ms var(--ease-zenvora);
   }
   @media (hover: hover) and (pointer: fine) {
     .zoom-hover:hover {
-      transform: scale(1.1);
+      transform: scale(1.08);
     }
   }
 
-  /* ── Film Grain Overlay ── */
+  /* ── Film Grain ──────────────────────────────────────────────────────── */
   .grain {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.05;
+    opacity: 0.055;
+    mix-blend-mode: screen;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* ── Liquid-Glass material ──────────────────────────────────────────────
-     Three materials (light / bar / dark) and one scrim, plus ROLE classes that
-     map a UI element to a material + layer:
-       light  → .glass-popover · .glass-drawer · .glass-dialog · .glass-filter-panel
-       bar    → .glass-header · .glass-nav · .glass-floating-control
-       dark   → .glass-toast
-     Rules: opaque fallback first; translucency + blur only where supported
-     and not under prefers-reduced-transparency; blur is a STATIC property
-     (never transitioned/animated); glass is never nested inside glass; the
-     ::before layer paints the inner highlight so content stays crisp. */
-  .glass-panel, .glass-popover, .glass-drawer, .glass-dialog, .glass-filter-panel,
-  .glass-bar, .glass-header, .glass-nav, .glass-floating-control,
-  .glass-dark, .glass-toast {
+  /* Page-wide grain, one fixed layer for the whole document. */
+  .grain-page {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: screen;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  }
+
+  /* ── Atelier frames ──────────────────────────────────────────────────── */
+  /* Gold hairline that brightens on hover — used by product cards & panels. */
+  .lux-frame {
+    position: relative;
+    isolation: isolate;
+  }
+  .lux-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      150deg,
+      rgba(198, 173, 122, 0.55),
+      rgba(245, 243, 236, 0.08) 34%,
+      rgba(245, 243, 236, 0.04) 66%,
+      rgba(198, 173, 122, 0.35)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.55;
+    transition: opacity 420ms var(--ease-zenvora);
+  }
+  @media (hover: hover) {
+    .lux-frame:hover::before {
+      opacity: 1;
+    }
+  }
+
+  /* Soft light pool behind hero content. */
+  .aura {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(60px);
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  /* Hairline rule with a champagne centre. */
+  .rule-hair {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(245, 243, 236, 0.14) 22%,
+      rgba(198, 173, 122, 0.5) 50%,
+      rgba(245, 243, 236, 0.14) 78%,
+      transparent
+    );
+  }
+
+  /* ── Marquee ─────────────────────────────────────────────────────────── */
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    user-select: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0;
+    min-width: max-content;
+    animation: marquee 46s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* ── Liquid-Glass material ───────────────────────────────────────────────
+     One dark material, four roles: bar / panel / dialog / toast.
+     Opaque fallback first; translucency + blur only where supported and not
+     under prefers-reduced-transparency; blur is never transitioned; glass is
+     never nested inside glass; ::before paints the inner highlight. */
+  .glass-panel,
+  .glass-popover,
+  .glass-drawer,
+  .glass-dialog,
+  .glass-filter-panel,
+  .glass-bar,
+  .glass-header,
+  .glass-nav,
+  .glass-floating-control,
+  .glass-dark,
+  .glass-toast {
     position: relative;
     isolation: isolate;
     border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-highlight), 0 2px 6px rgba(17, 24, 32, 0.05), 0 18px 32px -12px rgba(17, 24, 32, 0.14);
+    box-shadow:
+      var(--glass-highlight),
+      0 1px 0 rgba(0, 0, 0, 0.6),
+      0 24px 48px -24px rgba(0, 0, 0, 0.95);
   }
-  .glass-panel::before, .glass-popover::before, .glass-drawer::before, .glass-dialog::before, .glass-filter-panel::before,
-  .glass-dark::before, .glass-toast::before {
+  .glass-panel::before,
+  .glass-popover::before,
+  .glass-drawer::before,
+  .glass-dialog::before,
+  .glass-filter-panel::before,
+  .glass-dark::before,
+  .glass-toast::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
     border-radius: inherit;
     pointer-events: none;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 38%);
+    background: linear-gradient(180deg, rgba(245, 243, 236, 0.06), rgba(245, 243, 236, 0) 42%);
   }
-  .glass-dark::before, .glass-toast::before {
-    background: linear-gradient(180deg, rgba(119, 201, 193, 0.08), rgba(255, 255, 255, 0) 42%);
-  }
-  .glass-panel, .glass-popover, .glass-drawer, .glass-dialog, .glass-filter-panel {
+  .glass-panel,
+  .glass-popover,
+  .glass-drawer,
+  .glass-dialog,
+  .glass-filter-panel {
     background: var(--glass-bg-strong);
   }
-  .glass-bar, .glass-header, .glass-nav, .glass-floating-control {
-    background: rgba(246, 245, 240, 0.96);
-    box-shadow: var(--glass-highlight), 0 1px 0 var(--glass-border);
+  .glass-bar,
+  .glass-header,
+  .glass-nav,
+  .glass-floating-control {
+    background: rgba(8, 8, 10, 0.94);
+    box-shadow:
+      var(--glass-highlight),
+      0 1px 0 var(--glass-border);
   }
-  .glass-dark, .glass-toast {
+  .glass-dark,
+  .glass-toast {
     background: var(--glass-bg-dark-strong);
     border-color: var(--glass-border-dark);
     color: var(--color-porcelain);
   }
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     @media not (prefers-reduced-transparency: reduce) {
-      .glass-panel, .glass-popover, .glass-drawer, .glass-dialog, .glass-filter-panel {
+      .glass-panel,
+      .glass-popover,
+      .glass-drawer,
+      .glass-dialog,
+      .glass-filter-panel {
         background: var(--glass-bg);
         -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
         backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
       }
-      .glass-bar, .glass-header, .glass-nav, .glass-floating-control {
-        background: rgba(246, 245, 240, 0.84);
+      .glass-bar,
+      .glass-header,
+      .glass-nav,
+      .glass-floating-control {
+        background: rgba(8, 8, 10, 0.68);
         -webkit-backdrop-filter: blur(var(--glass-blur-bar)) saturate(var(--glass-saturate));
         backdrop-filter: blur(var(--glass-blur-bar)) saturate(var(--glass-saturate));
       }
-      .glass-dark, .glass-toast {
+      .glass-dark,
+      .glass-toast {
         background: var(--glass-bg-dark);
         -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
         backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
       }
     }
   }
-  /* Layer tokens per role (see docs/DESIGN_SYSTEM.md §4). */
-  .glass-header, .glass-nav, .glass-drawer { z-index: var(--z-sticky); }
-  .glass-floating-control                  { z-index: var(--z-floating); }
-  .glass-popover                           { z-index: var(--z-popover); }
-  /* Dialog / drawer backdrop. Low blur, static. */
+  .glass-header,
+  .glass-nav,
+  .glass-drawer {
+    z-index: var(--z-sticky);
+  }
+  .glass-floating-control {
+    z-index: var(--z-floating);
+  }
+  .glass-popover {
+    z-index: var(--z-popover);
+  }
   .glass-scrim {
-    background: rgba(17, 24, 32, 0.55);
+    background: rgba(4, 4, 5, 0.72);
   }
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     @media not (prefers-reduced-transparency: reduce) {
       .glass-scrim {
-        -webkit-backdrop-filter: blur(2px);
-        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(3px);
+        backdrop-filter: blur(3px);
       }
     }
   }
-  /* Glass never stacks on glass: a light glass role nested inside another
-     glass role falls back to a solid card surface. */
-  :is(.glass-panel, .glass-popover, .glass-drawer, .glass-dialog, .glass-filter-panel, .glass-bar, .glass-header, .glass-nav)
+  /* Glass never stacks on glass. */
+  :is(
+      .glass-panel,
+      .glass-popover,
+      .glass-drawer,
+      .glass-dialog,
+      .glass-filter-panel,
+      .glass-bar,
+      .glass-header,
+      .glass-nav
+    )
     :is(.glass-panel, .glass-popover, .glass-filter-panel) {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     background: var(--surface-card);
   }
-  /* Dark glass needs the teal focus ring (petrol ring is invisible on it). */
   :is(.glass-dark, .glass-toast, .on-dark) :focus-visible {
     --tw-ring-color: var(--color-focus-on-dark);
-    --tw-ring-offset-color: var(--color-midnight);
+    --tw-ring-offset-color: var(--color-obsidian);
   }
-  /* Readability guard: anything users must read precisely stays crisp. */
   .crisp {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
     background-color: var(--surface-card);
   }
 
-  /* ── Skeleton loading surface (transform-only shimmer) ── */
-  .skeleton {
-    position: relative;
-    overflow: hidden;
-    background: var(--surface-subtle);
-  }
-  .skeleton::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    transform: translateX(-100%);
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
-    animation: shimmer 1.6s linear infinite;
-  }
-  /* ── Micro-motion (transform/opacity only) ── */
+  /* ── Micro-motion (transform/opacity only) ───────────────────────────── */
   .motion-reveal {
     animation: motion-reveal var(--duration-normal) var(--ease-out) both;
   }
@@ -364,83 +635,189 @@
     animation: motion-pop var(--duration-slow) var(--ease-zenvora) both;
   }
   .motion-lift {
-    transition: transform var(--duration-micro) var(--ease-zenvora), opacity var(--duration-micro) ease-out;
+    transition:
+      transform var(--duration-micro) var(--ease-zenvora),
+      opacity var(--duration-micro) ease-out;
   }
   @media (hover: hover) {
-    .motion-lift:hover { transform: translateY(-1px); }
+    .motion-lift:hover {
+      transform: translateY(-1px);
+    }
   }
 
-  /* ── Scroll Reveal System ── */
+  /* ── Scroll Reveal System ────────────────────────────────────────────── */
   .js .reveal {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(22px);
     transition:
-      opacity var(--duration-slow) var(--ease-zenvora),
-      transform var(--duration-slow) var(--ease-zenvora);
+      opacity var(--duration-enter) var(--ease-zenvora),
+      transform var(--duration-enter) var(--ease-out);
   }
   .js .reveal.is-visible {
     opacity: 1;
     transform: none;
   }
 
-  /* ── Staggered Grid Choreography ── */
+  /* ── Staggered Grid Choreography ─────────────────────────────────────── */
   .js .reveal .stagger > * {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(18px);
   }
   .js .reveal.is-visible .stagger > * {
-    animation: fade-up 0.45s var(--ease-zenvora) both;
+    animation: fade-up 0.62s var(--ease-out) both;
   }
-  .js .reveal.is-visible .stagger > *:nth-child(2) { animation-delay: 45ms; }
-  .js .reveal.is-visible .stagger > *:nth-child(3) { animation-delay: 90ms; }
-  .js .reveal.is-visible .stagger > *:nth-child(4) { animation-delay: 135ms; }
-  .js .reveal.is-visible .stagger > *:nth-child(5) { animation-delay: 180ms; }
-  .js .reveal.is-visible .stagger > *:nth-child(6) { animation-delay: 225ms; }
-  .js .reveal.is-visible .stagger > *:nth-child(7) { animation-delay: 270ms; }
-  .js .reveal.is-visible .stagger > *:nth-child(8) { animation-delay: 315ms; }
-  .js .reveal.is-visible .stagger > *:nth-child(n + 9) { animation-delay: 360ms; }
+  .js .reveal.is-visible .stagger > *:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .js .reveal.is-visible .stagger > *:nth-child(3) {
+    animation-delay: 120ms;
+  }
+  .js .reveal.is-visible .stagger > *:nth-child(4) {
+    animation-delay: 180ms;
+  }
+  .js .reveal.is-visible .stagger > *:nth-child(5) {
+    animation-delay: 240ms;
+  }
+  .js .reveal.is-visible .stagger > *:nth-child(6) {
+    animation-delay: 300ms;
+  }
+  .js .reveal.is-visible .stagger > *:nth-child(7) {
+    animation-delay: 360ms;
+  }
+  .js .reveal.is-visible .stagger > *:nth-child(8) {
+    animation-delay: 420ms;
+  }
+  .js .reveal.is-visible .stagger > *:nth-child(n + 9) {
+    animation-delay: 480ms;
+  }
+
+  /* ── Aura spotlight (pointer-following light pool) ─────────────────────
+     Positioned by .aura-cursor.tsx with a transform only; the blur is a
+     static filter, never animated. Screen blend keeps it as light, not paint. */
+  .spotlight {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 9999px;
+    opacity: 0;
+    mix-blend-mode: screen;
+    background: radial-gradient(
+      circle,
+      rgba(198, 173, 122, 0.16) 0%,
+      rgba(245, 243, 236, 0.06) 38%,
+      transparent 68%
+    );
+    filter: blur(14px);
+    transition: opacity 700ms var(--ease-out);
+    will-change: transform, opacity;
+  }
+
+  /* ── Route-enter motion (see app/template.tsx) ───────────────────────── */
+  .page-enter {
+    animation: page-enter 380ms var(--ease-out) both;
+  }
+
+  /* ── Scroll cue (hero foot) ──────────────────────────────────────────── */
+  .scroll-cue {
+    position: relative;
+    display: block;
+    width: 1px;
+    height: 42px;
+    overflow: hidden;
+    background: rgba(245, 243, 236, 0.14);
+  }
+  .scroll-cue::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 14px;
+    background: linear-gradient(180deg, transparent, rgba(198, 173, 122, 0.95));
+    animation: cue-drift 2.4s var(--ease-silk) infinite;
+  }
+
+  /* ── Scroll progress hairline (top of viewport) ──────────────────────── */
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    background: linear-gradient(90deg, rgba(245, 243, 236, 0.55), var(--color-champagne));
+    z-index: var(--z-toast);
+    pointer-events: none;
+  }
 }
 
 @layer utilities {
-  /* Prevent horizontal page overflow on small screens */
   .no-page-overflow {
     overflow-x: clip;
   }
-  /* iOS home-indicator clearance for sticky mobile bars */
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  /* Horizontal snap rail (mobile category/deal strips) */
   .snap-rail {
     @apply flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none];
   }
   .snap-rail::-webkit-scrollbar {
     display: none;
   }
+  /* Editorial measure for long-form copy. */
+  .measure {
+    max-width: 68ch;
+  }
 }
 
 /* ── Keyframe Definitions ── */
 @keyframes shimmer {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(100%); }
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }
 @keyframes motion-reveal {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes motion-fade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes motion-pop {
-  from { opacity: 0; transform: scale(0.96); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 /* Server-confirmed success mark (order confirmation). Drawn once; the page
    only mounts it after the order state has been read from the database. */
 @keyframes success-draw {
-  from { stroke-dashoffset: 48; }
-  to   { stroke-dashoffset: 0; }
+  from {
+    stroke-dashoffset: 48;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 .success-check {
   stroke-dasharray: 48;
@@ -450,12 +827,121 @@
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+/* Opacity only, deliberately: a transform (even translate3d(0,0,0) left
+   behind by fill-mode) makes this wrapper a containing block for every
+   `position: fixed` descendant — which would unstick the chapter rail and
+   any sticky in-page element. */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes cue-drift {
+  0% {
+    transform: translateY(-16px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(44px);
+    opacity: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NOIR REMAP GUARDS (intentionally unlayered: these come after Tailwind's
+   utilities in the cascade, so a token that changed polarity still reads
+   correctly wherever the old light theme assumed its opposite).
+
+   Two families:
+   1. `.bg-white*` surfaces → Lacquer (a light card would break the canvas).
+   2. Type that sits ON an ivory/champagne/state fill → near-black, because
+      those fills are the light end of the monochrome ramp.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.bg-white {
+  background-color: var(--surface-card);
+}
+.bg-white\/95 {
+  background-color: rgba(14, 14, 17, 0.96);
+}
+.bg-white\/90 {
+  background-color: rgba(14, 14, 17, 0.92);
+}
+.bg-white\/80 {
+  background-color: rgba(14, 14, 17, 0.86);
+}
+.bg-white\/70 {
+  background-color: rgba(14, 14, 17, 0.78);
+}
+
+:is(
+  .bg-brand-300,
+  .bg-brand-400,
+  .bg-brand-500,
+  .bg-brand-600,
+  .bg-brand-700,
+  .bg-brand-800,
+  .bg-brand-900,
+  .bg-accent-300,
+  .bg-accent-400,
+  .bg-accent-500,
+  .bg-accent-600,
+  .bg-ink-900,
+  .bg-ink-950,
+  .bg-red-600,
+  .bg-red-700,
+  .bg-emerald-600,
+  .bg-emerald-700,
+  .bg-sage-500,
+  .bg-sage-600,
+  .bg-success-600,
+  .bg-danger-600
+).text-white {
+  color: var(--color-text-inverse);
+}
+
+:is(
+  .bg-brand-300,
+  .bg-brand-400,
+  .bg-brand-500,
+  .bg-brand-600,
+  .bg-brand-700,
+  .bg-brand-800,
+  .bg-accent-300,
+  .bg-accent-400,
+  .bg-accent-500,
+  .bg-accent-600,
+  .bg-ink-900,
+  .bg-ink-950
+):is(.text-accent-200, .text-accent-300, .text-accent-400) {
+  color: #5f4e29;
+}
+
+/* Dark type inside a light fill that lives on a child element. */
+.bg-brand-600 .text-accent-300,
+.bg-brand-700 .text-accent-300,
+.bg-brand-800 .text-accent-300 {
+  color: #5f4e29;
 }
 
 /* ── Reduced Motion: respect user preference ── */
@@ -486,6 +972,15 @@
     transform: none !important;
     opacity: 0;
   }
+  .text-sheen {
+    color: var(--color-porcelain);
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+  }
+  .marquee-track {
+    animation: none !important;
+  }
 }
 
 /* ── Print Styles ── */
@@ -495,5 +990,6 @@
   }
   body {
     background: white !important;
+    color: black !important;
   }
 }

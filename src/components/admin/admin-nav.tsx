@@ -23,6 +23,7 @@ const GROUPS: NavGroup[] = [
       { href: '/admin/analytics', label: 'Analytics & profit' },
       { href: '/admin/health', label: 'System health' },
       { href: '/admin/operations', label: 'Operations' },
+      { href: '/admin/cofounder', label: 'AI Cofounder' },
       { href: '/admin/ai-ceo', label: 'AI CEO' },
     ],
   },

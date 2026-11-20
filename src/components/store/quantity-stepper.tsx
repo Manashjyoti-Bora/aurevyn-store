@@ -15,13 +15,13 @@ export function QuantityStepper({
 }) {
   const set = (v: number) => onChange(Math.min(Math.max(v, min), max));
   return (
-    <div className="inline-flex items-center rounded-lg border border-ink-900/20 bg-white">
+    <div className="inline-flex items-center overflow-hidden rounded-full border border-white/[0.14] bg-[#08080A]">
       <button
         type="button"
         onClick={() => set(value - 1)}
         disabled={value <= min}
         aria-label={`Decrease ${label.toLowerCase()}`}
-        className="px-3 py-2 text-ink-500 hover:bg-cream-50 disabled:opacity-40"
+        className="px-3 py-2 text-ink-500 transition-colors hover:bg-white/[0.06] hover:text-ink-900 disabled:opacity-30"
       >
         −
       </button>
@@ -36,14 +36,14 @@ export function QuantityStepper({
           const n = parseInt(e.target.value, 10);
           if (!Number.isNaN(n)) set(n);
         }}
-        className="w-12 border-x border-ink-900/10 py-2 text-center text-sm font-medium tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="w-11 border-x border-white/[0.08] bg-transparent py-2 text-center text-[13px] font-medium tabular-nums text-ink-900 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
       <button
         type="button"
         onClick={() => set(value + 1)}
         disabled={value >= max}
         aria-label={`Increase ${label.toLowerCase()}`}
-        className="px-3 py-2 text-ink-500 hover:bg-cream-50 disabled:opacity-40"
+        className="px-3 py-2 text-ink-500 transition-colors hover:bg-white/[0.06] hover:text-ink-900 disabled:opacity-30"
       >
         +
       </button>

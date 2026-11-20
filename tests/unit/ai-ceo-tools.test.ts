@@ -74,7 +74,7 @@ describe('AI CEO — typed business tools', () => {
     if (result.ok) {
       const data = result.data as { blockers: Array<{ id: string; ownerAction: string }> };
       const payments = data.blockers.find((b) => b.id === 'payments-configured');
-      expect(payments?.ownerAction).toMatch(/RAZORPAY_KEY_ID/);
+      expect(payments?.ownerAction).toMatch(/UPI_VPA/);
     }
   });
 

@@ -2,6 +2,7 @@ import { prisma } from '../db';
 import { env } from '../env';
 import { logger, sanitizeForLog } from '../logger';
 import { randomToken } from '../crypto';
+import { fetchWithSafeRedirects } from '../net/outbound';
 import { Prisma } from '@prisma/client';
 import type { Supplier } from '@prisma/client';
 import {
@@ -343,7 +344,9 @@ export class HttpRestAdapter implements SupplierAdapter {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
-        const response = await fetch(url.toString(), {
+        // SSRF guard: the base URL is admin-supplied configuration, so every
+        // hop is validated (scheme, credentials, DNS → public IP only).
+        const response = await fetchWithSafeRedirects(url.toString(), {
           method,
           headers,
           body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,

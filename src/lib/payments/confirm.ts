@@ -21,8 +21,8 @@ import type { PaymentProviderKind } from './types';
 /**
  * Single authoritative payment-confirmation pipeline.
  *
- * EVERY payment outcome - Razorpay webhook, server-side verify after
- * Checkout.js, and the dev-only TEST simulator - funnels through here, so
+ * EVERY payment outcome - the admin's UPI bank reconciliation, the dev-only
+ * TEST simulator, and any future adapter - funnels through here, so
  * behaviour and idempotency are identical no matter the source. The frontend
  * is never trusted: callers must have independently verified the outcome
  * (gateway fetch and/or HMAC signature) before calling with outcome=PAID.

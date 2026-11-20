@@ -6,9 +6,11 @@ const prodEnv = {
   NODE_ENV: 'production',
   EMAIL_PROVIDER: 'smtp',
   CRON_SECRET: 'x',
-  RAZORPAY_WEBHOOK_SECRET: undefined,
+  UPI_VPA: undefined,
   STORAGE_PROVIDER: 'local',
   SUPPORT_EMAIL: 'owner@mailbox.test',
+  SMTP_HOST: 'smtp.mailprovider.com',
+  EMAIL_FROM: 'Zenvora <no-reply@zenvora.in>',
 };
 
 describe('collectLaunchReadiness', () => {
@@ -16,11 +18,11 @@ describe('collectLaunchReadiness', () => {
     const r = collectLaunchReadiness({
       settings: { demoMode: true, supportEmail: 'support@example.com', business },
       env: prodEnv,
-      razorpayConfigured: false,
+      paymentConfigured: false,
     });
     expect(r.blockers).toEqual(
       expect.arrayContaining([
-        expect.stringMatching(/Razorpay credentials/),
+        expect.stringMatching(/No payment method configured/),
         expect.stringMatching(/Demo mode is ON/),
         expect.stringMatching(/placeholder/),
       ])
@@ -33,11 +35,11 @@ describe('collectLaunchReadiness', () => {
     const r = collectLaunchReadiness({
       settings: { demoMode: false, supportEmail: 'owner@mailbox.test', business },
       env: prodEnv,
-      razorpayConfigured: true,
+      paymentConfigured: true,
     });
-    expect(r.blockers.join(' ')).not.toMatch(/placeholder|Demo mode|Razorpay credentials/);
+    expect(r.blockers.join(' ')).not.toMatch(/placeholder|Demo mode|No payment method configured/);
     expect(r.configGaps).toEqual(
-      expect.arrayContaining([expect.stringMatching(/SUPPORT_EMAIL environment fallback/), expect.stringMatching(/RAZORPAY_WEBHOOK_SECRET/)])
+      expect.arrayContaining([expect.stringMatching(/SUPPORT_EMAIL environment fallback/)])
     );
   });
 
@@ -48,18 +50,28 @@ describe('collectLaunchReadiness', () => {
         supportEmail: 'help@store.test',
         business: { ...business, legalName: 'Zenvora', addressLine: '1 Road', gstin: '18ABCDE1234F1Z5' },
       },
-      env: { ...prodEnv, RAZORPAY_WEBHOOK_SECRET: 'w', STORAGE_PROVIDER: 's3' },
-      razorpayConfigured: true,
+      env: { ...prodEnv, UPI_VPA: 'zenvora@ybl', STORAGE_PROVIDER: 's3' },
+      paymentConfigured: true,
     });
     expect(r.blockers).toEqual([]);
     expect(r.configGaps).toEqual([]);
+  });
+
+  it('flags undeliverable sending domains and a missing SMTP host in production', () => {
+    const r = collectLaunchReadiness({
+      settings: { demoMode: false, supportEmail: 'help@store.test', business },
+      env: { ...prodEnv, EMAIL_FROM: 'Zenvora <no-reply@zenvora.local>', SMTP_HOST: undefined },
+      paymentConfigured: true,
+    });
+    expect(r.blockers.join(' ')).toMatch(/SMTP_HOST is empty/);
+    expect(r.blockers.join(' ')).toMatch(/EMAIL_FROM uses a reserved\/internal domain/);
   });
 
   it('outside production only CRON_SECRET and the placeholder are blockers', () => {
     const r = collectLaunchReadiness({
       settings: { demoMode: true, supportEmail: 'support@example.com', business },
       env: { ...prodEnv, NODE_ENV: 'development', CRON_SECRET: undefined, EMAIL_PROVIDER: 'console' },
-      razorpayConfigured: false,
+      paymentConfigured: false,
     });
     expect(r.blockers).toHaveLength(2);
     expect(r.blockers.join(' ')).toMatch(/CRON_SECRET/);

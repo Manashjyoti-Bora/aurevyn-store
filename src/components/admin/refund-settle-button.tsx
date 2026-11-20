@@ -5,17 +5,19 @@ import { useRouter } from 'next/navigation';
 import { apiFetch, ApiClientError } from '@/lib/client/api';
 import { toast } from '@/components/ui/toaster';
 import { Button } from '@/components/ui/button';
-import { Field, Textarea } from '@/components/ui/form';
+import { Field, Input, Textarea } from '@/components/ui/form';
 import { Modal } from '@/components/ui/modal';
 import { Alert } from '@/components/ui/feedback';
 
 /**
- * Manual settlement for refunds the gateway could not process automatically
- * (e.g. TEST-provider refunds, or gateway refunds completed out-of-band).
+ * Manual settlement for refunds the store pays out itself. UPI has no refund
+ * API, so the owner transfers the money, then records the reference here —
+ * that is what turns a reservation into a settled, auditable refund.
  */
 export function RefundSettleButton({ refundId }: { refundId: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [reference, setReference] = useState('');
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState<'COMPLETED' | 'FAILED' | null>(null);
 
@@ -23,7 +25,11 @@ export function RefundSettleButton({ refundId }: { refundId: string }) {
     setBusy(status);
     try {
       await apiFetch(`/api/admin/refunds/${refundId}/settle`, {
-        body: { status, note: note.trim() || null },
+        body: {
+          status,
+          reference: reference.trim() || null,
+          note: note.trim() || null,
+        },
       });
       toast(
         status === 'COMPLETED'
@@ -66,7 +72,7 @@ export function RefundSettleButton({ refundId }: { refundId: string }) {
               variant="success"
               onClick={() => settle('COMPLETED')}
               loading={busy === 'COMPLETED'}
-              disabled={busy !== null}
+              disabled={busy !== null || reference.trim().length === 0}
             >
               Mark completed
             </Button>
@@ -75,11 +81,22 @@ export function RefundSettleButton({ refundId }: { refundId: string }) {
       >
         <div className="space-y-3">
           <Alert tone="warning">
-            Only use this when the money movement happened (or definitively failed) outside the
-            automatic gateway flow — e.g. TEST-mode refunds or a bank transfer you made manually.
-            Marking COMPLETED finalises the order&apos;s actual profit.
+            UPI refunds are paid out by you, not by an API. Transfer the money first, then record
+            the payout reference here. Marking COMPLETED finalises the order&apos;s actual profit.
           </Alert>
-          <Field label="Note (audit log)" hint="e.g. 'NEFT done, UTR 12345'">
+          <Field label="Payout reference" hint="e.g. UPI UTR / NEFT reference you sent">
+            {(p) => (
+              <Input
+                {...p}
+                value={reference}
+                onChange={(e) => setReference(e.target.value)}
+                maxLength={120}
+                autoComplete="off"
+                spellCheck={false}
+              />
+            )}
+          </Field>
+          <Field label="Note (audit log)" hint="optional context for your records">
             {(p) => (
               <Textarea
                 {...p}

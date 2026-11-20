@@ -1,4 +1,6 @@
-# USER INPUT REQUIRED — consolidated (2026-09-05, post-audit)
+# USER INPUT REQUIRED — consolidated
+
+> Updated: payments no longer need any third-party account or keys (see B4).
 
 Legend: 🔴 launch blocker · 🟠 required for automated reselling · 🟡 required before public
 marketing/traffic · ⚪ optional. "Where" = exactly where to enter it. NEVER paste secrets
@@ -27,14 +29,16 @@ into chat; secrets go directly into Vercel → Project → Settings → Environm
   (no hyphen). If your Vercel env still contains the hyphenated value, fix it and redeploy:
   canonical/OG/sitemap/robots currently point at the dead host.
 
-## 🟠 B4 — Razorpay decision (prepaid payments)
-- Choose: (a) launch COD-only first (nothing to enter), or (b) enable prepaid.
-- If (b): create keys in Razorpay dashboard; enter in Vercel env:
-  `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `NEXT_PUBLIC_RAZORPAY_KEY_ID`,
-  `RAZORPAY_WEBHOOK_SECRET`; add webhook URL `https://<prod>/api/payments/webhook`
-  (events: payment.captured, payment.failed, refund.*) in Razorpay dashboard.
-- Rule now enforced by code: production accepts ONLY `rzp_live_…` keys; test keys work only
-  outside production. Set `PAYMENTS_TEST_MODE=false` in Vercel once live keys are in.
+## 🟠 B4 — Prepaid payments (UPI QR) — RESOLVED, no keys needed
+- Razorpay has been removed from the codebase. There is nothing to sign up for and no
+  API keys to enter. Prepaid = a UPI QR that pays the store's own UPI ID directly.
+- Where: **Admin → Settings → Payments → Store UPI ID (VPA)** on the live site. It takes
+  effect immediately, no redeploy. `UPI_VPA` in the host environment overrides it if you
+  ever need to pin the payee.
+- Rule enforced by code: with no valid UPI ID the store hides UPI and offers COD only; it
+  never renders a QR that pays nobody, and no browser request can mark an order paid —
+  an admin confirms each UTR against the bank statement.
+- See docs/PAYMENT_SETUP.md (payments) and docs/OWNER_RUNBOOK.md (everything else).
 
 ## 🟠 B5 — CJ Dropshipping account + key (required for AUTOMATED reselling)
 - Code is implemented & mock-verified (supplier type `CJ`, API v2 adapter, trigger-only

@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const LAST_UPDATED = '2026-09-05';
+const LAST_UPDATED = '2026-11-18';
 
 export default async function PrivacyPolicyPage() {
   const settings = await getSettings();
@@ -30,6 +30,34 @@ export default async function PrivacyPolicyPage() {
       lastUpdated={LAST_UPDATED}
       settings={settings}
       sections={[
+        {
+          heading: 'Who is responsible for your data',
+          body: (
+            <>
+              <p>
+                {settings.business.legalName || settings.storeName} is the{' '}
+                <strong>Data Fiduciary</strong> for the personal data described below, and decides
+                why and how it is processed, in line with India&apos;s Digital Personal Data
+                Protection Act, 2023 (DPDP Act).
+              </p>
+              <p className="mt-2">
+                Postal address:{' '}
+                {settings.business.addressLine
+                  ? [
+                      settings.business.addressLine,
+                      settings.business.city,
+                      settings.business.state,
+                      settings.business.postalCode,
+                    ]
+                      .filter(Boolean)
+                      .join(', ')
+                  : 'shown on the contact page and invoice of every order'}
+                . Grievance and privacy contact:{' '}
+                <SupportContact settings={settings} fallback="via the contact form" />.
+              </p>
+            </>
+          ),
+        },
         {
           heading: 'What we collect',
           body: (
@@ -83,14 +111,56 @@ export default async function PrivacyPolicyPage() {
           ),
         },
         {
-          heading: 'Cookies',
+          heading: 'Consent, and how to withdraw it',
           body: (
-            <p>
-              We use only <strong>essential cookies</strong>: your login session, your cart and a
-              CSRF security token. No third-party advertising or tracking cookies are set by this
-              store by default. If analytics are added in future, they will be disclosed here and
-              gated behind the cookie preferences notice.
-            </p>
+            <>
+              <p>
+                We rely on consent only where the law requires it — for example marketing email.
+                Nothing else here is optional: an order cannot be delivered without an address,
+                and payment cannot be processed without a gateway reference.
+              </p>
+              <p className="mt-2">
+                You can withdraw consent at any time by replying to a marketing email, updating
+                your contact preferences, or contacting us. Withdrawing consent stops future
+                processing; it does not make lawful processing that already happened unlawful, and
+                it does not remove records we must keep by law.
+              </p>
+            </>
+          ),
+        },
+        {
+          heading: 'Cookies we set',
+          body: (
+            <>
+              <p>
+                We use only <strong>essential cookies</strong>. There are no advertising,
+                profiling or third-party tracking cookies in this store.
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                <li>
+                  <strong>Login session</strong> — httpOnly, SameSite=Lax, Secure in production;
+                  keeps you signed in and expires when you log out or after the session lifetime.
+                </li>
+                <li>
+                  <strong>Cart</strong> — remembers an anonymous cart before you sign in, so you do
+                  not lose it at checkout.
+                </li>
+                <li>
+                  <strong>CSRF token</strong> — a per-session security token that stops other sites
+                  from submitting actions as you.
+                </li>
+                <li>
+                  <strong>Cookie notice acknowledgement</strong> — stored in your browser only, so
+                  the notice is not shown repeatedly.
+                </li>
+              </ul>
+              <p className="mt-2">
+                Payment pages load the payment gateway&apos;s own scripts, which may set cookies
+                while you are on their secure interface; those are governed by the gateway&apos;s
+                privacy policy. Blocking essential cookies in your browser will stop sign-in,
+                cart and checkout from working.
+              </p>
+            </>
           ),
         },
         {
@@ -99,7 +169,7 @@ export default async function PrivacyPolicyPage() {
             <>
               <ul className="list-disc space-y-1 pl-5">
                 <li>
-                  <strong>Payment gateway providers</strong> (e.g. Razorpay) — to process payments
+                  <strong>Payment partners</strong> — your UPI app and bank process the payment
                   and refunds.
                 </li>
                 <li>
@@ -117,6 +187,17 @@ export default async function PrivacyPolicyPage() {
               </ul>
               <p>We do not sell your personal data, ever.</p>
             </>
+          ),
+        },
+        {
+          heading: 'Where your data is processed',
+          body: (
+            <p>
+              Our database and application servers, and some of the providers listed above, may
+              process data on servers located outside India. Where that happens we rely on the
+              permitted transfer routes under the DPDP Act, require the recipient to protect the
+              data to at least this standard, and never transfer more than the purpose needs.
+            </p>
           ),
         },
         {
@@ -143,15 +224,39 @@ export default async function PrivacyPolicyPage() {
           ),
         },
         {
-          heading: 'Your rights',
+          heading: 'If there is a data breach',
           body: (
             <p>
-              Subject to applicable law (including the Digital Personal Data Protection Act, 2023 as
-              brought into force), you can request access to, correction of, or deletion of your
-              personal data, and object to or restrict certain processing. Contact{' '}
-              <SupportContact settings={settings} fallback="us via the contact form" /> from your
-              registered address and we will respond within 30 days.
+              If a breach affects your personal data we notify the Data Protection Board of India
+              and every affected person without undue delay, describing what happened, what data
+              was involved and what we have done about it. We keep an internal record of every
+              security incident, including ones that turn out not to be breaches.
             </p>
+          ),
+        },
+        {
+          heading: 'Your rights',
+          body: (
+            <>
+              <p>
+                Under the DPDP Act you can: ask for a summary of the personal data we hold about you
+                and who we shared it with; ask us to correct or complete it; ask us to erase it;{' '}
+                withdraw consent; and nominate another person to exercise these rights if you die or
+                become incapacitated.
+              </p>
+              <p className="mt-2">
+                You can erase your account yourself at any time: go to{' '}
+                <strong> My account → Profile &amp; security → Delete my account</strong>. It removes
+                your login, profile, addresses, cart and wishlist immediately; order, payment and
+                tax records are retained as law requires. For anything else, contact{' '}
+                <SupportContact settings={settings} fallback="us via the contact form" /> and we will
+                respond within 30 days (usually much sooner).
+              </p>
+              <p className="mt-2">
+                If you are not satisfied with our response you may complain to the Data Protection
+                Board of India.
+              </p>
+            </>
           ),
         },
         {

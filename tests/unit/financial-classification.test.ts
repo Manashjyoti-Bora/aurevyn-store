@@ -9,7 +9,7 @@ describe('financial collection classification', () => {
         paymentStatus: 'PAID',
         grandTotalPaise: 10_000,
         payments: [
-          { id: 'real', provider: 'RAZORPAY', status: 'PAID', amountPaise: 10_000 },
+          { id: 'real', provider: 'UPI', status: 'PAID', amountPaise: 10_000 },
           { id: 'test', provider: 'TEST', status: 'PAID', amountPaise: 3_000 },
         ],
         refunds: [],
@@ -37,7 +37,7 @@ describe('financial collection classification', () => {
         paymentStatus: 'PARTIALLY_REFUNDED',
         grandTotalPaise: 12_000,
         payments: [
-          { id: 'real', provider: 'RAZORPAY', status: 'PARTIALLY_REFUNDED', amountPaise: 12_000 },
+          { id: 'real', provider: 'UPI', status: 'PARTIALLY_REFUNDED', amountPaise: 12_000 },
         ],
         refunds: [
           { paymentId: 'real', status: 'COMPLETED', amountPaise: 2_000 },

@@ -248,7 +248,7 @@ export default async function FaqPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
-      <header className="mb-8 rounded-2xl border border-ink-900/10 bg-gradient-to-br from-cream-100/80 via-white to-cream-50 p-6 shadow-hair sm:p-7">
+      <header className="mb-8 rounded-2xl border border-ink-900/10 bg-gradient-to-br from-cream-100 via-cream-50 to-cream-100 p-6 shadow-hair sm:p-7">
         <p className="eyebrow">Help Center</p>
         <h1 className="display mt-1">Frequently asked questions</h1>
         <p className="mt-2 text-sm text-ink-500">

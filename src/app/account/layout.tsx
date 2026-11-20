@@ -1,8 +1,14 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth/guards';
 import { AccountNav } from '@/components/account/account-nav';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'My account',
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   // Redirect (not 401) when the session cookie is missing/expired - the

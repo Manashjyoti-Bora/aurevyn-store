@@ -1,6 +1,6 @@
 import { apiRoute, jsonOk, badRequest, conflict } from '@/lib/errors';
 import { categoryInputSchema } from '@/lib/validation/schemas';
-import { requireAdmin } from '@/lib/auth/guards';
+import { requireAdminWrite } from '@/lib/auth/guards';
 import { prisma } from '@/lib/db';
 import { slugify } from '@/lib/utils';
 import { auditLog } from '@/lib/audit';
@@ -9,7 +9,7 @@ import { readJson } from '@/lib/http';
 export const dynamic = 'force-dynamic';
 
 export const POST = apiRoute(async (req: Request) => {
-  const admin = await requireAdmin();
+  const admin = await requireAdminWrite('categories');
   const raw = await readJson(req);
   if (!raw || typeof raw !== 'object') throw badRequest('Invalid request body');
   const body = categoryInputSchema.parse(raw);

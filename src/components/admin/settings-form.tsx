@@ -26,6 +26,8 @@ interface FormState {
   postalCode: string;
   feePercent: string;
   feeFixed: string;
+  upiVpa: string;
+  upiPayeeName: string;
   minMarginPercent: string;
   marginProtectionEnabled: boolean;
   returnReservePercent: string;
@@ -68,6 +70,8 @@ function toForm(s: StoreSettings): FormState {
     postalCode: s.business.postalCode,
     feePercent: String(s.payments.feePercent),
     feeFixed: paiseToRs(s.payments.feeFixedPaise),
+    upiVpa: s.payments.upiVpa,
+    upiPayeeName: s.payments.upiPayeeName,
     minMarginPercent: String(s.pricing.minMarginPercent),
     marginProtectionEnabled: s.pricing.marginProtectionEnabled,
     returnReservePercent: String(s.pricing.returnReservePercent),
@@ -107,7 +111,12 @@ function toPatch(f: FormState) {
       state: f.state.trim(),
       postalCode: f.postalCode.trim(),
     },
-    payments: { feePercent: Number(f.feePercent) || 0, feeFixedPaise: rsToPaise(f.feeFixed) },
+    payments: {
+      feePercent: Number(f.feePercent) || 0,
+      feeFixedPaise: rsToPaise(f.feeFixed),
+      upiVpa: f.upiVpa.trim(),
+      upiPayeeName: f.upiPayeeName.trim(),
+    },
     pricing: {
       minMarginPercent: Number(f.minMarginPercent) || 0,
       marginProtectionEnabled: f.marginProtectionEnabled,
@@ -360,11 +369,41 @@ export function SettingsForm({ initial }: { initial: StoreSettings }) {
 
       <Section
         title="Payments"
-        description="Estimated gateway fee used in profit forecasts. Real fees captured from Razorpay payloads override these per payment."
+        description="UPI QR pays your own UPI ID directly — no gateway, no API key. Enter the store UPI ID to switch prepaid payments on, or leave it blank to offer Cash on Delivery only."
       >
         <Field
+          label="Store UPI ID (VPA)"
+          hint="e.g. yourstore@okhdfcbank — the QR pays this address. Leave blank to hide UPI."
+        >
+          {(p) => (
+            <Input
+              {...p}
+              value={form.upiVpa}
+              onChange={(e) => set('upiVpa', e.target.value.trim())}
+              placeholder="yourstore@okhdfcbank"
+              autoComplete="off"
+              spellCheck={false}
+              inputMode="email"
+            />
+          )}
+        </Field>
+        <Field
+          label="Payee name shown in the UPI app"
+          hint="Optional — defaults to your store name."
+        >
+          {(p) => (
+            <Input
+              {...p}
+              value={form.upiPayeeName}
+              onChange={(e) => set('upiPayeeName', e.target.value)}
+              maxLength={80}
+              autoComplete="off"
+            />
+          )}
+        </Field>
+        <Field
           label="Estimated fee %"
-          hint="Razorpay standard plans are commonly around 2% — use your contracted rate"
+          hint="Used for profit forecasts only. Most UPI collections carry no fee — set 0 unless your bank charges."
         >
           {(p) => (
             <Input

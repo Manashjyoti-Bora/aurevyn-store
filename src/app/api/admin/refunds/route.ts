@@ -1,13 +1,13 @@
 import { apiRoute, jsonOk, badRequest } from '@/lib/errors';
 import { refundCreateSchema } from '@/lib/validation/schemas';
-import { requireAdmin } from '@/lib/auth/guards';
+import { requireAdminWrite } from '@/lib/auth/guards';
 import { createRefund } from '@/lib/payments/refunds';
 import { readJson } from '@/lib/http';
 
 export const dynamic = 'force-dynamic';
 
 export const POST = apiRoute(async (req: Request) => {
-  const admin = await requireAdmin();
+  const admin = await requireAdminWrite('refunds');
   const raw = await readJson(req);
   if (!raw || typeof raw !== 'object') throw badRequest('Invalid request body');
   const body = refundCreateSchema.parse(raw);

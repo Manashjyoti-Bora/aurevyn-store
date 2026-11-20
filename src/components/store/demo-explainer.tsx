@@ -13,15 +13,15 @@ export function DemoExplainer({ activeCount }: { activeCount?: number } = {}) {
     <div
       role="note"
       aria-label="Demo mode notice"
-      className="rounded-2xl border border-amber-300/70 bg-gradient-to-br from-amber-50/90 via-cream-50 to-white p-4 text-ink-800 shadow-hair sm:p-5"
+      className="rounded-2xl border border-accent-400/25 bg-cream-100 p-4 text-ink-800 shadow-hair sm:p-5"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-800 ring-1 ring-amber-300/60">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-400/15 text-accent-300 ring-1 ring-accent-400/30">
             <WarnIcon className="h-4 w-4" />
           </span>
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-amber-900 sm:text-sm">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent-300 sm:text-[11px]">
               This store is running in demo mode
             </p>
             <p className="text-[11px] text-ink-500 sm:text-xs">
@@ -31,15 +31,15 @@ export function DemoExplainer({ activeCount }: { activeCount?: number } = {}) {
         </div>
         <Link
           href="/admin/settings"
-          className="rounded-full border border-amber-300/80 bg-white px-3 py-1 text-[11px] font-semibold text-amber-900 shadow-hair transition-colors hover:border-amber-400 hover:bg-amber-50"
+          className="rounded-full border border-white/[0.14] px-3.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-ink-700 transition-colors hover:border-accent-400/50 hover:text-ink-950"
         >
           Admin → Settings
         </Link>
       </div>
 
-      <ul className="mt-3 grid grid-cols-1 gap-2 border-t border-amber-200/60 pt-3 text-xs text-ink-600 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-1.5">
+      <ul className="mt-4 grid grid-cols-1 gap-2 border-t border-white/[0.08] pt-4 text-xs text-ink-400 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-1.5">
         <li className="flex items-start gap-2">
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true" />
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-400" aria-hidden="true" />
           <span>
             {hasProducts
               ? 'Products shown are sample catalog entries for evaluating the platform.'
@@ -47,18 +47,18 @@ export function DemoExplainer({ activeCount }: { activeCount?: number } = {}) {
           </span>
         </li>
         <li className="flex items-start gap-2">
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true" />
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-400" aria-hidden="true" />
           <span>
             Payments (when enabled) run through a clearly-labelled TEST provider — no real money
             moves.
           </span>
         </li>
         <li className="flex items-start gap-2">
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true" />
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-400" aria-hidden="true" />
           <span>Orders placed here are not fulfilled or shipped.</span>
         </li>
         <li className="flex items-start gap-2">
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true" />
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-400" aria-hidden="true" />
           <span>
             The owner can switch off demo mode in <strong>Admin → Settings</strong> once real
             products, payment credentials and shipping arrangements are configured (see

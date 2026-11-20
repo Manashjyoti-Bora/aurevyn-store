@@ -256,7 +256,7 @@ export function orderPipelineHealth(snapshot: AiCeoSnapshot): DomainHealth {
 export function paymentPostureHealth(snapshot: AiCeoSnapshot): DomainHealth {
   const { kind, isTest, environment } = snapshot.payments;
   let level: HealthLevel = 'OK';
-  let summary = 'Live Razorpay configured';
+  let summary = 'Store UPI ID configured';
   if (kind === 'NONE') {
     level = 'CRITICAL';
     summary = 'No payment provider is configured — the store cannot take money';
@@ -271,8 +271,22 @@ export function paymentPostureHealth(snapshot: AiCeoSnapshot): DomainHealth {
     level,
     summary: `${summary} (${environment})`,
     metrics: [
-      countMetric('providerConfigured', 'Provider configured', kind === 'NONE' ? 0 : 1, 'VERIFIED', 'validated environment (RAZORPAY_* keys)', undefined),
-      countMetric('liveMode', 'Live mode', kind === 'RAZORPAY' && !isTest ? 1 : 0, 'VERIFIED', 'payment provider resolution', undefined),
+      countMetric(
+        'providerConfigured',
+        'Provider configured',
+        kind === 'NONE' ? 0 : 1,
+        'VERIFIED',
+        'validated environment (UPI_VPA / PAYMENTS_TEST_MODE)',
+        undefined
+      ),
+      countMetric(
+        'liveMode',
+        'Live mode',
+        kind === 'UPI' && !isTest ? 1 : 0,
+        'VERIFIED',
+        'payment provider resolution',
+        undefined
+      ),
     ],
     evidence: [
       {

@@ -9,20 +9,20 @@ export function DemoBanner({ demoMode }: { demoMode: boolean }) {
   if (!demoMode) return null;
   return (
     <div
-      className="border-b border-accent-300/25 bg-ink-900 px-3 py-1.5 text-center text-[11px] font-medium text-cream-100 sm:px-4 sm:text-xs"
+      className="border-b border-accent-400/20 bg-[#0B0B0E] px-3 py-2 text-center text-[10px] font-medium sm:px-4 sm:text-[11px]"
       role="status"
     >
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
-        <span className="inline-flex items-center gap-1 rounded-full bg-accent-300/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-300 ring-1 ring-accent-300/35">
-          <WarnIcon className="h-3 w-3 shrink-0 text-accent-300" />
-          Demo Mode
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-accent-400/30 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-accent-300">
+          <WarnIcon className="h-3 w-3 shrink-0 text-accent-400" />
+          Demo mode
         </span>
-        <span className="text-cream-100/90">
-          Sample catalog &amp; test payments only — no real orders are fulfilled.
+        <span className="text-ink-400">
+          Sample catalogue &amp; test payments only — no real orders are fulfilled.
         </span>
         <Link
           href="/faq#demo-mode"
-          className="font-semibold text-accent-300 underline decoration-accent-300/50 underline-offset-2 transition-colors hover:text-white hover:no-underline"
+          className="font-medium text-accent-300 underline decoration-accent-400/40 underline-offset-2 transition-colors hover:text-accent-200"
         >
           What is this?
         </Link>

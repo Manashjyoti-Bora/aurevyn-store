@@ -20,7 +20,7 @@ export default async function WishlistPage() {
   return (
     <div className="container-store py-6 sm:py-8">
       <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Wishlist' }]} />
-      <header className="mb-6 rounded-2xl border border-ink-900/10 bg-gradient-to-br from-cream-100/80 via-white to-cream-50 p-5 shadow-hair sm:p-6">
+      <header className="mb-6 rounded-2xl border border-ink-900/10 bg-gradient-to-br from-cream-100 via-cream-50 to-cream-100 p-5 shadow-hair sm:p-6">
         <p className="eyebrow">Saved Items</p>
         <h1 className="display mt-1.5">Your Wishlist</h1>
         <p className="mt-1 text-sm tabular-nums text-ink-500">

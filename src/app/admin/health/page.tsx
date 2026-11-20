@@ -1,14 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/db';
-import {
-  env,
-  isRazorpayConfigured,
-  isTestPaymentsAllowed,
-  isDemoSupplierAllowed,
-  isProduction,
-} from '@/lib/env';
-import { describePaymentProvider } from '@/lib/payments';
+import { env, isTestPaymentsAllowed, isDemoSupplierAllowed, isProduction } from '@/lib/env';
+import { loadPaymentStatus } from '@/lib/payments';
 import { getSettings } from '@/lib/settings';
 import { Card, Alert } from '@/components/ui/feedback';
 import { collectLaunchReadiness } from '@/lib/ops/launch-blockers';
@@ -88,7 +82,7 @@ export default async function AdminHealthPage() {
     stalePending,
   ] = await Promise.all([
     getSettings(),
-    Promise.resolve(describePaymentProvider()),
+    loadPaymentStatus(),
     prisma.job.groupBy({ by: ['status'], _count: { _all: true } }),
     prisma.job.groupBy({
       by: ['status'],
@@ -126,11 +120,10 @@ export default async function AdminHealthPage() {
 
   const smtpConfigured =
     env.EMAIL_PROVIDER === 'smtp' && Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS);
-  const razorpayWebhookReady = Boolean(env.RAZORPAY_WEBHOOK_SECRET);
   const readiness = collectLaunchReadiness({
     settings,
     env,
-    razorpayConfigured: isRazorpayConfigured(),
+    paymentConfigured: provider.kind === 'UPI' || settings.shipping.codEnabled,
     isProduction,
   });
   const productionBlockers = readiness.blockers;
@@ -202,7 +195,7 @@ export default async function AdminHealthPage() {
             />
             <CheckRow
               state={
-                provider.kind === 'RAZORPAY'
+                provider.kind === 'UPI'
                   ? 'ok'
                   : provider.kind === 'TEST'
                     ? isProduction
@@ -216,9 +209,11 @@ export default async function AdminHealthPage() {
               detail={
                 <>
                   mode: <code>{settings.demoMode ? 'demo settings ON' : 'demo settings OFF'}</code>{' '}
-                  · webhook secret{' '}
-                  {razorpayWebhookReady ? 'set' : 'not set (webhook deliveries will be REJECTED)'} ·{' '}
-                  TEST provider can never activate in production builds
+                  · UPI ID{' '}
+                  {provider.kind === 'UPI'
+                    ? `set (${provider.upiVpa} — QR payments live; admin verifies each UTR)`
+                    : 'not set (UPI QR hidden; COD only)'}{' '}
+                  · TEST provider can never activate in production builds
                 </>
               }
             />
@@ -361,23 +356,13 @@ export default async function AdminHealthPage() {
         <div className="grid gap-x-8 gap-y-0 sm:grid-cols-2 lg:grid-cols-3">
           <ul>
             <ConfigItem set name="DATABASE_URL" required />
+            <ConfigItem set={provider.kind === 'UPI'} name="UPI_VPA / Settings → UPI ID" required />
             <ConfigItem
-              set={isRazorpayConfigured()}
-              name="RAZORPAY_KEY_ID + SECRET"
-              required={isProduction}
-            />
-            <ConfigItem
-              set={Boolean(env.NEXT_PUBLIC_RAZORPAY_KEY_ID)}
-              name="NEXT_PUBLIC_RAZORPAY_KEY_ID"
-              required={isProduction}
+              set={Boolean(env.UPI_PAYEE_NAME)}
+              name="UPI_PAYEE_NAME (optional)"
             />
           </ul>
           <ul>
-            <ConfigItem
-              set={razorpayWebhookReady}
-              name="RAZORPAY_WEBHOOK_SECRET"
-              required={isProduction}
-            />
             <ConfigItem set={Boolean(env.SUPPLIER_WEBHOOK_SECRET)} name="SUPPLIER_WEBHOOK_SECRET" />
             <ConfigItem set={Boolean(env.CRON_SECRET)} name="CRON_SECRET" required={isProduction} />
           </ul>

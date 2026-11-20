@@ -1,3 +1,4 @@
+import QRCode from 'qrcode';
 import { apiRoute, jsonOk, badRequest, conflict, ApiError } from '@/lib/errors';
 import { createPaymentSchema } from '@/lib/validation/schemas';
 import { findOrderForAccess } from '@/lib/orders/access';
@@ -12,10 +13,15 @@ import { recordOrderEvent } from '@/lib/orders/state';
 
 export const dynamic = 'force-dynamic';
 
+const PAYABLE_ORDER_STATUSES = ['PENDING_PAYMENT', 'PAYMENT_FAILED'];
+const ALREADY_SETTLED_PAYMENT_STATUSES = ['PAID', 'REFUNDED', 'PARTIALLY_REFUNDED'];
+
 /**
- * Creates a provider-side payment order for an existing store order.
- * The amount ALWAYS comes from the stored order total - never from the
- * client - so the payable amount cannot be manipulated.
+ * Creates (or reopens) a payment attempt for an existing store order.
+ *
+ * The amount ALWAYS comes from the stored order total - never from the client -
+ * so the payable amount cannot be manipulated. Re-opening the payment page
+ * reuses the unpaid attempt instead of spraying duplicate rows.
  */
 export const POST = apiRoute(async (req: Request) => {
   const ip = clientIp(req) ?? 'local';
@@ -28,10 +34,7 @@ export const POST = apiRoute(async (req: Request) => {
   const user = await getCurrentUser();
   const order = await findOrderForAccess(body.orderNumber, user, body.email ?? null);
 
-  if (
-    ['PAID', 'REFUNDED', 'PARTIALLY_REFUNDED'].includes(order.paymentStatus) ||
-    ['CANCELLED', 'REFUNDED', 'DELIVERED', 'SHIPPED'].includes(order.status)
-  ) {
+  if (ALREADY_SETTLED_PAYMENT_STATUSES.includes(order.paymentStatus)) {
     throw conflict(
       `This order does not need payment (status: ${order.status.replace(/_/g, ' ')}).`
     );
@@ -39,24 +42,30 @@ export const POST = apiRoute(async (req: Request) => {
   if (order.paymentMethod === 'COD') {
     throw conflict('This is a Cash-on-Delivery order; no online payment is required.');
   }
-  if (!['PENDING_PAYMENT', 'PAYMENT_FAILED'].includes(order.status)) {
+  if (!PAYABLE_ORDER_STATUSES.includes(order.status)) {
     throw conflict(`Payment is not possible in order status ${order.status.replace(/_/g, ' ')}.`);
   }
 
-  const provider = getPaymentProvider();
+  const [provider, settings] = await Promise.all([getPaymentProvider(), getSettings()]);
   if (!provider) {
     throw new ApiError(
       503,
-      'Online payments are not configured on this store yet. The owner must add payment gateway credentials (see SETUP_CHECKLIST.md) or choose Cash on Delivery if enabled.',
+      'UPI QR payments are not configured on this store yet. The owner must set the store UPI ID in Admin → Settings → Payments (or UPI_VPA in the environment), or enable Cash on Delivery.',
       'PAYMENTS_NOT_CONFIGURED'
     );
   }
 
-  const settings = await getSettings();
   const amountPaise = toPaise(order.grandTotal);
   if (amountPaise <= 0) throw conflict('Order total must be greater than zero.');
 
-  const result = await provider.createPaymentOrder({
+  // One unpaid attempt per order+provider: reuse it so retries and reopened
+  // pages keep a single durable payment row.
+  const attempt = await prisma.payment.findFirst({
+    where: { orderId: order.id, provider: provider.kind, status: 'CREATED' },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const created = await provider.createPaymentOrder({
     orderId: order.id,
     orderNumber: order.orderNumber,
     amountPaise,
@@ -68,35 +77,61 @@ export const POST = apiRoute(async (req: Request) => {
     },
   });
 
-  await prisma.payment.upsert({
-    where: { providerOrderId: result.providerOrderId },
-    create: {
+  if (attempt) {
+    // Keep the stored attempt id stable for the browser and the audit trail;
+    // only the freshly rendered payment details are returned.
+    await prisma.payment.update({
+      where: { id: attempt.id },
+      data: {
+        amount: (amountPaise / 100).toFixed(2),
+        currency: created.currency,
+        method: provider.kind === 'UPI' ? 'UPI' : null,
+      },
+    });
+  } else {
+    await prisma.payment.create({
+      data: {
+        orderId: order.id,
+        provider: created.provider,
+        providerOrderId: created.providerOrderId,
+        amount: (amountPaise / 100).toFixed(2),
+        currency: created.currency,
+        status: 'CREATED',
+        method: created.provider === 'UPI' ? 'UPI' : null,
+      },
+    });
+    await recordOrderEvent({
       orderId: order.id,
-      provider: result.provider,
-      providerOrderId: result.providerOrderId,
-      amount: (amountPaise / 100).toFixed(2),
-      currency: result.currency,
-      status: 'CREATED',
-    },
-    update: {},
-  });
+      type: 'PAYMENT_INITIATED',
+      message: `Payment request created via ${created.provider} (${created.providerOrderId})`,
+      actorType: 'CUSTOMER',
+      actorId: user?.id ?? null,
+    });
+  }
 
-  await recordOrderEvent({
-    orderId: order.id,
-    type: 'PAYMENT_INITIATED',
-    message: `Payment order created via ${result.provider} (${result.providerOrderId})`,
-    actorType: 'CUSTOMER',
-    actorId: user?.id ?? null,
-  });
+  // Rendered server-side: the browser needs no QR library and no payment
+  // details ever reach a third-party image service.
+  const qrDataUrl =
+    created.checkoutMode === 'upi-qr' && created.upiUri
+      ? await QRCode.toDataURL(created.upiUri, {
+          errorCorrectionLevel: 'M',
+          margin: 1,
+          width: 512,
+          color: { dark: '#0A0A0C', light: '#FFFFFF' },
+        })
+      : null;
 
   return jsonOk({
-    mode: result.checkoutMode,
-    provider: result.provider,
-    providerOrderId: result.providerOrderId,
+    mode: created.checkoutMode,
+    provider: created.provider,
+    providerOrderId: attempt?.providerOrderId ?? created.providerOrderId,
     amountPaise,
-    currency: result.currency,
+    currency: created.currency,
     orderNumber: order.orderNumber,
-    keyId: result.keyId ?? null,
+    qrDataUrl,
+    upiUri: created.upiUri ?? null,
+    upiVpa: created.notes?.vpa ?? null,
+    upiPayeeName: created.notes?.payeeName ?? null,
     storeName: settings.storeName,
     prefill: {
       name: order.user?.name ?? order.guestName ?? '',

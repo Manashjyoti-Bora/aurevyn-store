@@ -6,8 +6,19 @@ import { cn } from '@/lib/utils';
 
 function BagGlyph({ className = 'h-16 w-16' }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.2} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5.5 8h13l-1 11.5a1.5 1.5 0 0 1-1.5 1.4H8a1.5 1.5 0 0 1-1.5-1.4L5.5 8Z" />
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.2}
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M5.5 8h13l-1 11.5a1.5 1.5 0 0 1-1.5 1.4H8a1.5 1.5 0 0 1-1.5-1.4L5.5 8Z"
+      />
       <path strokeLinecap="round" d="M9 10V6.8a3 3 0 0 1 6 0V10" />
     </svg>
   );
@@ -41,7 +52,7 @@ export function ProductGallery({
   if (images.length === 0) {
     return (
       <div
-        className="flex aspect-square items-center justify-center rounded-xl border border-ink-900/10 bg-cream-100 text-cream-300"
+        className="flex aspect-square items-center justify-center rounded-2xl border border-white/[0.07] bg-cream-100 text-ink-300"
         role="img"
         aria-label={`${name} - no image available`}
       >
@@ -52,7 +63,7 @@ export function ProductGallery({
 
   return (
     <div className="space-y-3">
-      <div className="relative aspect-square overflow-hidden rounded-xl bg-cream-100">
+      <div className="lux-frame relative aspect-square overflow-hidden rounded-2xl bg-cream-100 shadow-[0_50px_100px_-60px_rgba(0,0,0,1)]">
         {!loaded[current.url] && <div className="skeleton absolute inset-0" aria-hidden="true" />}
         <Image
           key={current.url}
@@ -80,8 +91,8 @@ export function ProductGallery({
               onClick={() => setActive(i)}
               onKeyDown={(e) => onThumbKey(e, i)}
               className={cn(
-                'relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-cream-100 transition-colors',
-                i === active ? 'border-brand-600' : 'border-transparent hover:border-ink-900/20'
+                'relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-cream-100 transition-colors duration-200',
+                i === active ? 'border-accent-400/70' : 'border-white/[0.1] hover:border-white/30'
               )}
             >
               <Image

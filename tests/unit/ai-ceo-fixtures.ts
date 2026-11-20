@@ -48,7 +48,7 @@ export function makeSnapshot(overrides: Partial<AiCeoSnapshot> = {}): AiCeoSnaps
       supportPhoneConfigured: true,
       businessIdentity: 'COMPLETE',
     },
-    payments: { kind: 'RAZORPAY', isTest: false, environment: 'production' },
+    payments: { kind: 'UPI', isTest: false, environment: 'production' },
     automation: {
       autoPublishEligible: false,
       supplierLiveOrderingEnabled: false,

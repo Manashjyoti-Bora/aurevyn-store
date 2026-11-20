@@ -56,13 +56,31 @@ export default async function ShopPage({
 
   return (
     <div className="container-store py-6 sm:py-8">
-      <header className="mb-6 rounded-2xl border border-ink-900/[0.06] bg-gradient-to-br from-sage-100/60 via-white to-cream-50 p-5 shadow-card sm:p-6">
-        <p className="eyebrow">Catalogue</p>
-        <h1 className="display mt-1.5">Shop all products</h1>
-        <p className="mt-1.5 text-sm tabular-nums text-ink-400">
-          {result.total} product{result.total === 1 ? '' : 's'}
-          {params.category ? ` in ${params.category}` : ''}
-        </p>
+      <header className="relative mb-6 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0B0B0E] p-5 sm:p-7">
+        <div className="grain" aria-hidden="true" />
+        <div
+          className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(198,173,122,0.14),transparent_70%)]"
+          aria-hidden="true"
+        />
+        <div className="relative flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-accent-400">
+              Catalogue
+            </p>
+            <h1 className="display mt-2 text-[2rem] sm:text-[2.6rem]">Shop all products</h1>
+            <p className="mt-2 text-sm tabular-nums text-ink-400">
+              {result.total} product{result.total === 1 ? '' : 's'}
+              {params.category ? ` in ${params.category}` : ''}
+            </p>
+          </div>
+          <p className="text-[9px] font-medium uppercase tracking-[0.26em] text-ink-300">
+            Index
+            <span className="mx-2 text-accent-500" aria-hidden="true">
+              /
+            </span>
+            Page {result.page} of {Math.max(result.totalPages, 1)}
+          </p>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">

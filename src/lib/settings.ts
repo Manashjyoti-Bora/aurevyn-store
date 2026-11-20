@@ -1,6 +1,6 @@
 import { z } from 'zod';
+import { UPI_VPA_PATTERN, env } from './env';
 import { prisma } from './db';
-import { env } from './env';
 
 /**
  * Store settings: typed key-value configuration stored in the database,
@@ -46,8 +46,22 @@ export const settingsSchema = z.object({
       // from provider payloads override this per payment.
       feePercent: z.number().min(0).max(15).default(2),
       feeFixedPaise: z.number().int().min(0).max(100000).default(0),
+      // The store's own UPI ID that the QR pays. The owner sets this in
+      // Admin → Settings, so UPI QR can go live without a redeploy. The
+      // UPI_VPA environment variable overrides it when present.
+      upiVpa: z.string().trim().max(120).default(''),
+      upiPayeeName: z.string().trim().max(80).default(''),
     })
-    .default({ feePercent: 2, feeFixedPaise: 0 }),
+    .superRefine((value, ctx) => {
+      if (value.upiVpa && !UPI_VPA_PATTERN.test(value.upiVpa)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['upiVpa'],
+          message: 'Enter a UPI ID like name@bank',
+        });
+      }
+    })
+    .default({ feePercent: 2, feeFixedPaise: 0, upiVpa: '', upiPayeeName: '' }),
 
   pricing: z
     .object({

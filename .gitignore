@@ -38,3 +38,9 @@ test-results/
 # prisma
 prisma/*.db
 prisma/*.db-journal
+/freebuff-sites-build/
+/.open-next/
+/.wrangler/
+
+# local QA screenshots (not source)
+artifacts/

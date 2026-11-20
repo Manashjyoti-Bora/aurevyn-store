@@ -1,5 +1,5 @@
 import { apiRoute, jsonOk, badRequest, conflict } from '@/lib/errors';
-import { requireAdmin } from '@/lib/auth/guards';
+import { requireAdminWrite } from '@/lib/auth/guards';
 import { prisma } from '@/lib/db';
 import { auditLog } from '@/lib/audit';
 import { readJson } from '@/lib/http';
@@ -17,7 +17,7 @@ const rtoSchema = z.object({ stage: z.enum(['RTO', 'RTO_RECEIVED']) });
  * LOCAL-mode lines are restocked with full movement history.
  */
 export const POST = apiRoute(async (req: Request, ctx: { params: Promise<{ id: string }> }) => {
-  const admin = await requireAdmin();
+  const admin = await requireAdminWrite('orders-by-id-rto');
   const { id } = await ctx.params;
   const raw = await readJson(req);
   const body = rtoSchema.parse(raw ?? {});

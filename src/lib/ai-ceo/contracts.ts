@@ -125,7 +125,7 @@ export interface AiCeoSnapshot {
   };
 
   payments: {
-    kind: 'RAZORPAY' | 'TEST' | 'NONE';
+    kind: 'UPI' | 'TEST' | 'NONE';
     /** True when the configured provider is a test/dev-only provider. */
     isTest: boolean;
     environment: string;

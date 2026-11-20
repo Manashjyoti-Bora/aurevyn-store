@@ -75,20 +75,33 @@ export function ProductBuyBox({
         : 'IN_STOCK');
   const stateLabel =
     availability?.label ??
-    (state === 'LOW_STOCK' ? `Low stock — only ${stock} left` : state === 'IN_STOCK' ? 'In stock' : '');
+    (state === 'LOW_STOCK'
+      ? `Low stock — only ${stock} left`
+      : state === 'IN_STOCK'
+        ? 'In stock'
+        : '');
   const soldOut = state === 'OUT_OF_STOCK';
   const unverified = state === 'UNVERIFIED';
+  // With several options and none chosen the button is disabled for a reason
+  // that is NOT stock — labelling it "Sold out" would be a false urgency cue.
+  const needsChoice = activeVariants.length > 1 && selectedVariantId === null;
 
   return (
     <div className="space-y-4">
-      <div className="flex items-baseline gap-3">
-        <p className="text-3xl font-bold tabular-nums text-ink-900">{formatINR(pricePaise)}</p>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <p className="text-[2.1rem] font-normal tabular-nums leading-none tracking-[-0.04em] text-ink-900 sm:text-[2.5rem]">
+          {formatINR(pricePaise)}
+        </p>
         {compareAtPaise && compareAtPaise > pricePaise && (
           <>
-            <p className="text-lg tabular-nums text-ink-400 line-through">
+            <p className="text-base tabular-nums text-ink-400 line-through">
               {formatINR(compareAtPaise)}
             </p>
-            {discount != null && <Badge tone="red">{discount}% off</Badge>}
+            {discount != null && (
+              <span className="rounded-full border border-accent-400/35 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.16em] text-accent-300">
+                {discount}% off
+              </span>
+            )}
           </>
         )}
       </div>
@@ -120,8 +133,7 @@ export function ProductBuyBox({
           </legend>
           <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Product options">
             {activeVariants.map((v) => {
-              const variantSoldOut =
-                v.purchasable !== undefined ? !v.purchasable : v.stock === 0;
+              const variantSoldOut = v.purchasable !== undefined ? !v.purchasable : v.stock === 0;
               return (
                 <button
                   key={v.id ?? 'default'}
@@ -130,16 +142,14 @@ export function ProductBuyBox({
                   aria-checked={selectedVariantId === v.id}
                   onClick={() => setSelectedVariantId(v.id)}
                   disabled={variantSoldOut}
-                  className={`btn-press rounded-lg border px-3.5 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-40 ${
+                  className={`btn-press rounded-full border px-4 py-2 text-[13px] font-medium tracking-wide transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                     selectedVariantId === v.id
-                      ? 'border-brand-600 bg-brand-50 text-brand-800 shadow-hair'
-                      : 'border-ink-900/20 bg-white text-ink-700 hover:border-brand-400'
+                      ? 'border-brand-700 bg-brand-700 text-cream-50'
+                      : 'border-white/[0.14] bg-[#0B0B0E] text-ink-700 hover:border-accent-400/45 hover:text-ink-900'
                   }`}
                 >
                   {v.label}
-                  {variantSoldOut && (
-                    <span className="ml-1 text-xs text-ink-400">(sold out)</span>
-                  )}
+                  {variantSoldOut && <span className="ml-1 text-xs text-ink-400">(sold out)</span>}
                 </button>
               );
             })}
@@ -164,7 +174,8 @@ export function ProductBuyBox({
           productId={productId}
           variantId={selectedVariantId ?? undefined}
           qty={qty}
-          disabled={soldOut || (activeVariants.length > 1 && selectedVariantId === null)}
+          disabled={soldOut || needsChoice}
+          disabledLabel={soldOut ? undefined : 'Choose an option'}
         />
         {/* Buy-now hidden when sold out: a second dead CTA labelled
             'Sold out' next to the first one reads as a rendering bug. */}
@@ -173,14 +184,17 @@ export function ProductBuyBox({
             productId={productId}
             variantId={selectedVariantId ?? undefined}
             qty={qty}
-            disabled={activeVariants.length > 1 && selectedVariantId === null}
-            disabledLabel="Buy now"
+            disabled={needsChoice}
+            disabledLabel="Choose an option"
             goToList
             label="Buy now"
           />
         )}
         <WishlistButton productId={productId} />
-        <ShareButton title={`Check out this product on Zenvora`} url={typeof window !== 'undefined' ? window.location.href : ''} />
+        <ShareButton
+          title={`Check out this product on Zenvora`}
+          url={typeof window !== 'undefined' ? window.location.href : ''}
+        />
       </div>
     </div>
   );

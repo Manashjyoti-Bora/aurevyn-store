@@ -1,6 +1,6 @@
 import { apiRoute, jsonOk, badRequest, notFound } from '@/lib/errors';
 import { inventoryUpdateSchema } from '@/lib/validation/schemas';
-import { requireAdmin } from '@/lib/auth/guards';
+import { requireAdminWrite } from '@/lib/auth/guards';
 import { prisma } from '@/lib/db';
 import { auditLog } from '@/lib/audit';
 import { readJson } from '@/lib/http';
@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 /** Quick inventory/status updates from the Inventory screen. */
 export const PATCH = apiRoute(async (req: Request) => {
-  const admin = await requireAdmin();
+  const admin = await requireAdminWrite('inventory');
   const raw = await readJson(req);
   if (!raw || typeof raw !== 'object') throw badRequest('Invalid request body');
   const body = inventoryUpdateSchema.parse(raw);

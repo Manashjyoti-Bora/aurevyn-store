@@ -23,7 +23,7 @@ export function PolicyView({
 }) {
   return (
     <div className="container-store max-w-3xl py-8 sm:py-12">
-      <header className="mb-6 rounded-2xl border border-ink-900/10 bg-gradient-to-br from-cream-100/80 via-white to-cream-50 p-6 shadow-hair sm:p-7">
+      <header className="mb-6 rounded-2xl border border-ink-900/10 bg-gradient-to-br from-cream-100 via-cream-50 to-cream-100 p-6 shadow-hair sm:p-7">
         <p className="eyebrow">Store Governance &amp; Legal</p>
         <h1 className="display mt-1">{title}</h1>
         <p className="mt-2 text-xs text-ink-400">

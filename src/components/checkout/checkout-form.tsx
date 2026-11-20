@@ -128,6 +128,10 @@ export function CheckoutForm(props: CheckoutProps) {
     return fieldErrors[path];
   }
 
+  // Decorative section index — it follows the sections actually rendered.
+  const sectionNo = (index: number) =>
+    String(isLoggedIn ? index - 1 : index).padStart(2, '0');
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (submitting || !canCheckout) return;
@@ -202,13 +206,21 @@ export function CheckoutForm(props: CheckoutProps) {
     >
       <div className="space-y-6">
         {topError && (
-          <Alert tone="error" title="Checkout could not be completed">
+          <Alert
+            tone="error"
+            title="Checkout could not be completed"
+            className="border-red-500/25 bg-red-500/[0.06] text-red-500"
+          >
             {topError}
           </Alert>
         )}
 
         {!canCheckout && (
-          <Alert tone="warning" title="Checkout is temporarily unavailable">
+          <Alert
+            tone="warning"
+            title="Checkout is temporarily unavailable"
+            className="border-amber-400/20 bg-amber-400/[0.05] text-amber-800"
+          >
             Online payments are not configured on this store yet and Cash on Delivery is disabled.
             The store owner needs to complete the payment setup (see SETUP_CHECKLIST.md). In the
             meantime, please{' '}
@@ -220,11 +232,19 @@ export function CheckoutForm(props: CheckoutProps) {
         )}
 
         {!isLoggedIn && (
-          <section className="card p-4 sm:p-5" aria-labelledby="guest-details">
-            <h2 id="guest-details" className="text-base font-semibold text-ink-900">
-              Your details
-            </h2>
-            <p className="mt-1 text-xs text-ink-400">
+          <section className="atelier-panel p-4 sm:p-5" aria-labelledby="guest-details">
+            <div className="flex items-baseline gap-3 border-b border-white/[0.07] pb-3">
+              <span className="text-[10px] tabular-nums tracking-[0.2em] text-accent-500/80">
+                {sectionNo(1)}
+              </span>
+              <h2
+                id="guest-details"
+                className="text-[15px] font-medium tracking-[-0.01em] text-ink-900"
+              >
+                Your details
+              </h2>
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-ink-400">
               Used for order updates and tracking. Already have an account?{' '}
               <Link href="/auth/login?next=/checkout" className="link-primary">
                 Log in
@@ -279,10 +299,18 @@ export function CheckoutForm(props: CheckoutProps) {
           </section>
         )}
 
-        <section className="card p-4 sm:p-5" aria-labelledby="shipping-address">
-          <h2 id="shipping-address" className="text-base font-semibold text-ink-900">
-            Shipping address
-          </h2>
+        <section className="atelier-panel p-4 sm:p-5" aria-labelledby="shipping-address">
+          <div className="flex items-baseline gap-3 border-b border-white/[0.07] pb-3">
+            <span className="text-[10px] tabular-nums tracking-[0.2em] text-accent-500/80">
+              {sectionNo(2)}
+            </span>
+            <h2
+              id="shipping-address"
+              className="text-[15px] font-medium tracking-[-0.01em] text-ink-900"
+            >
+              Shipping address
+            </h2>
+          </div>
           {addresses.length > 0 && (
             <div className="mt-3 space-y-2">
               {addresses.map((a, i) => (
@@ -302,15 +330,15 @@ export function CheckoutForm(props: CheckoutProps) {
                       country: a.country,
                     }))
                   }
-                  className={`block w-full rounded-lg border p-3 text-left text-sm transition-colors ${
+                  className={`block w-full rounded-xl border p-3 text-left text-sm transition-colors ${
                     i === 0 && a.line1 === form.line1
-                      ? 'border-brand-500 bg-brand-50'
-                      : 'border-ink-900/10 hover:border-brand-300'
+                      ? 'border-accent-400/55 bg-accent-400/[0.07]'
+                      : 'border-white/[0.09] hover:border-accent-400/30'
                   }`}
                 >
                   <span className="font-medium text-ink-900">{a.fullName}</span>
                   {a.label && (
-                    <span className="ml-2 rounded bg-cream-100 px-1.5 py-0.5 text-[10px] uppercase text-ink-400">
+                    <span className="ml-2 rounded-full border border-white/[0.1] px-1.5 py-0.5 text-[9px] uppercase tracking-[0.14em] text-ink-400">
                       {a.label}
                     </span>
                   )}
@@ -427,16 +455,24 @@ export function CheckoutForm(props: CheckoutProps) {
           </div>
         </section>
 
-        <section className="card p-4 sm:p-5" aria-labelledby="payment-method">
-          <h2 id="payment-method" className="text-base font-semibold text-ink-900">
-            Payment method
-          </h2>
+        <section className="atelier-panel p-4 sm:p-5" aria-labelledby="payment-method">
+          <div className="flex items-baseline gap-3 border-b border-white/[0.07] pb-3">
+            <span className="text-[10px] tabular-nums tracking-[0.2em] text-accent-500/80">
+              {sectionNo(3)}
+            </span>
+            <h2
+              id="payment-method"
+              className="text-[15px] font-medium tracking-[-0.01em] text-ink-900"
+            >
+              Payment method
+            </h2>
+          </div>
           <div className="mt-3 space-y-2" role="radiogroup" aria-labelledby="payment-method">
             <label
-              className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3.5 transition-colors ${
+              className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-colors ${
                 form.paymentMethod === 'PREPAID_GATEWAY'
-                  ? 'border-brand-500 bg-brand-50'
-                  : 'border-ink-900/10 hover:border-brand-300'
+                  ? 'border-accent-400/55 bg-accent-400/[0.07]'
+                  : 'border-white/[0.09] hover:border-accent-400/30'
               } ${!canPayOnline ? 'cursor-not-allowed opacity-50' : ''}`}
             >
               <input
@@ -446,27 +482,27 @@ export function CheckoutForm(props: CheckoutProps) {
                 checked={form.paymentMethod === 'PREPAID_GATEWAY'}
                 onChange={() => set('paymentMethod', 'PREPAID_GATEWAY')}
                 disabled={!canPayOnline}
-                className="mt-0.5 h-4 w-4 border-ink-900/20 text-brand-600 focus:ring-brand-500"
+                className="mt-0.5 h-4 w-4 accent-[#c6ad7a]"
               />
               <span className="text-sm">
                 <span className="block font-semibold text-ink-900">
-                  Pay online (UPI / cards / netbanking)
+                  Pay by UPI QR
                 </span>
                 <span className="mt-0.5 block text-xs text-ink-400">
                   {canPayOnline
                     ? payments.gatewayIsTest
                       ? 'TEST mode — the payment simulator will run; no real money moves. Clearly marked in your order history.'
-                      : `Securely processed by ${payments.gatewayLabel}. We never see or store your card details.`
-                    : 'Online payments are not configured on this store yet.'}
+                      : 'Scan a QR with any UPI app and submit the reference. We verify it against the store bank account before dispatch.'
+                    : 'UPI QR payments are not configured on this store yet.'}
                 </span>
               </span>
             </label>
 
             <label
-              className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3.5 transition-colors ${
+              className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-colors ${
                 form.paymentMethod === 'COD'
-                  ? 'border-brand-500 bg-brand-50'
-                  : 'border-ink-900/10 hover:border-brand-300'
+                  ? 'border-accent-400/55 bg-accent-400/[0.07]'
+                  : 'border-white/[0.09] hover:border-accent-400/30'
               } ${!settings.codEnabled ? 'cursor-not-allowed opacity-50' : ''}`}
             >
               <input
@@ -476,7 +512,7 @@ export function CheckoutForm(props: CheckoutProps) {
                 checked={form.paymentMethod === 'COD'}
                 onChange={() => set('paymentMethod', 'COD')}
                 disabled={!settings.codEnabled}
-                className="mt-0.5 h-4 w-4 border-ink-900/20 text-brand-600 focus:ring-brand-500"
+                className="mt-0.5 h-4 w-4 accent-[#c6ad7a]"
               />
               <span className="text-sm">
                 <span className="block font-semibold text-ink-900">
@@ -493,17 +529,25 @@ export function CheckoutForm(props: CheckoutProps) {
             </label>
           </div>
           {err('paymentMethod') && (
-            <p role="alert" className="mt-2 text-xs font-medium text-red-600">
+            <p role="alert" className="mt-2 text-xs font-medium text-red-500">
               {err('paymentMethod')}
             </p>
           )}
         </section>
 
-        <section className="card p-4 sm:p-5" aria-labelledby="order-note">
-          <h2 id="order-note" className="text-base font-semibold text-ink-900">
-            Delivery instructions{' '}
-            <span className="text-xs font-normal text-ink-400">(optional)</span>
-          </h2>
+        <section className="atelier-panel p-4 sm:p-5" aria-labelledby="order-note">
+          <div className="flex items-baseline gap-3 border-b border-white/[0.07] pb-3">
+            <span className="text-[10px] tabular-nums tracking-[0.2em] text-accent-500/80">
+              {sectionNo(4)}
+            </span>
+            <h2
+              id="order-note"
+              className="text-[15px] font-medium tracking-[-0.01em] text-ink-900"
+            >
+              Delivery instructions{' '}
+              <span className="text-[11px] font-normal text-ink-400">(optional)</span>
+            </h2>
+          </div>
           <div className="mt-3">
             <Textarea
               value={form.customerNote}
@@ -517,10 +561,17 @@ export function CheckoutForm(props: CheckoutProps) {
       </div>
 
       {/* Summary */}
-      <aside className="h-fit lg:sticky lg:top-20" aria-label="Order summary">
-        <div className="card p-4 sm:p-5">
-          <h2 className="text-base font-semibold text-ink-900">Your order</h2>
-          <ul className="mt-3 divide-y divide-ink-900/5 text-sm">
+      <aside className="h-fit lg:sticky lg:top-24" aria-label="Order summary">
+        <div className="atelier-panel p-4 sm:p-5">
+          <div className="flex items-baseline justify-between gap-3 border-b border-white/[0.07] pb-3">
+            <h2 className="text-[10px] font-medium uppercase tracking-[0.24em] text-accent-400">
+              Your order
+            </h2>
+            <span className="text-[10px] tabular-nums text-ink-400">
+              {cart.itemCount} item{cart.itemCount === 1 ? '' : 's'}
+            </span>
+          </div>
+          <ul className="mt-3 divide-y divide-white/[0.06] text-sm">
             {cart.lines.map((l) => (
               <li key={l.itemId} className="flex justify-between gap-3 py-2">
                 <span className="min-w-0 text-ink-500">
@@ -535,13 +586,13 @@ export function CheckoutForm(props: CheckoutProps) {
               </li>
             ))}
           </ul>
-          <dl className="mt-3 space-y-2 border-t border-ink-900/10 pt-3 text-sm">
+          <dl className="mt-3 space-y-2 border-t border-white/[0.08] pt-3 text-sm">
             <div className="flex justify-between gap-4">
               <dt className="text-ink-400">Subtotal</dt>
               <dd className="tabular-nums">{formatINR(cart.subtotalPaise)}</dd>
             </div>
             {discountPaise > 0 && (
-              <div className="flex justify-between gap-4 text-emerald-700">
+              <div className="flex justify-between gap-4 text-accent-300">
                 <dt>Coupon ({cart.coupon?.code})</dt>
                 <dd className="tabular-nums">−{formatINR(discountPaise)}</dd>
               </div>
@@ -551,12 +602,12 @@ export function CheckoutForm(props: CheckoutProps) {
               <dd className="tabular-nums">
                 {form.paymentMethod === 'COD' ? (
                   baseShipping === 0 ? (
-                    <span className="text-emerald-700">FREE</span>
+                    <span className="text-accent-300">Complimentary</span>
                   ) : (
                     formatINR(baseShipping)
                   )
                 ) : cart.shippingPaise === 0 ? (
-                  <span className="text-emerald-700">FREE</span>
+                  <span className="text-accent-300">Complimentary</span>
                 ) : (
                   formatINR(cart.shippingPaise)
                 )}
@@ -568,16 +619,20 @@ export function CheckoutForm(props: CheckoutProps) {
                 <dd className="tabular-nums">{formatINR(codFee)}</dd>
               </div>
             )}
-            <div className="flex justify-between gap-4 border-t border-ink-900/10 pt-3 text-base">
-              <dt className="font-semibold text-ink-900">Total payable</dt>
-              <dd className="font-bold tabular-nums">{formatINR(totalPaise)}</dd>
+            <div className="flex items-end justify-between gap-4 border-t border-white/[0.1] pt-4">
+              <dt className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink-400">
+                Total payable
+              </dt>
+              <dd className="text-[1.6rem] font-medium leading-none tracking-[-0.04em] tabular-nums text-ink-900">
+                {formatINR(totalPaise)}
+              </dd>
             </div>
           </dl>
 
           <Button
             type="submit"
             size="lg"
-            className="mt-4 w-full"
+            className="mt-5 w-full"
             loading={submitting}
             disabled={!canCheckout}
           >
@@ -585,10 +640,14 @@ export function CheckoutForm(props: CheckoutProps) {
               ? 'Placing order…'
               : form.paymentMethod === 'COD'
                 ? 'Place order (COD)'
-                : 'Place order & pay'}
+                : 'Place order & get UPI QR'}
           </Button>
 
-          <p className="mt-3 text-center text-[11px] leading-relaxed text-ink-400">
+          <p className="mt-2.5 text-center text-[10px] leading-relaxed text-ink-500">
+            Totals are verified by the server before the order is created.
+          </p>
+
+          <p className="mt-4 text-center text-[11px] leading-relaxed text-ink-400">
             By placing this order you agree to our{' '}
             <Link href="/policies/terms" className="link-primary">
               Terms

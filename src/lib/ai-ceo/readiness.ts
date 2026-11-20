@@ -24,8 +24,10 @@ export function evaluateReadiness({ snapshot }: ReadinessInput): ReadinessItem[]
       id: 'payments-configured',
       label: 'Payment provider configured',
       status: 'NOT_CONFIGURED',
-      detail: 'No Razorpay key pair is present in the environment, so checkout cannot collect payment.',
-      ownerAction: 'Create/verify the Razorpay account, complete the provider’s KYC, and set RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET / RAZORPAY_WEBHOOK_SECRET.',
+      detail:
+        'No UPI ID is present in the environment, so the store cannot show a payable QR and checkout is COD-only.',
+      ownerAction:
+        'Set UPI_VPA to the store\u2019s own UPI address (for example yourname@okhdfcbank) and UPI_PAYEE_NAME to the name customers will see.',
       blocks: ['TESTING', 'DEMO', 'LAUNCH'],
     });
   } else if (payments.isTest || payments.kind === 'TEST') {
@@ -42,7 +44,8 @@ export function evaluateReadiness({ snapshot }: ReadinessInput): ReadinessItem[]
       id: 'payments-live',
       label: 'Live payments enabled',
       status: 'PASS',
-      detail: 'A live-capable Razorpay configuration is present and accepted by the environment guard.',
+      detail:
+        'A store UPI ID is configured, so customers can scan a QR and an admin reconciles the reference against the bank statement.',
       ownerAction: '',
       blocks: [],
     });

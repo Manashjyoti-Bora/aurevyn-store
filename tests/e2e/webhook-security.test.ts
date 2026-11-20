@@ -23,7 +23,6 @@ const agent = new HttpAgent();
 const NONCE = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
 const supplierSecret = process.env.SUPPLIER_WEBHOOK_SECRET ?? '';
-const razorpaySecret = process.env.RAZORPAY_WEBHOOK_SECRET ?? '';
 const cronSecret = process.env.CRON_SECRET ?? '';
 
 function sign(body: string, secret: string): string {
@@ -40,37 +39,15 @@ afterAll(async () => {
   await prisma.$disconnect();
 });
 
-describe('Razorpay payment webhook', () => {
-  const body = JSON.stringify({
-    event: 'payment.captured',
-    payload: { payment: { entity: { id: `pay_E2Eforged_${NONCE}`, amount: 100000, status: 'captured' } } },
-  });
-
-  it('rejects a forged signature — also when the webhook secret is not configured', async () => {
+describe('UPI payment has no webhook surface', () => {
+  it('has no payment webhook endpoint that could mark an order paid', async () => {
     const res = await agent.post('/api/payments/webhook', undefined, {
-      rawBody: body,
+      rawBody: JSON.stringify({ event: 'payment.captured' }),
       headers: { 'x-razorpay-signature': 'deadbeef'.repeat(8) },
       csrf: false,
       cookies: false,
     });
-    // With the secret configured: signature mismatch → 400 + REJECTED event.
-    // Without it (RAZORPAY_WEBHOOK_SECRET unset — external blocker): validation
-    // can never pass, so the endpoint must still refuse (400/503) and never
-    // pretend a payment was captured.
-    expect([400, 503]).toContain(res.status);
-    expect(res.json<{ ok?: boolean }>()?.ok).toBe(false);
-    if (razorpaySecret) {
-      const rejected = await prisma.webhookEvent.findFirst({
-        where: { source: 'PAYMENT', status: 'REJECTED' },
-        orderBy: { receivedAt: 'desc' },
-      });
-      expect(rejected?.signatureValid).toBe(false);
-    }
-  });
-
-  it('never marks a forged payment as captured', async () => {
-    const forged = await prisma.payment.findFirst({ where: { providerOrderId: { startsWith: 'pay_E2Eforged_' } } });
-    expect(forged).toBeNull();
+    expect(res.status).toBe(404);
   });
 });
 

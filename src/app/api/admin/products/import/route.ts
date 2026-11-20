@@ -1,5 +1,5 @@
 import { apiRoute, jsonOk, badRequest } from '@/lib/errors';
-import { requireAdmin } from '@/lib/auth/guards';
+import { requireAdminWrite } from '@/lib/auth/guards';
 import { importProductsCsv } from '@/lib/catalog/import';
 import { z } from 'zod';
 import { readJson } from '@/lib/http';
@@ -12,7 +12,7 @@ const importSchema = z.object({
 });
 
 export const POST = apiRoute(async (req: Request) => {
-  const admin = await requireAdmin();
+  const admin = await requireAdminWrite('products-import');
   const raw = await readJson(req);
   if (!raw || typeof raw !== 'object') throw badRequest('Invalid request body');
   const body = importSchema.parse(raw);

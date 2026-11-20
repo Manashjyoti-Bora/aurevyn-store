@@ -16,6 +16,8 @@ import { Footer } from '@/components/layout/footer';
 import { DemoBanner } from '@/components/layout/demo-banner';
 import { CookieConsent } from '@/components/layout/cookie-consent';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
+import { Concierge } from '@/components/store/assistant/concierge';
+import { ScrollProgress } from '@/components/store/scroll-progress';
 import { Toaster } from '@/components/ui/toaster';
 import { jsonLdScript } from '@/lib/utils';
 
@@ -51,7 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#174A50',
+  themeColor: '#08080A',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -120,6 +122,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 ]),
               }}
             />
+            <ScrollProgress />
+            <div className="grain-page" aria-hidden="true" />
             <DemoBanner demoMode={settings.demoMode} />
             {settings.announcement?.enabled && settings.announcement.text && (
               <div className="bg-brand-700 px-4 py-2 text-center text-xs font-medium tracking-wide text-cream-100">
@@ -133,6 +137,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </main>
             <Footer />
             <MobileBottomNav />
+            <Concierge storeName={settings.storeName} />
             <CookieConsent storeName={settings.storeName} />
             <Toaster />
           </>

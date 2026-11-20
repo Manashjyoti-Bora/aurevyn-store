@@ -316,6 +316,9 @@ enum SupplierType {
   HTTP_REST
   // CJ Dropshipping (general-catalogue dropshipping) via official API v2.
   CJ
+  // Meesho sourcing account. Meesho has no open ordering API, so orders are
+  // queued with a copy-ready purchase sheet for manual placement.
+  MEESHO
   // Clearly-labelled demo adapter for development/testing only.
   DEMO
 }
@@ -999,6 +1002,9 @@ enum NotificationTemplate {
   RETURN_UPDATE
   FULFILMENT_FAILED_ADMIN
   CONTACT_MESSAGE_ADMIN
+  // Owner-facing operational alert (e.g. a UPI reference waiting to be
+  // matched against the bank statement).
+  OWNER_ALERT
 }
 
 model Notification {

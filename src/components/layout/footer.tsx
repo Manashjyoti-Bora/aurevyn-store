@@ -149,7 +149,10 @@ export async function Footer() {
           <p>
             © {year} {settings.storeName}. All rights reserved.
           </p>
-          <p>Prices in INR (₹), inclusive of applicable taxes where configured.</p>
+          <p className="text-center sm:text-right">
+            Prices in INR (₹), inclusive of applicable taxes where configured. Product visuals
+            are illustrative studio renders; minor colour and finish details can differ.
+          </p>
         </div>
       </div>
     </footer>

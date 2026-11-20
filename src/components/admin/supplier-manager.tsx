@@ -16,7 +16,7 @@ export interface SupplierRow {
   id: string;
   name: string;
   slug: string;
-  type: 'MANUAL' | 'HTTP_REST' | 'CJ' | 'DEMO';
+  type: 'MANUAL' | 'HTTP_REST' | 'CJ' | 'MEESHO' | 'DEMO';
   contactEmail: string | null;
   contactPhone: string | null;
   baseUrl: string | null;
@@ -69,7 +69,7 @@ const EMPTY: FormState = {
 
 const TYPE_INFO: Record<
   SupplierRow['type'],
-  { label: string; tone: 'blue' | 'purple' | 'gray'; hint: string }
+  { label: string; tone: 'blue' | 'purple' | 'gray' | 'amber'; hint: string }
 > = {
   MANUAL: {
     label: 'Manual',
@@ -85,6 +85,11 @@ const TYPE_INFO: Record<
     label: 'CJ Dropshipping',
     tone: 'blue',
     hint: 'General-catalogue dropshipping via CJ’s official API v2: catalogue import, stock, automated order forwarding, wallet payment, tracking. Needs a CJ API key env var + fxRateInrPerUsd config.',
+  },
+  MEESHO: {
+    label: 'Meesho sourcing',
+    tone: 'amber',
+    hint: 'Your own Meesho sourcing account. Paid orders queue with a copy-ready purchase sheet; place the order in the Meesho app, then record courier + tracking. No API is pretended — Meesho has none.',
   },
   DEMO: {
     label: 'Demo',
@@ -389,6 +394,7 @@ export function SupplierManager({ initial }: { initial: SupplierRow[] }) {
                   <option value="MANUAL">Manual fulfilment</option>
                   <option value="HTTP_REST">HTTP REST API (automated)</option>
                   <option value="CJ">CJ Dropshipping (automated, general catalogue)</option>
+                  <option value="MEESHO">Meesho sourcing (manual placement)</option>
                   <option value="DEMO">Demo simulator (testing)</option>
                 </Select>
               )}

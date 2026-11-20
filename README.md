@@ -107,7 +107,7 @@ Indian order-number format, mobile-first UI.
 
 ### C. Requires action from you (cannot be coded for you)
 
-See **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** — database, admin account, the
+See **[docs/OWNER_RUNBOOK.md](docs/OWNER_RUNBOOK.md)** and **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** — database, admin account, the
 store's own UPI ID (`UPI_VPA`), SMTP credentials, real supplier onboarding,
 domain + deployment, GSTIN/legal review, replacing demo catalog, turning
 demoMode off.
@@ -194,9 +194,9 @@ docs/DEPLOYMENT.md       Vercel + Neon deploy + post-deploy checks
 docs/TROUBLESHOOTING.md  symptom → cause → fix
 docs/SUPPLIER_API.md     supplier integration contract
 SETUP_CHECKLIST.md       everything you must provide before launch
-PROJECT_STATUS.md        audit: what was run and verified (feature-by-feature)
 USER_INPUT_REQUIRED.md   exactly what the owner must provide (blockers A–F)
-FINAL_STATUS.md          final status in the required vocabulary (CODE/TEST/DEPLOYMENT READY, not LIVE)
+docs/OWNER_RUNBOOK.md    day-one launch, Meesho sourcing, UPI confirmation, alerts
+docs/DESIGN_LANGUAGE.md  the visual system (Noir Atelier) and why it is restrained
 ```
 
 ## Compliance notes (not legal advice)

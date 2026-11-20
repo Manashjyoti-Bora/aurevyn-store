@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/feedback';
 import { LinkButton } from '@/components/ui/button';
 import { BoxIcon, BagIcon } from '@/components/ui/icons';
+import { CatalogueInstaller } from '@/components/admin/catalogue-installer';
+import { curatedCatalogueStatus } from '@/lib/catalog/curated';
 import type { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
@@ -45,7 +47,7 @@ export default async function AdminProductsPage({
   if (sp.category) where.categoryId = sp.category;
   if (sp.supplier) where.supplierId = sp.supplier;
 
-  const [products, total, categories, suppliers] = await Promise.all([
+  const [products, total, categories, suppliers, catalogue] = await Promise.all([
     prisma.product.findMany({
       where,
       orderBy: { updatedAt: 'desc' },
@@ -65,6 +67,7 @@ export default async function AdminProductsPage({
     prisma.product.count({ where }),
     prisma.category.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true } }),
     prisma.supplier.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true } }),
+    curatedCatalogueStatus(),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
 
@@ -89,6 +92,12 @@ export default async function AdminProductsPage({
           </LinkButton>
         </div>
       </header>
+
+      <CatalogueInstaller
+        activeProducts={catalogue.activeProducts}
+        totalProducts={catalogue.totalProducts}
+        installed={catalogue.alreadyInstalled}
+      />
 
       {/* Filters */}
       <form

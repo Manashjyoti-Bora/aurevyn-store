@@ -413,7 +413,7 @@ export const supplierInputSchema = z.object({
   id: z.string().optional(),
   name: z.string().trim().min(2).max(120),
   slug: z.string().trim().max(90).optional().or(z.literal('')),
-  type: z.enum(['MANUAL', 'HTTP_REST', 'CJ', 'DEMO']).default('MANUAL'),
+  type: z.enum(['MANUAL', 'HTTP_REST', 'CJ', 'MEESHO', 'DEMO']).default('MANUAL'),
   contactEmail: emailSchema.optional().or(z.literal('')).nullable(),
   contactPhone: z.string().trim().max(32).optional().or(z.literal('')).nullable(),
   // Requested by the SERVER (see src/lib/net/outbound.ts): refuse private,

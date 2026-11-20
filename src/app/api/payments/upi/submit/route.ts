@@ -3,14 +3,12 @@ import { upiSubmitSchema } from '@/lib/validation/schemas';
 import { findOrderForAccess } from '@/lib/orders/access';
 import { getCurrentUser } from '@/lib/auth/guards';
 import { prisma } from '@/lib/db';
-import { toPaise } from '@/lib/money';
+import { formatINR, toPaise } from '@/lib/money';
 import { assertRateLimit } from '@/lib/rate-limit';
 import { clientIp, readJson } from '@/lib/http';
 import { recordOrderEvent } from '@/lib/orders/state';
 import { auditLog } from '@/lib/audit';
-import { queueNotification } from '@/lib/notifications/notify';
-import { configuredSupportEmail, getSettings } from '@/lib/settings';
-import { env } from '@/lib/env';
+import { alertOwner } from '@/lib/notifications/owner-alert';
 
 export const dynamic = 'force-dynamic';
 
@@ -86,23 +84,25 @@ export const POST = apiRoute(async (req: Request) => {
 
   // Tell the owner a claim is waiting to be checked — never tell the customer
   // they have paid before the bank statement confirms it.
-  const settings = await getSettings();
-  const notifyEmail = configuredSupportEmail(settings) ?? env.ADMIN_EMAIL ?? null;
-  if (notifyEmail) {
-    await queueNotification({
-      template: 'CONTACT_MESSAGE_ADMIN',
-      email: notifyEmail,
-      orderId: order.id,
-      vars: {
-        name: 'Zenvora payments',
-        email: notifyEmail,
-        subject: `UPI payment submitted for ${order.orderNumber}`,
-        message: `Customer submitted UPI reference ${utr} for order ${order.orderNumber}. Verify it against the bank statement, then mark the order paid in Admin → Payments.`,
-        adminUrl: `${env.APP_URL}/admin/payments`,
-      },
-      skipIfNoEmail: true,
-    });
-  }
+  await alertOwner({
+    title: `UPI reference submitted · ${order.orderNumber}`,
+    summary: `${formatINR(toPaise(payment.amount))} claimed as paid. Match UTR ${utr} against the bank statement.`,
+    details: [
+      `Order: ${order.orderNumber}`,
+      `Amount: ${formatINR(toPaise(payment.amount))}`,
+      `UTR / RRN: ${utr}`,
+      `Customer: ${user?.email ?? order.guestEmail ?? 'guest'}`,
+      '',
+      'Only confirm the payment after the credit appears in the store bank account.',
+    ].join('\n'),
+    url: '/admin/payments?status=CREATED&provider=UPI',
+    ctaLabel: 'Verify and confirm',
+    orderId: order.id,
+    dedupeExtra: utr,
+  }).catch(() => {
+    // Alerting is best-effort: a mail/Telegram outage must never fail the
+    // customer's submission, which is already persisted above.
+  });
 
   return jsonOk({ status: 'SUBMITTED', utr });
 });

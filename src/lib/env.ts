@@ -53,6 +53,14 @@ const envSchema = z.object({
   /** Payee name shown in the customer's UPI app (defaults to APP_NAME). */
   UPI_PAYEE_NAME: optionalNonEmpty(z.string().max(80)),
 
+  /**
+   * Instant owner alerts on Telegram (optional). When both are set, a UPI
+   * reference submission pings the owner's phone immediately in addition to
+   * the queued email. Values are server secrets — never exposed to clients.
+   */
+  TELEGRAM_BOT_TOKEN: optionalNonEmpty(z.string().max(200)),
+  TELEGRAM_CHAT_ID: optionalNonEmpty(z.string().max(64)),
+
   SUPPLIER_DEMO_MODE: boolStr,
   SUPPLIER_WEBHOOK_SECRET: optionalNonEmpty(z.string()),
 

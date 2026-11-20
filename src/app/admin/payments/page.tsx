@@ -5,6 +5,7 @@ import { toPaise, formatINR } from '@/lib/money';
 import { TableWrap, Th, Td, Pagination } from '@/components/ui/table';
 import { Badge, GatewayPaymentStatusBadge } from '@/components/ui/badge';
 import { ConfirmUpiPayment } from '@/components/admin/confirm-upi-payment';
+import { Alert } from '@/components/ui/feedback';
 import type { PaymentStatus } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
@@ -24,6 +25,10 @@ export default async function AdminPaymentsPage({
     ...(sp.status ? { status: sp.status as PaymentStatus } : {}),
     ...(sp.provider ? { provider: sp.provider as 'UPI' | 'TEST' } : {}),
   };
+
+  const awaitingUtr = await prisma.payment.count({
+    where: { provider: 'UPI', status: 'CREATED', providerPaymentId: { not: null } },
+  });
 
   const [payments, total] = await Promise.all([
     prisma.payment.findMany({
@@ -49,6 +54,21 @@ export default async function AdminPaymentsPage({
           are settings-based estimates until the gateway reports the actual charge.
         </p>
       </header>
+
+      {awaitingUtr > 0 && (
+        <Alert tone="warning" title={`${awaitingUtr} UPI reference${awaitingUtr === 1 ? '' : 's'} awaiting verification`}>
+          <p className="text-sm">
+            A customer has submitted a transaction reference. Match each UTR against the store bank
+            statement, then confirm it here — the order is not marked paid until you do.{' '}
+            <Link
+              href="/admin/payments?status=CREATED&provider=UPI"
+              className="font-medium underline underline-offset-2"
+            >
+              Show only these
+            </Link>
+          </p>
+        </Alert>
+      )}
 
       <form className="flex flex-wrap items-center gap-2" method="get" action="/admin/payments">
         <select

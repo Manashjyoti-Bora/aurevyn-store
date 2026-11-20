@@ -6,6 +6,7 @@ import { ManualAdapter } from './manual';
 import { HttpRestAdapter } from './http-rest';
 import { CJDropshippingAdapter } from './cj';
 import { DemoAdapter } from './demo';
+import { MeeshoAdapter } from './meesho';
 
 /**
  * Supplier adapter registry - the single place that maps a supplier record to
@@ -33,6 +34,8 @@ export function getSupplierAdapter(supplier: Supplier): SupplierAdapter {
         });
         return new ManualAdapter(supplier);
       }
+    case 'MEESHO':
+      return new MeeshoAdapter(supplier);
     case 'DEMO':
       if (!isDemoSupplierAllowed()) {
         logger.warn('DEMO supplier requested but disabled - falling back to manual queue', {
@@ -47,7 +50,7 @@ export function getSupplierAdapter(supplier: Supplier): SupplierAdapter {
   }
 }
 
-export { ManualAdapter, HttpRestAdapter, CJDropshippingAdapter, DemoAdapter };
+export { ManualAdapter, HttpRestAdapter, CJDropshippingAdapter, DemoAdapter, MeeshoAdapter };
 export * from './types';
 
 /** Safe adapter-configuration diagnostics (never includes secret values). */
@@ -74,6 +77,9 @@ export function diagnoseSupplierAdapter(supplier: Supplier): SupplierAdapterDiag
         break;
       case 'CJ':
         new CJDropshippingAdapter(supplier);
+        break;
+      case 'MEESHO':
+        new MeeshoAdapter(supplier);
         break;
       case 'DEMO':
         if (!isDemoSupplierAllowed()) {

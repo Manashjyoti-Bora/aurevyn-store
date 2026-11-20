@@ -266,6 +266,21 @@ export const templates: Record<NotificationTemplate, TemplateFn> = {
     text: `Fulfilment failed for ${vars.orderNumber} (supplier ${vars.supplier}): ${vars.error}. ${vars.adminUrl}`,
   }),
 
+  OWNER_ALERT: (vars, ctx) => ({
+    subject: `[Action needed] ${vars.title}`,
+    html: layout(
+      ctx,
+      vars.title,
+      p(`<strong>${escapeHtml(vars.summary)}</strong>`) +
+        (vars.details
+          ? `<pre style="margin:0 0 12px;padding:12px;background:#f3f4f6;border-radius:8px;font-size:13px;line-height:1.5;white-space:pre-wrap;color:#374151;">${escapeHtml(vars.details)}</pre>`
+          : '') +
+        p('Open the admin console to finish this step.'),
+      vars.url ? { label: vars.ctaLabel || 'Open admin console', url: vars.url } : undefined
+    ),
+    text: `${vars.title}\n\n${vars.summary}\n\n${vars.details ?? ''}\n${vars.url ?? ''}`,
+  }),
+
   CONTACT_MESSAGE_ADMIN: (vars, ctx) => ({
     subject: `New contact message: ${vars.subject || '(no subject)'}`,
     html: layout(

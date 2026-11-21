@@ -33,12 +33,12 @@
  *   6. admin          `scripts/create-admin.ts` — idempotent, never overwrites
  *                     an existing user, never invents credentials.
  *   7. build          `next build`.
- *   8. catalogue      `scripts/catalogue-install.ts` — only on a database with
- *                     no active products, so a fresh production deploy is a
- *                     sellable store immediately. Idempotent; skip with
- *                     AUTO_INSTALL_CATALOGUE=false. Non-fatal: a store that
- *                     boots without products is fixable from the admin panel,
- *                     a failed deploy is not.
+ *
+ * The build does NOT touch catalogue data. Product writes (the launch
+ * catalogue, re-syncs, imports) are an operator action, never a deploy side
+ * effect: run `npm run catalogue:install` or press "Install catalogue" in
+ * Admin → Products. A deploy must be able to ship code without mutating what
+ * the owner is currently selling.
  *
  * Secrets are never printed. Hostnames are reduced to a short fingerprint.
  * See docs/RELEASE_PROCESS.md for the rollback / recovery runbook.
@@ -96,26 +96,6 @@ function run(
   if (res.error) fail(stage, [`could not start "${cmd}": ${res.error.message}`]);
   if (res.status !== 0) {
     fail(stage, [`"${cmd} ${args.join(' ')}" exited with code ${res.status ?? 'unknown'}`]);
-  }
-}
-
-/**
- * Like run(), but a non-zero exit is logged as a warning instead of failing the
- * build. Used only for the catalogue bootstrap, which is recoverable from the
- * admin panel and must never block a deploy.
- */
-function runSoft(stage: string, cmd: string, args: string[]): void {
-  log(stage, `$ ${cmd} ${args.join(' ')}`);
-  const res = spawnSync(cmd, args, { stdio: 'inherit', env: { ...process.env } });
-  if (res.error) {
-    log(stage, `warning: could not start "${cmd}": ${res.error.message}`);
-    return;
-  }
-  if (res.status !== 0) {
-    log(
-      stage,
-      `warning: exited with code ${res.status ?? 'unknown'} — install the catalogue later from Admin → Products`
-    );
   }
 }
 
@@ -379,11 +359,10 @@ async function main(): Promise<void> {
   // from the shell cannot switch the compiler into development mode.
   run('build', 'next', ['build'], { NODE_ENV: 'production' });
 
-  if (process.env.AUTO_INSTALL_CATALOGUE === 'false') {
-    log('catalogue', 'skipped (AUTO_INSTALL_CATALOGUE=false)');
-  } else {
-    runSoft('catalogue', 'tsx', ['scripts/install-catalogue.ts']);
-  }
+  log(
+    'catalogue',
+    'not touched by the build — install/refresh from Admin → Products (or `npm run catalogue:install`)'
+  );
 
   log('done', `release build complete (${releaseEnv})`);
 }

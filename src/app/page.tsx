@@ -27,10 +27,11 @@ import { Marquee } from '@/components/store/marquee';
 import { AuraCursor } from '@/components/store/aura-cursor';
 import { ChapterRail } from '@/components/store/chapter-rail';
 import { Fracture } from '@/components/store/fracture';
+import { CustomerVoices } from '@/components/store/customer-voices';
 
 export const dynamic = 'force-dynamic';
 
-/* Inline icon set — drawn for Zenvora, no emoji, no icon dependency. */
+/* Inline icon set — drawn for Nirvora, no emoji, no icon dependency. */
 function TruckIcon({ className = 'h-4 w-4' }: { className?: string }) {
   return (
     <svg
@@ -607,6 +608,8 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      <CustomerVoices />
 
       {/* ══════════════ MANIFESTO — the atelier's factual promises ══════════════ */}
       <section

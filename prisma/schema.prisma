@@ -53,6 +53,7 @@ model User {
   couponRedemptions CouponRedemption[]
   notifications     Notification[]
   auditLogs         AuditLog[]
+  reviews           ProductReview[]
 
   @@index([role])
   @@index([createdAt])
@@ -221,6 +222,7 @@ model Product {
   cartItems      CartItem[]
   orderItems     OrderItem[]
   pricingRules   PricingRule[]
+  reviews        ProductReview[]
 
   @@index([status])
   @@index([categoryId])
@@ -274,6 +276,48 @@ model ProductImage {
 
   @@index([productId])
   @@map("product_images")
+}
+
+/// Customer reviews. Rows are created ONLY from a delivered order line, so
+/// every published rating is a verified purchase - the store never seeds,
+/// imports or fabricates a review. One review per product per customer and one
+/// per purchased order line (both enforced by unique indexes).
+enum ReviewStatus {
+  PENDING
+  PUBLISHED
+  HIDDEN
+}
+
+model ProductReview {
+  id        String @id @default(cuid())
+  productId String
+  userId    String
+  orderItemId String? @unique
+
+  rating     Int
+  title      String?
+  body       String
+  /// Display name derived at write time ("Rituparna B.") - full names and
+  /// e-mail addresses are never rendered on the storefront.
+  authorName String
+  /// Customer photos (site-relative paths or https URLs) and one optional
+  /// video link. Shown only when the customer supplied them.
+  photos   String[] @default([])
+  videoUrl String?
+
+  verifiedPurchase Boolean      @default(true)
+  status           ReviewStatus @default(PUBLISHED)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItem OrderItem? @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+
+  @@unique([productId, userId])
+  @@index([productId, status, createdAt])
+  @@index([status, createdAt])
+  @@map("product_reviews")
 }
 
 // ---------------------------------------------------------------------------
@@ -696,6 +740,7 @@ model OrderItem {
   variant        ProductVariant?  @relation(fields: [variantId], references: [id], onDelete: SetNull)
   supplierOrder  SupplierOrder?   @relation(fields: [supplierOrderId], references: [id], onDelete: SetNull)
   returns        ReturnRequest[]
+  review         ProductReview?
 
   @@index([orderId])
   @@map("order_items")

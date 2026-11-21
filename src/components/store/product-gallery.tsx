@@ -28,7 +28,8 @@ export function ProductGallery({
   images,
   name,
 }: {
-  images: Array<{ url: string; alt: string | null }>;
+  /** `videoUrl` turns the frame into a real product video (poster = url). */
+  images: Array<{ url: string; alt: string | null; videoUrl?: string | null }>;
   name: string;
 }) {
   const [active, setActive] = useState(0);
@@ -64,20 +65,36 @@ export function ProductGallery({
   return (
     <div className="space-y-3">
       <div className="lux-frame relative aspect-square overflow-hidden rounded-2xl bg-cream-100 shadow-[0_50px_100px_-60px_rgba(0,0,0,1)]">
-        {!loaded[current.url] && <div className="skeleton absolute inset-0" aria-hidden="true" />}
-        <Image
-          key={current.url}
-          src={current.url}
-          alt={current.alt || name}
-          fill
-          sizes="(max-width: 1024px) 100vw, 50vw"
-          className={cn(
-            'zoom-hover animate-fade-in object-cover transition-opacity duration-300 ease-zenvora',
-            loaded[current.url] ? 'opacity-100' : 'opacity-0'
-          )}
-          onLoad={() => markLoaded(current.url)}
-          priority
-        />
+        {current.videoUrl ? (
+          <video
+            key={current.videoUrl}
+            src={current.videoUrl}
+            poster={current.url}
+            controls
+            playsInline
+            preload="metadata"
+            className="h-full w-full animate-fade-in object-cover"
+          >
+            Your browser cannot play this video.
+          </video>
+        ) : (
+          <>
+            {!loaded[current.url] && <div className="skeleton absolute inset-0" aria-hidden="true" />}
+            <Image
+              key={current.url}
+              src={current.url}
+              alt={current.alt || name}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className={cn(
+                'zoom-hover animate-fade-in object-cover transition-opacity duration-300 ease-zenvora',
+                loaded[current.url] ? 'opacity-100' : 'opacity-0'
+              )}
+              onLoad={() => markLoaded(current.url)}
+              priority
+            />
+          </>
+        )}
       </div>
       {images.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Product images">
@@ -87,7 +104,7 @@ export function ProductGallery({
               type="button"
               role="tab"
               aria-selected={i === active}
-              aria-label={`View image ${i + 1} of ${images.length}`}
+              aria-label={`View ${img.videoUrl ? 'video' : 'image'} ${i + 1} of ${images.length}`}
               onClick={() => setActive(i)}
               onKeyDown={(e) => onThumbKey(e, i)}
               className={cn(
@@ -107,6 +124,16 @@ export function ProductGallery({
                 onLoad={() => markLoaded(img.url)}
                 loading="lazy"
               />
+              {img.videoUrl && (
+                <span
+                  className="absolute inset-0 flex items-center justify-center bg-black/35"
+                  aria-hidden="true"
+                >
+                  <svg width="14" height="14" viewBox="0 0 12 12" fill="currentColor" className="text-white">
+                    <path d="M3 1.8l7 4.2-7 4.2V1.8Z" />
+                  </svg>
+                </span>
+              )}
             </button>
           ))}
         </div>

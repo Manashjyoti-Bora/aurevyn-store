@@ -73,7 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             delays LCP and can blank the storefront on a slow connection. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: "document.documentElement.classList.add('js')",
+            __html: "document.documentElement.classList.add('js');try{if(localStorage.getItem('nirvora-theme')==='light'){document.documentElement.setAttribute('data-theme','light')}}catch(e){}",
           }}
         />
         {/* No-JS fallback: scroll-reveal elements must never stay hidden without script. */}

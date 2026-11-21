@@ -354,6 +354,9 @@ async function hydrateWishlistEntries(entries: StoredWishlistEntry[]): Promise<W
       hasVariants: p.hasVariants,
       categoryName: p.category?.name ?? null,
       availability,
+      // Wishlist cards do not resolve ratings (one extra grouped query for a
+      // saved-items list is not worth it); stars simply do not render there.
+      rating: null,
     };
 
     return {

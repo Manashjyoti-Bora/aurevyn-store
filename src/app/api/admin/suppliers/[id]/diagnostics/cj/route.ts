@@ -19,7 +19,7 @@ type Ctx = { params: Promise<{ id: string }> };
  * fingerprints. NEVER the API key or any token value. No logout, no retries:
  * running the probe never invalidates the currently-working token.
  *
- * Purpose: prove whether a catalog-sync failure is Zenvora-side
+ * Purpose: prove whether a catalog-sync failure is Nirvora-side
  * (configuration) or CJ-side (credential/authorization), and produce the
  * requestId evidence CJ support asks for.
  */
@@ -33,7 +33,7 @@ export async function POST(req: Request, ctx: Ctx): Promise<Response> {
       throw badRequest(`Supplier ${supplier.name} is of type ${supplier.type}, not CJ.`);
     }
 
-    // Configuration gate first: a record/env problem is Zenvora-side and the
+    // Configuration gate first: a record/env problem is Nirvora-side and the
     // probe cannot even run without the credential.
     const diag = diagnoseSupplierAdapter(supplier);
     const envVarName = supplier.apiKeyEnvVar?.trim() || null;
@@ -48,7 +48,7 @@ export async function POST(req: Request, ctx: Ctx): Promise<Response> {
         gitBranch,
         adapterError: diag.error,
         conclusion:
-          'Zenvora-side configuration problem (see adapterError). Fix this before probing CJ.',
+          'Nirvora-side configuration problem (see adapterError). Fix this before probing CJ.',
       });
     }
 

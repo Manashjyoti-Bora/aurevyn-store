@@ -1,4 +1,4 @@
-# Zenvora — Architecture (verified 2026-10-25, `main@ac8041e`)
+# Nirvora — Architecture (verified 2026-10-25, `main@ac8041e`)
 
 This document describes what is **actually in the repository**, not an aspiration. Every
 statement below was checked against the code on the date above; when something is a

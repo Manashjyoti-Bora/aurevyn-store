@@ -280,7 +280,7 @@ Endpoints used:
 - Status: `GET /shopping/order/getOrderDetail`, `GET /logistic/trackInfo`
 - Webhook registration: `POST /webhook/set` (order + logistics → our callback)
 
-Product mapping: Zenvora product's supplier SKU must hold the CJ **vid** (GUID/snowflake) or a
+Product mapping: Nirvora product's supplier SKU must hold the CJ **vid** (GUID/snowflake) or a
 CJ SKU (resolved via stock/queryBySku). Idempotency: `storeLineItemId` = `<job idempotency
 key>:<line>`; duplicate createOrder responses fall back to `shopping/order/list` lookup so a
 retry can never create a second CJ order.
@@ -289,8 +289,8 @@ Catalog sync semantics (intentional):
 
 - Sync pulls **My Products only** (`GET /product/myProduct/query`). CJ's general catalogue
   (`/product/listV2`) is deliberately NOT auto-imported: nothing becomes publicly sellable in
-  Zenvora without the owner explicitly adding it to CJ My Products, syncing, and mapping it to
-  a Zenvora product with a reviewed price.
+  Nirvora without the owner explicitly adding it to CJ My Products, syncing, and mapping it to
+  a Nirvora product with a reviewed price.
 - Envelope & field normalisation: CJ's `GET /product/myProduct/query` returns a Spring `Page`
   payload inside `data` (`{ pageSize, pageNumber, totalRecords, totalPages, content: [...] }`),
   where each item uses `productId` (or `pid`), `nameEn` (or `productName`/`productNameEn`),

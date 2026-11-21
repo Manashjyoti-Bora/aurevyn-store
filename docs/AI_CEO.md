@@ -1,4 +1,4 @@
-# Zenvora — AI CEO & autonomous store brain
+# Nirvora — AI CEO & autonomous store brain
 
 Status: **implemented, deterministic mode verified by unit tests**; the optional model
 provider is **disabled** (no provider configured, no key present) and live

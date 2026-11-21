@@ -11,6 +11,15 @@ import type {
 import { ManualAdapter } from './manual';
 
 /**
+ * Public Meesho search URL for a product name. Used only as a sourcing
+ * shortcut for the owner - the store never scrapes or republishes Meesho
+ * catalogue data, and nothing here is shown to customers.
+ */
+export function meeshoSearchUrl(query: string): string {
+  return `https://www.meesho.com/search?q=${encodeURIComponent(query.trim())}`;
+}
+
+/**
  * Meesho sourcing adapter.
  *
  * Meesho is where a large share of Indian resellers actually buy stock, and it
@@ -55,10 +64,13 @@ export class MeeshoAdapter implements SupplierAdapter {
   }
 
   async createOrder(input: SupplierCreateOrderInput): Promise<SupplierCreateOrderResult> {
+    // Each line carries a ready Meesho search link, so placing the order is a
+    // tap-tap-verify job instead of retyping product names and buying the
+    // wrong listing (the main source of reselling losses).
     const lines = input.items
       .map(
         (i) =>
-          `• ${i.name} — qty ${i.quantity} — supplier ref ${i.supplierSku}${i.unitCostPaise ? ` — ₹${(i.unitCostPaise / 100).toFixed(2)} each` : ''}`
+          `• ${i.name} — qty ${i.quantity} — supplier ref ${i.supplierSku}${i.unitCostPaise ? ` — ₹${(i.unitCostPaise / 100).toFixed(2)} each` : ''}\n  search: ${meeshoSearchUrl(i.name)}`
       )
       .join('\n');
     const address = input.shippingAddress;

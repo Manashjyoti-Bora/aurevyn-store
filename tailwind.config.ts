@@ -5,7 +5,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ── ZENVORA "NOIR ATELIER" palette (2026-11) ─────────────────────
+        // ── NIRVORA "NOIR ATELIER" palette (2026-11) ─────────────────────
         // One monochrome direction: obsidian canvas, porcelain type, a single
         // muted champagne metallic for hairlines and rare emphasis. No second
         // accent hue — restraint is the luxury signal.

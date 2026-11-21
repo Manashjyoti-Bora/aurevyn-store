@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { UPI_VPA_PATTERN, env } from './env';
 import { prisma } from './db';
+import { BRAND } from './brand';
 
 /**
  * Store settings: typed key-value configuration stored in the database,
@@ -296,17 +297,31 @@ const CACHE_TTL_MS = 30_000;
 let cache: { data: StoreSettings; at: number } | null = null;
 
 const FALLBACK: StoreSettings = settingsSchema.parse({
-  storeName: process.env.APP_NAME ?? 'Zenvora',
-  supportEmail: 'support@example.com',
+  storeName: process.env.APP_NAME ?? BRAND.name,
+  supportEmail: BRAND.placeholderSupportEmail,
   currency: 'INR',
 });
+
+/**
+ * A rebrand changes the shipped default; a store still carrying a previous
+ * default name is shown under the current brand. A name the owner chose
+ * deliberately is not in `BRAND.legacyNames`, so it is never touched.
+ */
+function applyRebrand<T extends Pick<StoreSettings, 'storeName'>>(settings: T): T {
+  const isLegacy = BRAND.legacyNames.some(
+    (name) => name.toLowerCase() === settings.storeName.trim().toLowerCase()
+  );
+  return isLegacy ? { ...settings, storeName: BRAND.name } : settings;
+}
 
 export async function getSettings(): Promise<StoreSettings> {
   if (cache && Date.now() - cache.at < CACHE_TTL_MS) return cache.data;
   try {
     const row = await prisma.setting.findUnique({ where: { key: SETTINGS_KEY } });
-    const data = applySupportEmailFallback(
-      row ? settingsSchema.parse(mergeDefaults(row.value)) : FALLBACK
+    const data = applyRebrand(
+      applySupportEmailFallback(
+        row ? settingsSchema.parse(mergeDefaults(row.value)) : FALLBACK
+      )
     );
     cache = { data, at: Date.now() };
     return data;

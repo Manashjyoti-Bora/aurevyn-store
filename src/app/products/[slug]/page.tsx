@@ -15,6 +15,9 @@ import { Breadcrumbs } from '@/components/store/breadcrumbs';
 import { Badge } from '@/components/ui/badge';
 import { CreditCardIcon, ReceiptIcon } from '@/components/ui/icons';
 import { AddToCartButton } from '@/components/store/add-to-cart-button';
+import { ProductReviews } from '@/components/store/product-reviews';
+import { getCurrentUser } from '@/lib/auth/guards';
+import { getReviewSummary } from '@/lib/reviews/service';
 import { jsonLdScript } from '@/lib/utils';
 
 import { RecentlyViewedRecorder } from '@/components/store/recently-viewed-recorder';
@@ -64,7 +67,12 @@ export default async function ProductPage({ params }: Ctx) {
   const product = await getStorefrontProduct(slug);
   if (!product) notFound();
 
-  const [settings, related] = await Promise.all([getSettings(), getRelatedProducts(product, 4)]);
+  const [settings, related, user, reviewSummary] = await Promise.all([
+    getSettings(),
+    getRelatedProducts(product, 4),
+    getCurrentUser(),
+    getReviewSummary(product.id),
+  ]);
 
   const activeVariants = product.variants.filter((v) => v.isActive);
   const basePricePaise = toPaise(product.sellingPrice);
@@ -89,7 +97,11 @@ export default async function ProductPage({ params }: Ctx) {
       }))
     : [];
 
-  const images = product.images.map((i) => ({ url: i.url, alt: i.alt }));
+  const images = product.images.map((i) => ({
+    url: i.url,
+    alt: i.alt,
+    videoUrl: i.videoUrl,
+  }));
 
   // Public DTO boundary: everything below that leaves the server (structured
   // data, cached metadata) is derived from the whitelist mapper, so supplier
@@ -110,6 +122,20 @@ export default async function ProductPage({ params }: Ctx) {
     brand: publicProduct.brand ? { '@type': 'Brand', name: publicProduct.brand } : undefined,
     image: images.map((i) => (i.url.startsWith('http') ? i.url : `${env.APP_URL}${i.url}`)),
     url: `${env.APP_URL}/products/${publicProduct.slug}`,
+    // AggregateRating is emitted ONLY when real, verified reviews exist. A
+    // zero-review product ships no rating markup at all (Google treats invented
+    // ratings as spam and it would be dishonest to the customer).
+    ...(reviewSummary.count > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: reviewSummary.average,
+            reviewCount: reviewSummary.count,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
     offers:
       variantPrices.length > 1
         ? {
@@ -322,6 +348,13 @@ export default async function ProductPage({ params }: Ctx) {
           </dl>
         </div>
       </section>
+
+      <ProductReviews
+        productId={product.id}
+        productSlug={product.slug}
+        productName={product.name}
+        userId={user?.id ?? null}
+      />
 
       {related.length > 0 && (
         <section className="mt-12" aria-labelledby="related-products">

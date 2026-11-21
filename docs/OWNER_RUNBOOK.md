@@ -1,4 +1,4 @@
-# Owner runbook — Zenvora store
+# Owner runbook — Nirvora store
 
 Everything the owner has to do to run this store, in order. Nothing here needs a
 developer, and no payment API keys exist to manage: payments are UPI QR and Cash
@@ -33,10 +33,9 @@ invoices, policy pages and the AI co-founder read from them.
    do it), then `npm run db:create-admin` if no admin exists.
 2. Sign in at `/admin` and set: business identity, support email, COD on/off,
    **store UPI ID**, shipping rates, return/cancellation windows.
-3. **Catalogue.** A production database with no active products installs the
-   Meesho launch catalogue automatically the first time the server starts
-   (`AUTO_INSTALL_CATALOGUE=true`, the default). To re-run it by hand use
-   **Admin → Products → Install Meesho catalogue**: eleven items across six
+3. **Catalogue.** The deploy build never writes product data — installing the
+   catalogue is your call. Press **Admin → Products → Install Meesho catalogue**
+   once (or run `npm run catalogue:install`): eleven items across six
    low-return categories, all under ₹800, with studio visuals we own, real stock
    counts, stated sourcing cost and editable prices. It also switches `demoMode`
    off and archives any product from the older, higher-priced set. Existing
@@ -59,7 +58,7 @@ invoices, policy pages and the AI co-founder read from them.
 
 ## 4. Catalogue strategy: what we list, and why
 
-Zenvora resells from Meesho today. CJ Dropshipping will be added as a second
+Nirvora resells from Meesho today. CJ Dropshipping will be added as a second
 supplier once that account is funded; the supplier layer already supports it, so
 adding it is a supplier record, not a code change.
 

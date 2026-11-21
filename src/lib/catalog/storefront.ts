@@ -8,6 +8,7 @@ import {
   supplierFreshnessCutoff,
   type Availability,
 } from './availability';
+import { ratingsForProducts } from '../reviews/service';
 
 /**
  * Storefront catalog queries - read-only, ACTIVE products only.
@@ -39,6 +40,11 @@ export interface ProductCardData {
   categoryName: string | null;
   /** What the storefront is allowed to claim about availability. */
   availability: Availability;
+  /**
+   * Real verified-purchase rating, or null when the product has no published
+   * review yet (the card then renders no stars at all).
+   */
+  rating: { average: number; count: number } | null;
 }
 
 const cardInclude = {
@@ -97,7 +103,18 @@ export function toCardData(p: CardProduct): ProductCardData {
     hasVariants: p.hasVariants,
     categoryName: p.category?.name ?? null,
     availability,
+    rating: null,
   };
+}
+
+/**
+ * Attach verified-purchase ratings to a batch of cards in ONE grouped query.
+ * Cards without reviews keep `rating: null` and must not render stars.
+ */
+async function attachRatings(cards: ProductCardData[]): Promise<ProductCardData[]> {
+  if (cards.length === 0) return cards;
+  const ratings = await ratingsForProducts(cards.map((c) => c.id));
+  return cards.map((card) => ({ ...card, rating: ratings.get(card.id) ?? null }));
 }
 
 const orderByFor: Record<StoreSort, Prisma.ProductOrderByWithRelationInput[]> = {
@@ -212,7 +229,7 @@ export async function listStorefrontProducts(params: ListParams): Promise<ListRe
   ]);
 
   return {
-    items: rows.map(toCardData),
+    items: await attachRatings(rows.map(toCardData)),
     total,
     page,
     perPage,
@@ -305,7 +322,7 @@ export async function getRelatedProducts(
     });
     rows = [...rows, ...extra];
   }
-  return rows.map(toCardData);
+  return attachRatings(rows.map(toCardData));
 }
 
 // ---------------------------------------------------------------------------
@@ -373,7 +390,7 @@ export async function getFeaturedProducts(limit = 8): Promise<ProductCardData[]>
     orderBy: [{ sortOrder: 'desc' }, { viewCount: 'desc' }],
     take: limit,
   });
-  return rows.map(toCardData);
+  return attachRatings(rows.map(toCardData));
 }
 
 /**
@@ -390,7 +407,7 @@ export async function getSaleProducts(limit = 8): Promise<ProductCardData[]> {
     orderBy: { updatedAt: 'desc' },
     take: 60,
   });
-  return candidates
+  const cards = candidates
     .filter((p) => p.compareAtPrice !== null && p.compareAtPrice.gt(p.sellingPrice))
     .sort((a, b) => {
       const da = Number(a.compareAtPrice) - Number(a.sellingPrice);
@@ -399,6 +416,7 @@ export async function getSaleProducts(limit = 8): Promise<ProductCardData[]> {
     })
     .slice(0, limit)
     .map(toCardData);
+  return attachRatings(cards);
 }
 
 export async function getNewArrivals(limit = 8): Promise<ProductCardData[]> {
@@ -408,7 +426,7 @@ export async function getNewArrivals(limit = 8): Promise<ProductCardData[]> {
     orderBy: [{ createdAt: 'desc' }],
     take: limit,
   });
-  return rows.map(toCardData);
+  return attachRatings(rows.map(toCardData));
 }
 
 export function parseSort(value: string | undefined): StoreSort {

@@ -8,6 +8,7 @@ import { getSettings } from '@/lib/settings';
 import { MobileMenu } from './mobile-menu';
 import { AccountMenu } from './account-menu';
 import { SearchForm } from './search-form';
+import { ThemeToggle } from './theme-toggle';
 
 export async function Header() {
   const user = await getCurrentUser();
@@ -90,6 +91,7 @@ export async function Header() {
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-1 md:ml-2">
+            <ThemeToggle className="hidden sm:flex" />
             <AccountMenu user={user} />
 
             <Link

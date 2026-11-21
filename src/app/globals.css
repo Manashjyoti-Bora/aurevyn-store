@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ZENVORA — "NOIR ATELIER" DESIGN SYSTEM
+   NIRVORA — "NOIR ATELIER" DESIGN SYSTEM
    Obsidian canvas · Porcelain type · Muted Champagne hairline · one accent.
 
    Direction: a monochrome atelier. Everything is ink, paper and light —
@@ -992,4 +992,114 @@
     background: white !important;
     color: black !important;
   }
+}
+
+/* ==========================================================================
+   LIGHT THEME — "Daylight Atelier"
+   An ADDITIVE layer: with no `data-theme` attribute the store renders exactly
+   as it did before. The inline script in the root layout applies the stored
+   choice before first paint, so there is never a flash of the wrong canvas.
+   Warm off-white canvas, white raised surfaces, near-black type, champagne
+   action fills (so a "light" button still reads as the brand accent).
+   ========================================================================== */
+[data-theme='light'] {
+  color-scheme: light;
+}
+
+[data-theme='light'],
+[data-theme='light'] body {
+  background-color: #f7f5ef;
+  color: #16160f;
+}
+
+/* Canvas & raised surfaces */
+[data-theme='light'] .bg-cream-50 { background-color: #f7f5ef; }
+[data-theme='light'] .bg-cream-50\/75 { background-color: rgba(247, 245, 239, 0.8); }
+[data-theme='light'] .bg-cream-100 { background-color: #ffffff; }
+[data-theme='light'] .bg-cream-100\/95 { background-color: rgba(255, 255, 255, 0.96); }
+[data-theme='light'] .bg-cream-200 { background-color: #ede9de; }
+[data-theme='light'] .bg-cream-300 { background-color: #dfd9c9; }
+[data-theme='light'] .bg-cream-400 { background-color: #cfc8b4; }
+
+/* Arbitrary obsidian surfaces used by the atelier frames */
+[data-theme='light'] .bg-\[\#08080A\],
+[data-theme='light'] .bg-\[\#0A0A0C\],
+[data-theme='light'] .bg-\[\#0B0B0E\],
+[data-theme='light'] .bg-\[\#0E0E11\] { background-color: #ffffff; }
+[data-theme='light'] .bg-\[\#050506\],
+[data-theme='light'] .bg-\[\#060607\] { background-color: #f7f5ef; }
+
+/* Type — the porcelain ramp becomes the near-black ramp */
+[data-theme='light'] .text-ink-950 { color: #0b0b08; }
+[data-theme='light'] .text-ink-900 { color: #16160f; }
+[data-theme='light'] .text-ink-800 { color: #23231b; }
+[data-theme='light'] .text-ink-700 { color: #38382d; }
+[data-theme='light'] .text-ink-600 { color: #4a4a3d; }
+[data-theme='light'] .text-ink-500 { color: #5c5c4d; }
+[data-theme='light'] .text-ink-400 { color: #71715f; }
+[data-theme='light'] .text-ink-300 { color: #8b8b79; }
+[data-theme='light'] .hover\:text-ink-950:hover { color: #0b0b08; }
+[data-theme='light'] .hover\:text-ink-900:hover { color: #16160f; }
+
+/* Ink-coloured fills (primary buttons) keep working: black fill, white label */
+[data-theme='light'] .bg-ink-900 { background-color: #16160f; }
+[data-theme='light'] .bg-ink-950 { background-color: #0b0b08; }
+[data-theme='light'] .bg-ink-900 .text-cream-50,
+[data-theme='light'] .bg-ink-950 .text-cream-50 { color: #faf8f1; }
+
+/* Champagne action fills + their (dark) labels */
+[data-theme='light'] .bg-brand-600 { background-color: #d8c39a; color: #16160f; }
+[data-theme='light'] .bg-brand-700 { background-color: #cbb488; color: #16160f; }
+[data-theme='light'] .bg-brand-600.text-white,
+[data-theme='light'] .bg-brand-700.text-white { color: #16160f; }
+[data-theme='light'] .hover\:bg-brand-700:hover { background-color: #cbb488; }
+[data-theme='light'] .hover\:bg-brand-800:hover { background-color: #b9a077; }
+[data-theme='light'] .text-brand-700 { color: #6b5a33; }
+[data-theme='light'] .text-brand-600 { color: #7a6738; }
+[data-theme='light'] .text-brand-500 { color: #8b7643; }
+[data-theme='light'] .hover\:text-brand-700:hover { color: #57492a; }
+
+/* Hairlines: white-on-black becomes ink-on-paper */
+[data-theme='light'] .border-white\/\[0\.07\],
+[data-theme='light'] .border-white\/\[0\.08\] { border-color: rgba(22, 22, 15, 0.12); }
+[data-theme='light'] .border-white\/\[0\.1\],
+[data-theme='light'] .border-white\/10 { border-color: rgba(22, 22, 15, 0.16); }
+[data-theme='light'] .border-white\/\[0\.06\] { border-color: rgba(22, 22, 15, 0.1); }
+[data-theme='light'] .border-cream-200 { border-color: #e3ddcd; }
+[data-theme='light'] .divide-white\/\[0\.06\] > :not([hidden]) ~ :not([hidden]),
+[data-theme='light'] .divide-white\/\[0\.08\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(22, 22, 15, 0.1);
+}
+[data-theme='light'] .bg-white\/\[0\.06\],
+[data-theme='light'] .hover\:bg-white\/\[0\.06\]:hover { background-color: rgba(22, 22, 15, 0.05); }
+[data-theme='light'] .bg-white\/5 { background-color: rgba(22, 22, 15, 0.04); }
+[data-theme='light'] .bg-white\/10 { background-color: rgba(22, 22, 15, 0.1); }
+
+/* Glass chrome: the sticky header and floating bars */
+[data-theme='light'] .glass-header {
+  background-color: rgba(251, 250, 245, 0.82);
+  border-color: rgba(22, 22, 15, 0.1);
+}
+[data-theme='light'] .glass-floating-control {
+  background-color: rgba(251, 250, 245, 0.9);
+  border-color: rgba(22, 22, 15, 0.12);
+  box-shadow: 0 -8px 30px -18px rgba(22, 22, 15, 0.4);
+}
+[data-theme='light'] .grain-page { display: none; }
+[data-theme='light'] .lux-frame::after { opacity: 0.25; }
+
+/* Dark full-bleed panels stay dark on purpose (photography, hero, footer) —
+   their own light text is preserved, so no override is needed there. */
+
+/* The hero's animated champagne sheen is designed for a black canvas; on paper
+   it must run through ink and deep gold so the line stays legible. */
+[data-theme='light'] .text-sheen {
+  background-image: linear-gradient(
+    100deg,
+    #6b5a33 0%,
+    #9c8452 34%,
+    #c6ad7a 52%,
+    #9c8452 70%,
+    #6b5a33 100%
+  );
 }

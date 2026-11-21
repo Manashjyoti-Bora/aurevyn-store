@@ -6,7 +6,7 @@ checklist below is the 2026-11-18 review.
 
 ## Authentication & authorization
 - Session cookies: httpOnly, sameSite, secure in production (`resellix_*` internal names kept
-  deliberately; brand-facing name is Zenvora).
+  deliberately; brand-facing name is Nirvora).
 - RBAC roles `USER / ADMIN / SUPER_ADMIN`. **Every** admin API and admin page runs
   `requireAdmin()`/RBAC guards (`src/lib/auth/guards.ts`) — verified 401/307 on live probes
   (`/admin` → 307 login, cron without secret → 401).

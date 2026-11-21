@@ -595,7 +595,7 @@ export class CJDropshippingAdapter implements SupplierAdapter {
       shippingAddress: input.shippingAddress.line1,
       shippingAddress2: input.shippingAddress.line2 ?? '',
       taxId: '',
-      remark: input.note ?? `Zenvora order ${input.orderNumber} (${input.paymentMethod})`,
+      remark: input.note ?? `Nirvora order ${input.orderNumber} (${input.paymentMethod})`,
       email: input.customer.email ?? '',
       consigneeID: '',
       payType: '',
@@ -1575,7 +1575,7 @@ function probeConclusion(r: CjProbeResult): string {
     return `All three CJ probes succeeded: the API key authenticates, the account reads as authorized, and product/myProduct/query returned ${returned} item(s) (total=${total}). There is no CJ-side blocker for catalog sync.`;
   }
   if (!r.getAccessToken.ok) {
-    return `CJ rejected the credential exchange itself (${r.classification}). Verify the environment variable holds the FULL key of Type "API Key" (CJ also issues MCP tokens, which are not API keys) for the "Zenvora API" app.`;
+    return `CJ rejected the credential exchange itself (${r.classification}). Verify the environment variable holds the FULL key of Type "API Key" (CJ also issues MCP tokens, which are not API keys) for the "Nirvora API" app.`;
   }
   if (!r.authenticatedProbe.ok) {
     const len = r.getAccessToken.tokenLength;
@@ -1593,7 +1593,7 @@ function probeConclusion(r: CjProbeResult): string {
   if (r.authenticatedProbe.root === 'NO_PERMISSION' || r.authenticatedProbe.isSandbox === true) {
     return `CJ itself reports this account as root=${r.authenticatedProbe.root ?? 'unknown'}, isSandbox=${String(r.authenticatedProbe.isSandbox)} — the token authenticates but the account is NOT fully authorized for API access. This must be fixed on CJ's side (API store authorization).`;
   }
-  return `CJ-side endpoint authorization mismatch: the token authenticates and setting/get succeeds (root=${r.authenticatedProbe.root ?? 'unknown'}), but product/myProduct/query still fails (code ${r.myProductQuery.code ?? 'n/a'}). This is not a Zenvora code or token-caching problem — send both requestIds to CJ support and verify the API store "Zenvora Store" authorization for the "Zenvora API" app.`;
+  return `CJ-side endpoint authorization mismatch: the token authenticates and setting/get succeeds (root=${r.authenticatedProbe.root ?? 'unknown'}), but product/myProduct/query still fails (code ${r.myProductQuery.code ?? 'n/a'}). This is not a Nirvora code or token-caching problem — send both requestIds to CJ support and verify the API store "Nirvora Store" authorization for the "Nirvora API" app.`;
 }
 
 export interface CjExtractedPage {

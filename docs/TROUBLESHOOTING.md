@@ -48,7 +48,7 @@ Symptom → cause → fix. Everything here was hit and solved during development
   (`tokenLength`) plus sha256 fingerprints and requestIds — safe to send to CJ support.
   `tokenLength: 500` = truncation signature; `593` = intact.
 - **Probe says `NETWORK_FAILURE`** — the runtime cannot reach
-  `developers.cjdropshipping.com` (sandboxed/offline environment). Not a Zenvora bug: the
+  `developers.cjdropshipping.com` (sandboxed/offline environment). Not a Nirvora bug: the
   probe reports transport failures honestly instead of faking success. Re-run from a
   network-connected runtime (Vercel).
 - **Log line `CJ forensic token received/sent length=…` looks redacted** — the logger

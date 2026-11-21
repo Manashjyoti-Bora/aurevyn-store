@@ -146,7 +146,7 @@ export function SupplierOrderActions({
           <Alert tone="warning" title="This does not contact the supplier">
             {status === 'CANCELLED'
               ? 'This legacy row was marked cancelled before supplier-confirmation tracking existed. Only continue after verifying the supplier confirmed cancellation. This records your attestation without changing the existing local status.'
-              : 'Only continue after the supplier has confirmed cancellation outside Zenvora. This records your confirmation, marks the supplier order cancelled, and closes its pending job.'}
+              : 'Only continue after the supplier has confirmed cancellation outside Nirvora. This records your confirmation, marks the supplier order cancelled, and closes its pending job.'}
           </Alert>
           <Field
             label="Supplier confirmation details"

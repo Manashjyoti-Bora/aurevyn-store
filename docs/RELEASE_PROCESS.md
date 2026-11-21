@@ -1,4 +1,4 @@
-# Release process — how Zenvora gets to Production safely
+# Release process — how Nirvora gets to Production safely
 
 This is the operational contract between the code, CI, Vercel and Neon.
 It replaces the previous bare build command

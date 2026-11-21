@@ -6,6 +6,7 @@ import { purgeExpiredSessions } from '@/lib/auth/session';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { purgeExpiredRateLimitBuckets } from '@/lib/rate-limit';
+import { runTeamCycle } from '@/lib/team/service';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,10 +38,22 @@ async function handleCron(req: Request): Promise<Response> {
   });
   const rateLimitBucketsPurged = await purgeExpiredRateLimitBuckets();
 
+  // The daily cron also drives one autonomous-team cycle, so the team keeps
+  // working even if only Vercel Cron is configured. A failure here must never
+  // fail the housekeeping run.
+  let team: { cycleId: string; counts: Record<string, number> } | null = null;
+  try {
+    const cycle = await runTeamCycle({ trigger: 'CRON' });
+    team = { cycleId: cycle.cycleId, counts: cycle.counts };
+  } catch (error) {
+    logger.error('Team cycle failed during daily cron', { error });
+  }
+
   return NextResponse.json({
     ok: true,
     jobs: stats,
     housekeeping: { sessionsPurged, cartsPurged: cartsPurged.count, rateLimitBucketsPurged },
+    team,
   });
 }
 

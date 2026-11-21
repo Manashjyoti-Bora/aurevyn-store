@@ -19,9 +19,11 @@ const boolStr = z
   .default(false);
 
 const optionalNonEmpty = <T extends z.ZodTypeAny>(schema: T) =>
-  schema.optional().transform((value): z.infer<T> | undefined =>
-    typeof value === 'string' && value.trim() === '' ? undefined : value
-  );
+  schema
+    .optional()
+    .transform((value): z.infer<T> | undefined =>
+      typeof value === 'string' && value.trim() === '' ? undefined : value
+    );
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -44,11 +46,7 @@ const envSchema = z.object({
    */
   UPI_VPA: z.preprocess(
     (v) => (typeof v === 'string' && v.trim() === '' ? undefined : v),
-    z
-      .string()
-      .max(120)
-      .regex(UPI_VPA_PATTERN, 'UPI_VPA must look like name@bank')
-      .optional()
+    z.string().max(120).regex(UPI_VPA_PATTERN, 'UPI_VPA must look like name@bank').optional()
   ),
   /** Payee name shown in the customer's UPI app (defaults to APP_NAME). */
   UPI_PAYEE_NAME: optionalNonEmpty(z.string().max(80)),
@@ -83,7 +81,7 @@ const envSchema = z.object({
   SMTP_SECURE: boolStr,
   SMTP_USER: optionalNonEmpty(z.string()),
   SMTP_PASS: optionalNonEmpty(z.string()),
-  EMAIL_FROM: z.string().default('Nirvora <no-reply@zenvora.local>'),
+  EMAIL_FROM: z.string().default('Nirvora <no-reply@nirvora.local>'),
   EMAIL_REPLY_TO: optionalNonEmpty(z.string()),
 
   /**
@@ -93,7 +91,6 @@ const envSchema = z.object({
    * A value saved in the admin UI always wins.
    */
   SUPPORT_EMAIL: optionalNonEmpty(z.string().email().max(160)),
-
 
   // --- Optional AI narrative provider (AI CEO) -------------------------------
   // Absent by default: the AI CEO runs deterministically (see
@@ -105,7 +102,6 @@ const envSchema = z.object({
   AI_BASE_URL: optionalNonEmpty(z.string().url()),
   AI_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60_000).default(15_000),
   AI_MAX_OUTPUT_TOKENS: z.coerce.number().int().min(50).max(2_000).default(500),
-
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -189,9 +185,7 @@ export function aiProviderConfig(): AiProviderConfig | null {
   if (!provider || !apiKey || !model) return null;
   const baseUrl =
     env.AI_BASE_URL ??
-    (provider === 'anthropic'
-      ? 'https://api.anthropic.com'
-      : 'https://api.openai.com');
+    (provider === 'anthropic' ? 'https://api.anthropic.com' : 'https://api.openai.com');
   return {
     provider,
     apiKey,

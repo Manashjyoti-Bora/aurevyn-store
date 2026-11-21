@@ -28,6 +28,7 @@ import { AuraCursor } from '@/components/store/aura-cursor';
 import { ChapterRail } from '@/components/store/chapter-rail';
 import { Fracture } from '@/components/store/fracture';
 import { CustomerVoices } from '@/components/store/customer-voices';
+import { AuraStage } from '@/components/store/aura-stage';
 
 export const dynamic = 'force-dynamic';
 
@@ -206,11 +207,8 @@ export default async function HomePage() {
           className="aura left-[8%] top-[-14%] h-[34rem] w-[34rem] animate-aurora bg-[radial-gradient(circle,rgba(198,173,122,0.16),transparent_68%)]"
           aria-hidden="true"
         />
-        <div
-          className="aura right-[-6%] top-[16%] h-[30rem] w-[30rem] animate-aurora bg-[radial-gradient(circle,rgba(245,243,236,0.09),transparent_70%)]"
-          style={{ animationDelay: '-8s' }}
-          aria-hidden="true"
-        />
+        {/* Chromatic aura — the 2026 refresh. Decorative only. */}
+        <AuraStage className="opacity-80" />
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.35]"
           aria-hidden="true"
@@ -250,7 +248,7 @@ export default async function HomePage() {
                 ) : (
                   <>
                     <span className="block">Considered objects,</span>
-                    <span className="text-sheen block">honestly priced.</span>
+                    <span className="aura-text block">honestly priced.</span>
                   </>
                 )}
               </h1>
@@ -264,7 +262,11 @@ export default async function HomePage() {
               </p>
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
-                <LinkButton href="/shop" size="lg" className="w-full justify-center sm:w-auto">
+                <LinkButton
+                  href="/shop"
+                  size="lg"
+                  className="w-full justify-center shadow-[0_22px_70px_-26px_rgba(139,92,246,0.95)] sm:w-auto"
+                >
                   Enter the catalogue
                 </LinkButton>
                 <Link
@@ -306,7 +308,7 @@ export default async function HomePage() {
             >
               <HeroPanel>
                 {heroProduct ? (
-                  <div className="relative mx-auto w-full max-w-[24rem]">
+                  <div className="aura-halo relative mx-auto w-full max-w-[24rem]">
                     <span
                       className="pointer-events-none absolute -left-3 -top-3 h-8 w-8 border-l border-t border-accent-400/50"
                       aria-hidden="true"
@@ -610,6 +612,53 @@ export default async function HomePage() {
       )}
 
       <CustomerVoices />
+
+      {/* ══════════════ THE STANDARD — chromatic glass, verifiable claims ══════════════ */}
+      <section className="container-store py-14 sm:py-20" aria-labelledby="aura-standard">
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-gradient-to-br from-[#0d0b16] via-[#08080a] to-[#071014] px-5 py-10 sm:px-10 sm:py-14">
+          <AuraStage className="opacity-60" />
+          <div className="relative">
+            <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-accent-400">
+              The {settings.storeName} standard
+            </p>
+            <h2
+              id="aura-standard"
+              className="mt-3 max-w-xl text-[1.9rem] font-normal leading-[1.05] tracking-[-0.035em] text-ink-900 sm:text-[2.6rem]"
+            >
+              Luxury is what you can
+              <span className="aura-text"> verify.</span>
+            </h2>
+            <p className="measure mt-3 max-w-lg text-sm leading-relaxed text-ink-400">
+              Three promises the software itself enforces — not a badge we bought.
+            </p>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              {[
+                {
+                  t: 'Verified reviews only',
+                  d: 'A review can only come from a delivered order, one per customer per product. Until then the section says so plainly.',
+                },
+                {
+                  t: 'Stock that cannot oversell',
+                  d: 'Inventory is reserved inside the order transaction, so two customers can never buy the last unit.',
+                },
+                {
+                  t: settings.tax.pricesIncludeTax ? 'One final price' : 'Transparent pricing',
+                  d: settings.tax.pricesIncludeTax
+                    ? 'Every ₹ shown is tax-inclusive. Shipping and COD fees appear before you pay, never after.'
+                    : 'Prices, shipping and tax are itemised before payment — no surprise line at the end.',
+                },
+              ].map((item) => (
+                <div key={item.t} className="aura-card p-5">
+                  <div className="aura-rule mb-4 w-10" />
+                  <h3 className="text-[15px] font-normal text-ink-900">{item.t}</h3>
+                  <p className="mt-2 text-[12.5px] leading-relaxed text-ink-400">{item.d}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ══════════════ MANIFESTO — the atelier's factual promises ══════════════ */}
       <section

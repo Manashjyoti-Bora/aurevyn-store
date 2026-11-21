@@ -1244,3 +1244,44 @@ model RateLimitBucket {
   @@index([resetAt])
   @@map("rate_limit_buckets")
 }
+
+// ---------------------------------------------------------------------------
+// Autonomous team
+// ---------------------------------------------------------------------------
+
+/// One run of the eight-agent team. Stored so the owner can audit what every
+/// agent concluded at a given time. A cycle is read-only for business records.
+model TeamCycle {
+  id          String         @id @default(cuid())
+  /// CRON | OWNER
+  trigger     String
+  agentCount  Int
+  actionCount Int
+  watchCount  Int
+  clearCount  Int
+  durationMs  Int
+  createdAt   DateTime       @default(now())
+  briefings   TeamBriefing[]
+
+  @@index([createdAt])
+  @@map("team_cycles")
+}
+
+model TeamBriefing {
+  id        String   @id @default(cuid())
+  cycleId   String
+  agentId   String
+  agentName String
+  status    String
+  headline  String
+  summary   String   @db.Text
+  findings  Json
+  priorities Json
+  createdAt DateTime @default(now())
+
+  cycle TeamCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+
+  @@unique([cycleId, agentId])
+  @@index([agentId, createdAt])
+  @@map("team_briefings")
+}

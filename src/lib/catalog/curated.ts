@@ -180,7 +180,9 @@ export const CURATED_PRODUCTS: CuratedProduct[] = [
   {
     name: 'GripMag Magnetic Phone Holder',
     slug: 'gripmag-magnetic-phone-holder',
-    sku: 'ZV-TEC-02',
+    // ZV-TEC-02 belonged to the retired power bank; SKUs are unique across the
+    // whole store, so the replacement takes the next free one.
+    sku: 'ZV-TEC-04',
     categorySlug: 'mobile-tech',
     shortDescription: 'Slim magnetic grip that doubles as a kickstand for one-handed scrolling.',
     description:
@@ -294,6 +296,7 @@ export const CURATED_PRODUCTS: CuratedProduct[] = [
 export interface InstallResult {
   created: string[];
   skipped: string[];
+  failed: string[];
   archived: string[];
   categoriesCreated: number;
   supplierCreated: boolean;
@@ -350,6 +353,7 @@ export async function installCuratedCatalogue(actor: Actor): Promise<InstallResu
 
   const created: string[] = [];
   const skipped: string[] = [];
+  const failed: string[] = [];
   for (const p of CURATED_PRODUCTS) {
     const existing = await prisma.product.findUnique({ where: { slug: p.slug } });
     if (existing) {
@@ -357,53 +361,68 @@ export async function installCuratedCatalogue(actor: Actor): Promise<InstallResu
       continue;
     }
     const categoryId = categoryIds.get(p.categorySlug) ?? null;
-    await saveProduct(
-      {
-        name: p.name,
-        slug: p.slug,
-        description: p.description,
-        shortDescription: p.shortDescription,
-        sku: p.sku,
-        brand: settingsBefore.storeName,
-        status: 'ACTIVE',
-        categoryId,
-        supplierId: supplier.id,
-        supplierSku: p.sku,
-        stockMode: 'LOCAL',
-        supplierCost: p.costPaise,
-        supplierShippingCost: p.shippingPaise,
-        otherCost: 0,
-        pricingMode: 'FIXED_PRICE',
-        fixedPrice: p.pricePaise,
-        fixedMargin: null,
-        percentMarkup: null,
-        minProfit: null,
-        roundingRule: 'NONE',
-        compareAtPrice: null,
-        taxRatePercent: 0,
-        weightGrams: p.weightGrams,
-        lengthCm: null,
-        widthCm: null,
-        heightCm: null,
-        seoTitle: `${p.name} — buy online in India`,
-        seoDescription: p.shortDescription.slice(0, 158),
-        images: [
-          { url: p.image, alt: `${p.name} — illustrative studio render`, position: 0, isPrimary: true },
-        ],
-        variants: [],
-      },
-      actor
-    );
-    // Real merchant stock + merchandising order. saveProduct intentionally does
-    // not manage stock counters (that is the inventory surface), so set them
-    // here in the same install step. Storefront "featured" ordering is
-    // sortOrder DESC, so the first item gets the highest number and leads the
-    // homepage hero.
-    await prisma.product.update({
-      where: { slug: p.slug },
-      data: { stock: p.stock, sortOrder: 100 - p.sortOrder },
-    });
-    created.push(p.slug);
+    // One bad row (a conflicting SKU, a validation change) must never stop the
+    // rest of the catalogue or the retirement of the previous set.
+    try {
+      await saveProduct(
+        {
+          name: p.name,
+          slug: p.slug,
+          description: p.description,
+          shortDescription: p.shortDescription,
+          sku: p.sku,
+          brand: settingsBefore.storeName,
+          status: 'ACTIVE',
+          categoryId,
+          supplierId: supplier.id,
+          supplierSku: p.sku,
+          stockMode: 'LOCAL',
+          supplierCost: p.costPaise,
+          supplierShippingCost: p.shippingPaise,
+          otherCost: 0,
+          pricingMode: 'FIXED_PRICE',
+          fixedPrice: p.pricePaise,
+          fixedMargin: null,
+          percentMarkup: null,
+          minProfit: null,
+          roundingRule: 'NONE',
+          compareAtPrice: null,
+          taxRatePercent: 0,
+          weightGrams: p.weightGrams,
+          lengthCm: null,
+          widthCm: null,
+          heightCm: null,
+          seoTitle: `${p.name} — buy online in India`,
+          seoDescription: p.shortDescription.slice(0, 158),
+          images: [
+            {
+              url: p.image,
+              alt: `${p.name} — illustrative studio render`,
+              position: 0,
+              isPrimary: true,
+            },
+          ],
+          variants: [],
+        },
+        actor
+      );
+      // Real merchant stock + merchandising order. saveProduct intentionally
+      // does not manage stock counters (that is the inventory surface), so set
+      // them here in the same install step. Storefront "featured" ordering is
+      // sortOrder DESC, so the first item gets the highest number and leads the
+      // homepage hero.
+      await prisma.product.update({
+        where: { slug: p.slug },
+        data: { stock: p.stock, sortOrder: 100 - p.sortOrder },
+      });
+      created.push(p.slug);
+    } catch (err) {
+      failed.push(p.slug);
+      console.error(
+        `[catalogue] could not publish ${p.slug}:`,
+        err instanceof Error ? err.message.split('\n').slice(-1)[0] : err
+      );
+    }
   }
 
   // Retire the previous, higher-priced launch set. Archiving keeps order
@@ -446,6 +465,7 @@ export async function installCuratedCatalogue(actor: Actor): Promise<InstallResu
     data: {
       created: created.length,
       skipped: skipped.length,
+      failed: failed.length,
       archived: archived.length,
       categoriesCreated,
       supplierCreated: supplier.created,
@@ -456,6 +476,7 @@ export async function installCuratedCatalogue(actor: Actor): Promise<InstallResu
   return {
     created,
     skipped,
+    failed,
     archived,
     categoriesCreated,
     supplierCreated: supplier.created,
@@ -464,9 +485,9 @@ export async function installCuratedCatalogue(actor: Actor): Promise<InstallResu
 }
 
 /**
- * Deploy-time bootstrap. Called from `src/instrumentation.ts` when the server
- * starts, so a fresh production database gets the real catalogue without
- * anyone clicking through the admin panel.
+ * Deploy-time bootstrap. Called by `scripts/install-catalogue.ts` at the end of
+ * the release build, so a fresh production database gets the real catalogue
+ * without anyone clicking through the admin panel.
  *
  * Deliberately conservative:
  *  - runs when the store has no ACTIVE product at all, or when it is still

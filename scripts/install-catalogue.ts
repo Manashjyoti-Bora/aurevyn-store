@@ -28,7 +28,8 @@ async function main(): Promise<void> {
 
   console.log(
     `[catalogue] created ${result.created.length}, skipped ${result.skipped.length}, ` +
-      `archived ${result.archived.length}, categories ${result.categoriesCreated}` +
+      `failed ${result.failed.length}, archived ${result.archived.length}, ` +
+      `categories ${result.categoriesCreated}` +
       (result.demoModeDisabled ? ', demo mode off' : '')
   );
 }

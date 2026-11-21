@@ -11,6 +11,7 @@ import { Alert } from '@/components/ui/feedback';
 interface InstallResult {
   created: string[];
   skipped: string[];
+  failed: string[];
   archived: string[];
   categoriesCreated: number;
   supplierCreated: boolean;
@@ -65,6 +66,9 @@ export function CatalogueInstaller({
           {result.supplierCreated ? ', and the Meesho sourcing partner was created' : ''}.
           {result.archived.length > 0
             ? ` ${result.archived.length} retired product${result.archived.length === 1 ? '' : 's'} archived.`
+            : ''}
+          {result.failed.length > 0
+            ? ` ${result.failed.length} piece${result.failed.length === 1 ? '' : 's'} could not be published — see the server log.`
             : ''}
           {result.demoModeDisabled ? ' Demo mode has been switched off.' : ''}
         </p>

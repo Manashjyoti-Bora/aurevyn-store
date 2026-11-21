@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/auth/guards';
 import { AdminNav } from '@/components/admin/admin-nav';
 import { getSettings } from '@/lib/settings';
 import { MenuIcon } from '@/components/ui/icons';
+import { OwnerVoiceAlert } from '@/components/admin/owner-voice-alert';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,6 +60,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </header>
         <main className="p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
+      <OwnerVoiceAlert />
     </div>
   );
 }

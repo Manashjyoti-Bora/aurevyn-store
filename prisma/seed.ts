@@ -262,7 +262,7 @@ async function main() {
 
   // ── Store settings (demoMode ON) ─────────────────────────────────────────
   await updateSettings({
-    storeName: process.env.APP_NAME ?? 'Resellix',
+    storeName: process.env.APP_NAME ?? 'Zenvora',
     storeTagline: 'Curated picks, delivered across India',
     supportEmail: adminEmail,
     supportPhone: '',

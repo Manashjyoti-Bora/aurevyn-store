@@ -192,7 +192,7 @@ export function ProductBuyBox({
         )}
         <WishlistButton productId={productId} />
         <ShareButton
-          title={`Check out this product on Nirvora`}
+          title={`Check out this product on Zenvora`}
           url={typeof window !== 'undefined' ? window.location.href : ''}
         />
       </div>

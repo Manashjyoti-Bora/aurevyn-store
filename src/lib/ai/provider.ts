@@ -1,7 +1,7 @@
 import { env } from '../env';
 
 /**
- * AI assistance status. Nirvora ships with NO AI provider configured: every
+ * AI assistance status. Zenvora ships with NO AI provider configured: every
  * "assist" feature must call `getAiStatus()` first and fall back to the
  * deterministic helpers below when `enabled` is false. Nothing in this module
  * contacts a network service, invents model output, or changes approval

@@ -32,7 +32,7 @@ import { AuraStage } from '@/components/store/aura-stage';
 
 export const dynamic = 'force-dynamic';
 
-/* Inline icon set — drawn for Nirvora, no emoji, no icon dependency. */
+/* Inline icon set — drawn for Zenvora, no emoji, no icon dependency. */
 function TruckIcon({ className = 'h-4 w-4' }: { className?: string }) {
   return (
     <svg
@@ -265,7 +265,7 @@ export default async function HomePage() {
                 <LinkButton
                   href="/shop"
                   size="lg"
-                  className="w-full justify-center shadow-[0_22px_70px_-26px_rgba(139,92,246,0.95)] sm:w-auto"
+                  className="zen-glow w-full justify-center shadow-[0_22px_70px_-26px_rgba(139,92,246,0.95)] sm:w-auto"
                 >
                   Enter the catalogue
                 </LinkButton>

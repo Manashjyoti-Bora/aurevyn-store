@@ -1308,3 +1308,49 @@
     #6b5a33 100%
   );
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ZENVORA CHROMATIC IDENTITY — additive colour layer (2026-11)
+   The house stays restrained (obsidian + porcelain + champagne), but the brand
+   mark, the announcement rail and key CTAs carry a vivid violet→cyan→rose
+   gradient. Colour is identity only — never used to encode data, never on
+   checkout/payment/product photos. Contrast is preserved: the gradient bar is
+   always dark enough for white type; the gradient text lives on dark glass.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.zen-gradient-text {
+  background-image: linear-gradient(100deg, #a78bfa 0%, #22d3ee 34%, #f9a8d4 60%, #c6ad7a 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: zen-pan 12s linear infinite;
+}
+@keyframes zen-pan {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* Dark, vivid bar — white type stays AA on every stop. */
+.zen-bar {
+  background-image: linear-gradient(100deg, #3b0764 0%, #0e7490 55%, #831843 100%);
+}
+
+/* Vivid mark / CTA fill. */
+.bg-zen-gradient {
+  background-image: linear-gradient(120deg, #7c3aed 0%, #06b6d4 55%, #ec4899 100%);
+}
+
+.zen-glow {
+  box-shadow:
+    0 0 0 1px rgba(167, 139, 250, 0.28),
+    0 20px 64px -26px rgba(124, 92, 246, 0.6);
+}
+
+/* Light theme: keep the gradient wordmark legible on paper. */
+[data-theme='light'] .zen-gradient-text {
+  background-image: linear-gradient(100deg, #6d28d9 0%, #0e7490 34%, #be185d 60%, #8e7440 100%);
+}

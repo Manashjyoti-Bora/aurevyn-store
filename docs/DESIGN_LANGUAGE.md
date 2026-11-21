@@ -7,7 +7,7 @@ Companion to: `FRONTEND_AUDIT_REPORT.md`, `FRONTEND_REDESIGN_REPORT.md`, `FINAL_
 
 A visitor should see: **a porcelain canvas, midnight ink, one deep-petrol action colour, one
 quiet champagne rule, big editorial type, real product photography treated like a magazine
-spread — and motion that behaves like physics, not decoration.** Nirvora reads as "a considered
+spread — and motion that behaves like physics, not decoration.** Zenvora reads as "a considered
 Indian commerce house," not a template: no gradients-for-their-own-sake, glass only on the few
 overlay surfaces listed in §1a, no faked hype.
 
@@ -97,7 +97,7 @@ underlay + shimmer skeleton until `onLoad`. Hover: 1.05 breathe on cards; **cros
 second product image where one exists** (signature, §D); desktop zoom 1.12 on PDP main image
 (pointer:fine + hover:hover gated). SVG bag-glyph placeholder when a product has no image.
 
-## 9. Motion language ("Nirvora ease")
+## 9. Motion language ("Zenvora ease")
 Tokens (`globals.css`): `--duration-micro 120ms` (hover tint, press), `--duration-fast 160ms`
 (toggles, chips), `--duration-normal 220ms` (dropdowns, toasts, drawers), `--duration-slow 240ms`
 (dialogs), `--duration-enter 450ms` (one-shot section reveal). Easing `--ease-zenvora`

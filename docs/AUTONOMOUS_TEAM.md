@@ -1,4 +1,4 @@
-# Nirvora — the autonomous team
+# Zenvora — the autonomous team
 
 Status: **implemented and tested**. Eight agents read the store on a schedule,
 rank what needs doing and store a briefing per cycle. They do not publish

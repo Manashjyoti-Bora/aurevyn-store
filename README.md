@@ -1,6 +1,6 @@
 # NIRVORA — automated reselling / dropshipping store (India, ₹ INR)
 
-> Store brand: **Nirvora** (set via `APP_NAME` / Admin → Settings). Internal code identifiers (package name, `resellix_*` cookie names, `RX-` order prefix) remain `resellix` — cosmetic only.
+> Store brand: **Zenvora** (set via `APP_NAME` / Admin → Settings). Internal code identifiers (package name, `resellix_*` cookie names, `RX-` order prefix) remain `resellix` — cosmetic only.
 
 A complete, production-oriented e-commerce platform for the reselling/dropshipping
 business model: **supplier cost → your price/margin → customer pays by UPI QR or

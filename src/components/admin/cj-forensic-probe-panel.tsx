@@ -18,7 +18,7 @@ import { Badge } from '@/components/ui/badge';
  * key or token values — safe to run against production while diagnosing.
  */
 
-/** The route answers with the probe result, or a Nirvora-side config gate. */
+/** The route answers with the probe result, or a Zenvora-side config gate. */
 type ProbeResponse =
   | ({
       zenvoraSide: true;

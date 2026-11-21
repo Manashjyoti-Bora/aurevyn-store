@@ -568,9 +568,9 @@ export function SupplierManager({ initial }: { initial: SupplierRow[] }) {
                 )}
               </Field>
               <p className="text-xs text-ink-400">
-                Map each Nirvora product to a CJ variant: store the CJ <code>vid</code> (or CJ SKU)
+                Map each Zenvora product to a CJ variant: store the CJ <code>vid</code> (or CJ SKU)
                 in the product&apos;s supplier SKU field. Cancellations/returns are manual via the
-                CJ dashboard — CJ&apos;s public API v2 does not expose them, and Nirvora says so
+                CJ dashboard — CJ&apos;s public API v2 does not expose them, and Zenvora says so
                 instead of pretending otherwise.
               </p>
             </div>

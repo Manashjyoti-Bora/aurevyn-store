@@ -48,11 +48,11 @@ export async function Header() {
           >
             <span
               aria-hidden="true"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-700 text-[13px] font-semibold text-cream-50 transition-transform duration-500 ease-zenvora [@media(hover:hover)]:group-hover:rotate-[18deg]"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zen-gradient text-[13px] font-semibold text-white transition-transform duration-500 ease-zenvora [@media(hover:hover)]:group-hover:rotate-[18deg]"
             >
               {settings.storeName.slice(0, 1).toUpperCase()}
             </span>
-            <span className="max-w-[130px] truncate text-xs font-medium uppercase tracking-[0.26em] text-ink-900 sm:max-w-none sm:text-sm sm:tracking-[0.3em]">
+            <span className="zen-gradient-text max-w-[130px] truncate text-xs font-medium uppercase tracking-[0.26em] text-ink-900 sm:max-w-none sm:text-sm sm:tracking-[0.3em]">
               {settings.storeName}
             </span>
           </Link>
@@ -91,7 +91,7 @@ export async function Header() {
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-1 md:ml-2">
-            <ThemeToggle className="hidden sm:flex" />
+            <ThemeToggle />
             <AccountMenu user={user} />
 
             <Link

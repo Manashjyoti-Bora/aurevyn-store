@@ -1,4 +1,4 @@
-# Owner runbook — Nirvora store
+# Owner runbook — Zenvora store
 
 Everything the owner has to do to run this store, in order. Nothing here needs a
 developer, and no payment API keys exist to manage: payments are UPI QR and Cash
@@ -58,7 +58,7 @@ invoices, policy pages and the AI co-founder read from them.
 
 ## 4. Catalogue strategy: what we list, and why
 
-Nirvora resells from Meesho today. CJ Dropshipping will be added as a second
+Zenvora resells from Meesho today. CJ Dropshipping will be added as a second
 supplier once that account is funded; the supplier layer already supports it, so
 adding it is a supplier record, not a code change.
 

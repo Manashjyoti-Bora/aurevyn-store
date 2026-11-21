@@ -2,7 +2,7 @@
 
 Status: **AUTOMATED** (runs on every product, cart, coupon and order — no external services required).
 
-This is the commercial core of Nirvora. It is a **configurable, deterministic pricing engine** —
+This is the commercial core of Zenvora. It is a **configurable, deterministic pricing engine** —
 not a prediction system. It never claims to know "what will sell best"; it only computes prices
 from costs and admin-configured rules, and shows its working.
 

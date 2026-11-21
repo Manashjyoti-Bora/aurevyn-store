@@ -1,5 +1,5 @@
 /**
- * Nirvora autonomous team — shared contracts.
+ * Zenvora autonomous team — shared contracts.
  *
  * The team is a set of specialised agents that each own one part of the store
  * and work on their own schedule. Two rules keep it honest:

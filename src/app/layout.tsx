@@ -126,7 +126,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <div className="grain-page" aria-hidden="true" />
             <DemoBanner demoMode={settings.demoMode} />
             {settings.announcement?.enabled && settings.announcement.text && (
-              <div className="bg-brand-700 px-4 py-2 text-center text-xs font-medium tracking-wide text-cream-100">
+              <div className="zen-bar px-4 py-2 text-center text-xs font-medium tracking-wide text-white">
                 <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-accent-300 align-middle" aria-hidden="true" />
                 {settings.announcement.text}
               </div>

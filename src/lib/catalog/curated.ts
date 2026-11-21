@@ -412,7 +412,24 @@ export async function installCuratedCatalogue(actor: Actor): Promise<InstallResu
   for (const slug of RETIRED_SLUGS) {
     const product = await prisma.product.findUnique({ where: { slug }, select: { id: true, status: true } });
     if (!product || product.status === 'ARCHIVED') continue;
-    await archiveProduct(product.id, actor);
+    try {
+      await archiveProduct(product.id, actor);
+    } catch (err) {
+      // archiveProduct ends with a storefront revalidation, which throws when
+      // the installer runs outside a request (the release build). The row is
+      // written first, so only fall back if it did not land.
+      const current = await prisma.product.findUnique({
+        where: { id: product.id },
+        select: { status: true },
+      });
+      if (current?.status !== 'ARCHIVED') {
+        await prisma.product.update({ where: { id: product.id }, data: { status: 'ARCHIVED' } });
+      }
+      console.warn(
+        `[catalogue] archived ${slug} without storefront revalidation:`,
+        err instanceof Error ? err.message : err
+      );
+    }
     archived.push(slug);
   }
 

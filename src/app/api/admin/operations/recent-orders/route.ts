@@ -56,5 +56,5 @@ export async function GET(req: Request) {
         createdAt: o.createdAt.toISOString(),
       })),
     });
-  })(req);
+  })(req, undefined);
 }

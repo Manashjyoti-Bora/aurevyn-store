@@ -52,7 +52,12 @@ export function OwnerVoiceAlert() {
   const [enabled, setEnabled] = useState(true);
   const seenRef = useRef<Set<string>>(loadSeen());
   const enabledRef = useRef(true);
-  const supported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  // Resolved after mount so server and first client render agree (no hydration
+  // mismatch); the button only appears once we know speech is available.
+  const [supported, setSupported] = useState(false);
+  useEffect(() => {
+    setSupported(typeof window !== 'undefined' && 'speechSynthesis' in window);
+  }, []);
 
   useEffect(() => {
     const stored = localStorage.getItem(ENABLED_KEY);

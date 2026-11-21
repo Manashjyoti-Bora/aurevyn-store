@@ -221,6 +221,7 @@ export default async function AdminSupplierOrdersPage({
                   <SupplierOrderActions
                     supplierOrderId={so.id}
                     status={so.status}
+                    supplierType={so.supplier.type}
                     manualCancellationRequired={[
                       'MANUAL_ACTION_REQUIRED',
                       'SUBMITTING',

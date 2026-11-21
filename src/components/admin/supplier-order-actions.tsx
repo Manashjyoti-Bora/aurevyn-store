@@ -12,16 +12,20 @@ import { Alert } from '@/components/ui/feedback';
 export function SupplierOrderActions({
   supplierOrderId,
   status,
+  supplierType,
   manualCancellationRequired = false,
   manualCancellationAvailable = false,
 }: {
   supplierOrderId: string;
   status: string;
+  supplierType?: string;
   manualCancellationRequired?: boolean;
   manualCancellationAvailable?: boolean;
 }) {
   const router = useRouter();
   const [shipOpen, setShipOpen] = useState(false);
+  const [meeshoOpen, setMeeshoOpen] = useState(false);
+  const [meeshoOrderId, setMeeshoOrderId] = useState('');
   const [manualCancelOpen, setManualCancelOpen] = useState(false);
   const [manualCancelNote, setManualCancelNote] = useState('');
   const [carrier, setCarrier] = useState('');
@@ -42,6 +46,24 @@ export function SupplierOrderActions({
       router.refresh();
     } catch (err) {
       toast(err instanceof ApiClientError ? err.message : 'Retry failed', 'error');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function saveMeeshoId() {
+    setBusy(true);
+    setError(null);
+    try {
+      await apiFetch(`/api/admin/supplier-orders/${supplierOrderId}/meesho-id`, {
+        body: { meeshoOrderId: meeshoOrderId.trim() },
+      });
+      toast('Meesho order recorded — customer notified, team takes over', 'success');
+      setMeeshoOpen(false);
+      setMeeshoOrderId('');
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : 'Could not record the Meesho order');
     } finally {
       setBusy(false);
     }
@@ -101,6 +123,18 @@ export function SupplierOrderActions({
           {status === 'CANCELLED' ? 'Verify supplier cancellation' : 'Record manual cancellation'}
         </Button>
       )}
+      {supplierType === 'MEESHO' && !['CANCELLED', 'DELIVERED'].includes(status) && (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setMeeshoOpen(true);
+            setError(null);
+          }}
+        >
+          Record Meesho ID
+        </Button>
+      )}
       {canRetry && (
         <Button variant="outline" size="sm" onClick={retry} loading={busy}>
           Retry
@@ -117,6 +151,41 @@ export function SupplierOrderActions({
           Mark shipped
         </Button>
       )}
+      <Modal
+        open={meeshoOpen}
+        onClose={() => setMeeshoOpen(false)}
+        title="Meesho order placed"
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setMeeshoOpen(false)} disabled={busy}>
+              Cancel
+            </Button>
+            <Button onClick={saveMeeshoId} loading={busy} disabled={meeshoOrderId.trim().length < 6}>
+              Save & confirm to customer
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-3">
+          {error && <Alert tone="error">{error}</Alert>}
+          <p className="text-sm text-ink-600">
+            Paste the order ID Meesho gave you after placing this purchase (for example
+            MEESHO-123456789). The store uses this single reference to advance the order, email the
+            customer that it is confirmed, and attach every later tracking update.
+          </p>
+          <Field label="Meesho order ID" required hint="Format: MEESHO-XXXXXXXX">
+            {(p) => (
+              <Input
+                {...p}
+                value={meeshoOrderId}
+                onChange={(e) => setMeeshoOrderId(e.target.value.toUpperCase())}
+                maxLength={48}
+                placeholder="MEESHO-123456789"
+              />
+            )}
+          </Field>
+        </div>
+      </Modal>
       <Modal
         open={manualCancelOpen}
         onClose={() => setManualCancelOpen(false)}

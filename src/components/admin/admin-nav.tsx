@@ -28,6 +28,7 @@ const GROUPS: NavGroup[] = [
   {
     title: 'Catalog',
     items: [
+      { href: '/admin/sourcing', label: 'Meesho sourcing' },
       { href: '/admin/products', label: 'Products' },
       { href: '/admin/categories', label: 'Categories' },
       { href: '/admin/inventory', label: 'Inventory' },

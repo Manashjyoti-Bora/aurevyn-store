@@ -824,6 +824,95 @@ export async function markSupplierOrderShipped(params: {
   });
 }
 
+/**
+ * Record the Meesho order ID the owner got after placing the purchase in the
+ * Meesho app.
+ *
+ * Meesho has no ordering API, so the owner places the order and the store
+ * records the real reference it returns. That single ID is what the team needs
+ * to resume the hands-free part: the customer is told the order is confirmed,
+ * the order advances to supplier-accepted, and later tracking updates attach
+ * to the same supplier order.
+ */
+export async function recordMeeshoOrderPlacement(params: {
+  supplierOrderId: string;
+  meeshoOrderId: string;
+  adminId: string;
+}): Promise<{ orderId: string; orderNumber: string; meeshoOrderId: string }> {
+  const reference = params.meeshoOrderId.trim().toUpperCase();
+  if (!/^MEESHO-[A-Z0-9-]{4,40}$/.test(reference)) {
+    throw new PermanentJobError(
+      'Use the Meesho order ID in the form MEESHO-XXXXXXXX (letters, digits and dashes).'
+    );
+  }
+
+  const so = await prisma.supplierOrder.findUnique({
+    where: { id: params.supplierOrderId },
+    include: { supplier: true, order: true },
+  });
+  if (!so) throw notFound('Supplier order not found');
+  if (so.supplier.type !== 'MEESHO') {
+    throw new PermanentJobError('This supplier order is not fulfilled through Meesho.');
+  }
+  if (so.supplierOrderId && so.supplierOrderId !== reference) {
+    throw conflict(`A different Meesho order ID (${so.supplierOrderId}) is already recorded.`);
+  }
+
+  const duplicate = await prisma.supplierOrder.findFirst({
+    where: { supplierOrderId: reference, NOT: { id: so.id } },
+    select: { id: true },
+  });
+  if (duplicate) throw conflict('That Meesho order ID is already attached to another order.');
+
+  await prisma.supplierOrder.update({
+    where: { id: so.id },
+    data: {
+      supplierOrderId: reference,
+      status: 'ACCEPTED',
+      sentAt: so.sentAt ?? new Date(),
+      acceptedAt: so.acceptedAt ?? new Date(),
+      attempts: { increment: 1 },
+      lastError: null,
+    },
+  });
+
+  await recordOrderEvent({
+    orderId: so.orderId,
+    type: 'SUPPLIER_ACCEPTED',
+    message: `Meesho order ${reference} placed by the owner`,
+    data: { supplierOrderId: so.id, meeshoOrderId: reference, adminId: params.adminId },
+  });
+
+  await advanceOrderFulfilment(so.orderId, 'SUPPLIER_ACCEPTED', {
+    supplierOrderId: reference,
+    supplier: so.supplier.name,
+  });
+
+  // The customer is told the order is confirmed; the team owns every message
+  // after this point (dispatch, tracking, delivery).
+  const vars = await renderOrderEmailVars(so.orderId);
+  await queueNotification({
+    template: 'ORDER_PROCESSING',
+    email: so.order.guestEmail ?? vars.email,
+    userId: so.order.userId,
+    orderId: so.orderId,
+    vars,
+    skipIfNoEmail: true,
+    dedupeExtra: `meesho-${reference}`,
+  });
+
+  logger.info('Meesho order placement recorded', {
+    supplierOrderId: so.id,
+    orderNumber: so.order.orderNumber,
+  });
+
+  return {
+    orderId: so.orderId,
+    orderNumber: so.order.orderNumber,
+    meeshoOrderId: reference,
+  };
+}
+
 /** Admin retry after a fulfilment failure. */
 export async function retrySupplierFulfilment(
   supplierOrderId: string,

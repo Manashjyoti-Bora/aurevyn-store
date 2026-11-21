@@ -3,10 +3,12 @@ import Link from 'next/link';
 import { getSessionUser } from '@/lib/auth/session';
 import { PERMISSION_LEVEL_LABELS, permissionLevelOf } from '@/lib/auth/permissions';
 import { loadCofounderFacts } from '@/lib/cofounder/service';
+import { loadVoiceBriefing } from '@/lib/cofounder/voice';
 import { formatINR } from '@/lib/money';
 import { Badge } from '@/components/ui/badge';
 import { Alert, Card, EmptyState, StatCard } from '@/components/ui/feedback';
 import { CofounderChat } from '@/components/admin/cofounder-chat';
+import { CofounderVoice } from '@/components/admin/cofounder-voice';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'AI Cofounder — Admin', robots: { index: false } };
@@ -21,7 +23,7 @@ const SEVERITY_TONE: Record<string, 'red' | 'amber' | 'blue' | 'gray'> = {
 export default async function CofounderPage() {
   const session = await getSessionUser();
   const level = permissionLevelOf(session?.user ?? null);
-  const loaded = await loadCofounderFacts();
+  const [loaded, voice] = await Promise.all([loadCofounderFacts(), loadVoiceBriefing()]);
 
   const header = (
     <header className="space-y-2">
@@ -90,6 +92,8 @@ export default async function CofounderPage() {
           tone={facts.risks.length > 0 ? 'negative' : 'positive'}
         />
       </dl>
+
+      <CofounderVoice initial={voice} />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.55fr_1fr]">
         <CofounderChat storeName={facts.storeName} headline={facts.headline} />

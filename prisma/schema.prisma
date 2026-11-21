@@ -1285,3 +1285,44 @@ model TeamBriefing {
   @@index([agentId, createdAt])
   @@map("team_briefings")
 }
+
+// ---------------------------------------------------------------------------
+
+/// One Meesho listing the owner is considering, scored from evidence the
+/// owner entered. Meesho exposes no public catalogue API, so nothing here is
+/// scraped: the store keeps the numbers the owner actually saw.
+model SourcingCandidate {
+  id                  String   @id @default(cuid())
+  /// Stable listing identity (url slug / sku / name+price), prevents duplicates.
+  externalKey         String   @unique
+  name                String
+  meeshoUrl           String?
+  sku                 String?
+  supplierPricePaise  Int
+  shippingPaise       Int      @default(0)
+  mrpPaise            Int?
+  rating              Float?
+  reviewCount         Int?
+  unitsSold           Int?
+  returnRatePercent   Float?
+  trendScore          Int?
+  landedCostPaise     Int
+  suggestedPricePaise Int
+  marginPaise         Int
+  marginPercent       Float
+  score               Int
+  /// PUBLISH | WATCH | SKIP
+  verdict             String
+  reasons             Json
+  flags               Json
+  /// OPEN | DRAFTED | DISMISSED
+  status              String   @default("OPEN")
+  productId           String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([score])
+  @@index([verdict])
+  @@index([status, createdAt])
+  @@map("sourcing_candidates")
+}

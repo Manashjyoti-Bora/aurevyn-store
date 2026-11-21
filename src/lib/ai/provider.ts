@@ -5,7 +5,7 @@ import { env } from '../env';
  * "assist" feature must call `getAiStatus()` first and fall back to the
  * deterministic helpers below when `enabled` is false. Nothing in this module
  * contacts a network service, invents model output, or changes approval
- * policy — AI can propose, never approve (see docs/AUTONOMOUS_OPERATIONS.md).
+ * policy — AI can propose, never approve (see docs/OWNER_RUNBOOK.md).
  */
 export interface AiStatus {
   enabled: false;

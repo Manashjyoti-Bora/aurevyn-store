@@ -77,7 +77,7 @@ adapter.getProducts() ─▶ upsert SupplierProduct (provenance, cost, stock, la
                             settings.autoImport.autoPublishEligible === true  (default false)
 ```
 
-What it does **not** have yet (see `ROADMAP.md` → Phase 5): a lifecycle status on
+What it does **not** have yet (see `docs/OWNER_RUNBOOK.md`): a lifecycle status on
 `SupplierProduct`, an explainable score with confidence/sample size, freshness classes,
 persisted rejection reasons, a contribution model that separates estimates from realised costs,
 and a dry-run report.
@@ -119,7 +119,7 @@ Vercel env vars `DATABASE_URL`/`DIRECT_URL` exist separately per environment.
   Server components by default; `'use client'` only where state/events are needed.
 - **Layering:** z-index is a CSS-variable ladder in `globals.css` (`--z-floating 30 … --z-skip 80`)
   applied by the glass role classes; new overlays must use a role class, not ad-hoc `z-*`.
-  Table in `docs/DESIGN_SYSTEM.md` §4.
+  Table in `docs/DESIGN_LANGUAGE.md` §4.
 - **Glass:** role classes `.glass-header/.glass-nav/.glass-floating-control/.glass-popover/
   .glass-drawer/.glass-dialog/.glass-filter-panel/.glass-toast`; opaque fallback first,
   blur gated by `@supports` and `prefers-reduced-transparency`.
@@ -130,7 +130,7 @@ Vercel env vars `DATABASE_URL`/`DIRECT_URL` exist separately per environment.
   empty states are plain copy with one action.
 - **URL-synced filters:** `/shop` and `/search` read filters/sort/page from `searchParams`;
   the filter sidebar writes back to the URL so state survives reload and sharing.
-- **Tokens:** colours only via Tailwind role names / CSS variables (see `docs/DESIGN_SYSTEM.md`).
+- **Tokens:** colours only via Tailwind role names / CSS variables (see `docs/DESIGN_LANGUAGE.md`).
 - **Business info:** `SUPPORT_EMAIL` env is a fallback only while the stored support e-mail is the
   shipped placeholder (`applySupportEmailFallback`, `src/lib/settings.ts`).
 

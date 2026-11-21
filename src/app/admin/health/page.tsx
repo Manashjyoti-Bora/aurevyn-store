@@ -149,7 +149,7 @@ export default async function AdminHealthPage() {
             ))}
           </ul>
           <p className="mt-1">
-            Resolve each item per docs/LAUNCH_READINESS.md before taking real orders.
+            Resolve each item per docs/OWNER_RUNBOOK.md before taking real orders.
           </p>
         </Alert>
       ) : (
@@ -351,7 +351,7 @@ export default async function AdminHealthPage() {
         <h2 className="mb-1 text-sm font-semibold text-ink-900">Environment configuration</h2>
         <p className="mb-3 text-xs text-ink-400">
           Presence check only — values are never rendered here or sent to the browser. Full guidance
-          in <code>.env.example</code> and SETUP_CHECKLIST.md.
+          in <code>.env.example</code> and docs/OWNER_RUNBOOK.md.
         </p>
         <div className="grid gap-x-8 gap-y-0 sm:grid-cols-2 lg:grid-cols-3">
           <ul>

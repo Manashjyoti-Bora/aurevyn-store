@@ -1,6 +1,6 @@
 # Security posture
 
-Last verified against code + live deployment: 2026-11-18 (see `docs/AUDIT_2026-09-05.md` for the
+Last verified against code + live deployment: 2026-11-18 (the security log lives in this file;
 route-by-route audit; this file is the summary that must stay true). The 20-item pre-launch
 checklist below is the 2026-11-18 review.
 

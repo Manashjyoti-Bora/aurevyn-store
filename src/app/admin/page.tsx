@@ -140,7 +140,7 @@ export default async function AdminDashboard({
       {payments.kind === 'NONE' && (
         <Alert tone="error" title="Payments are not configured">
           Online checkout cannot take payments until gateway credentials are added (see
-          SETUP_CHECKLIST.md).{' '}
+          docs/OWNER_RUNBOOK.md).{' '}
           {settings.shipping.codEnabled
             ? 'COD orders still work.'
             : 'COD is also disabled — no orders can be completed.'}

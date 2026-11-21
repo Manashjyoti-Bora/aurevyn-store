@@ -62,7 +62,7 @@ export function DemoExplainer({ activeCount }: { activeCount?: number } = {}) {
           <span>
             The owner can switch off demo mode in <strong>Admin → Settings</strong> once real
             products, payment credentials and shipping arrangements are configured (see
-            SETUP_CHECKLIST.md).
+            docs/OWNER_RUNBOOK.md).
           </span>
         </li>
       </ul>

@@ -29,4 +29,4 @@ MANUAL · NOT SUPPORTED**.
 | GST invoicing / legal compliance | MANUAL | invoice numbering exists; tax filing and compliance need your CA — not legal advice |
 
 Nothing above claims more than what the code does today. Items marked REQUIRES CONFIGURATION
-list their exact env vars in `docs/ENVIRONMENT.md` and `USER_INPUT_REQUIRED.md`.
+list their exact env vars in `docs/ENVIRONMENT.md` and `docs/OWNER_RUNBOOK.md`.

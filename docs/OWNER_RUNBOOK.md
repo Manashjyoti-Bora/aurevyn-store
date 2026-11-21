@@ -33,10 +33,14 @@ invoices, policy pages and the AI co-founder read from them.
    do it), then `npm run db:create-admin` if no admin exists.
 2. Sign in at `/admin` and set: business identity, support email, COD on/off,
    **store UPI ID**, shipping rates, return/cancellation windows.
-3. **Admin → Products → Install launch catalogue.** One click publishes twelve
-   ready-to-sell pieces across five categories (studio visuals we own, real stock
-   counts, stated sourcing cost, editable prices) and switches `demoMode` off.
-   Existing products are never overwritten, so it is safe to run again later.
+3. **Catalogue.** A production database with no active products installs the
+   Meesho launch catalogue automatically the first time the server starts
+   (`AUTO_INSTALL_CATALOGUE=true`, the default). To re-run it by hand use
+   **Admin → Products → Install Meesho catalogue**: eleven items across six
+   low-return categories, all under ₹800, with studio visuals we own, real stock
+   counts, stated sourcing cost and editable prices. It also switches `demoMode`
+   off and archives any product from the older, higher-priced set. Existing
+   products are never overwritten, so it is safe to run again later.
 4. Place one real ₹1 order, pay it by UPI, and confirm it with **Mark received**
    in Admin → Payments (see `docs/PAYMENT_SETUP.md`).
 5. Check `/api/health` returns `status: "ok"`, `paymentsConfigured: true`, and
@@ -53,7 +57,31 @@ invoices, policy pages and the AI co-founder read from them.
 - **Admin → Health** — database, payments, email and launch blockers.
 - **Admin → Operations** — job queue, supplier sync and automation posture.
 
-## 4. Sourcing: buying the stock on Meesho
+## 4. Catalogue strategy: what we list, and why
+
+Zenvora resells from Meesho today. CJ Dropshipping will be added as a second
+supplier once that account is funded; the supplier layer already supports it, so
+adding it is a supplier record, not a code change.
+
+The catalogue rule is deliberate and worth keeping as you add products:
+
+- **Sell in the ₹249–₹799 band.** Meesho's volume sits at ₹99–₹499; under ₹500
+  converts, above ₹1,000 sits unsold.
+- **Prefer low-return categories.** Kitchen utility, storage and organisation,
+  phone accessories, lighting, stationery and small self-care tools. They are
+  unisex, need no size chart and are hard to return "because it didn't fit".
+- **Avoid apparel and footwear** while the store is small. Size and fit returns
+  are the fastest way to turn a 60% margin into a loss.
+- **Avoid fragile, food, cosmetic and battery-heavy items** until a real returns
+  process and a GST/legal review exist for them.
+- **Source on price, then check quality.** The cheapest Meesho listing is often
+  the one that comes back; read recent reviews and the return rate before
+  ordering stock.
+
+Every product in the catalogue carries a stated sourcing cost and shipping cost,
+so Admin → Analytics shows real profit rather than optimism.
+
+## 5. Sourcing: buying the stock on Meesho
 
 The launch catalogue is linked to a supplier called **Meesho (own sourcing)**
 (Admin → Suppliers). Nothing is automated through an API, because Meesho does
@@ -69,7 +97,7 @@ not publish one — the flow is real, just manual:
 Delivery estimates on the storefront are your own promise, so keep the promised
 window wider than Meesho's (the catalogue uses 2–4 business days).
 
-## 5. Instant owner alerts
+## 6. Instant owner alerts
 
 When a customer submits a UPI reference, the store notifies you twice:
 
@@ -82,7 +110,7 @@ When a customer submits a UPI reference, the store notifies you twice:
 Admin → Payments also shows a standing banner with the number of references
 waiting for verification, so nothing gets forgotten during a busy day.
 
-## 6. Deploying changes
+## 7. Deploying changes
 
 - Push to `main`. CI runs typecheck, lint, tests and a release build against a
   throw-away PostgreSQL service; the host then deploys.
@@ -91,12 +119,12 @@ waiting for verification, so nothing gets forgotten during a busy day.
 - Payment configuration changed? Nothing to redeploy: change the UPI ID in
   Admin → Settings.
 
-## 7. Honest limits
+## 8. Honest limits
 
 - UPI money is confirmed by you, not by software. The store never marks a UPI
   order paid automatically, and there is no webhook.
 - Refunds are manual. There is no API to reverse a UPI transfer.
-- The launch catalogue's visuals are studio renders we generated, and the
+- The catalogue's visuals are studio renders we generated, and the
   storefront says so in the footer and in every image's alt text. Replace them
   with real photographs of the actual stock as soon as you have them — a render
   is an illustration, not evidence of what arrived.

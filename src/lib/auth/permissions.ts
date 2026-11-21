@@ -15,7 +15,7 @@ import type { SessionUser } from './session';
  * Today the admin area is ADMIN-only (see src/app/admin/layout.tsx), so STAFF
  * effectively sits at level 2 only for API routes that call requireStaff().
  * Automation (cron, AI helpers, job runner) acts at most as level 3 and can
- * never grant itself level 4 — see docs/AUTONOMOUS_OPERATIONS.md.
+ * never grant itself level 4 — see docs/OWNER_RUNBOOK.md.
  */
 export type PermissionLevel = 0 | 1 | 2 | 3 | 4;
 

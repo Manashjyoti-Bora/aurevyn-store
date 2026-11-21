@@ -5,7 +5,7 @@ import { isPlaceholderEmail } from '@/lib/settings';
  * Launch blockers and configuration gaps, derived from stored settings and
  * the validated environment. Pure: both admin pages (Health, Operations)
  * call this so they never disagree. Nothing here is a legal determination;
- * see docs/LAUNCH_READINESS.md for the owner-facing checklist.
+ * see docs/OWNER_RUNBOOK.md for the owner-facing checklist.
  */
 export interface LaunchReadiness {
   /** Must be fixed before real customers pay. */

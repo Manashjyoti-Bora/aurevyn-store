@@ -222,7 +222,7 @@ export function CheckoutForm(props: CheckoutProps) {
             className="border-amber-400/20 bg-amber-400/[0.05] text-amber-800"
           >
             Online payments are not configured on this store yet and Cash on Delivery is disabled.
-            The store owner needs to complete the payment setup (see SETUP_CHECKLIST.md). In the
+            The store owner needs to complete the payment setup (see docs/OWNER_RUNBOOK.md). In the
             meantime, please{' '}
             <Link href="/contact" className="link-primary">
               contact us

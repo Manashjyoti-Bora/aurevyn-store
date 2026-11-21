@@ -33,4 +33,4 @@ fast with a clear message; storage providers fall back to `local` **loudly** (lo
 misconfigured instead of silently failing uploads.
 
 Local dev: copy `.env.example` → `.env.local`, point DATABASE_URL/DIRECT_URL at local Postgres,
-generate your own secrets. See `SETUP_CHECKLIST.md`.
+generate your own secrets. See `docs/OWNER_RUNBOOK.md`.

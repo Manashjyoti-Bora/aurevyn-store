@@ -1,6 +1,6 @@
 # ZENVORA — automated reselling / dropshipping store (India, ₹ INR)
 
-> Store brand: **Zenvora** (set via `APP_NAME` / Admin → Settings). Internal code identifiers (package name, `resellix_*` cookie names, `RX-` order prefix) remain `resellix` — cosmetic only; see USER_INPUT_REQUIRED.md §E.
+> Store brand: **Zenvora** (set via `APP_NAME` / Admin → Settings). Internal code identifiers (package name, `resellix_*` cookie names, `RX-` order prefix) remain `resellix` — cosmetic only.
 
 A complete, production-oriented e-commerce platform for the reselling/dropshipping
 business model: **supplier cost → your price/margin → customer pays by UPI QR or
@@ -26,7 +26,7 @@ Indian order-number format, mobile-first UI.
 
 ## Implementation status (as shipped in this repo)
 
-### A. Fully implemented & verified (typecheck, lint, 134 unit+integration tests, 62 HTTP-level E2E tests, production build)
+### A. Fully implemented & verified (typecheck, lint, unit + integration suites, HTTP-level E2E specs, production build)
 
 - **Storefront (21+ pages)**: home, shop (filters/sort/pagination), product
   (variants, GST-inclusive pricing, stock states), category, search, cart,
@@ -91,7 +91,11 @@ Indian order-number format, mobile-first UI.
   redemption); webhook signature verification (payment + supplier); secure
   headers & CSP (next.config.mjs); sanitized logs (secrets redacted) + hashed
   IPs in audit log; npm audit clean (0 vulnerabilities) with pinned overrides.
-- **Tests**: 134 unit + integration tests (vitest) covering money math, pricing
+- **Catalogue**: a Meesho-sourced launch catalogue (11 items, six low-return
+  categories, every price under ₹800) that installs itself on a fresh
+  production database, plus the admin installer for re-runs. Old high-ticket
+  products are archived, never deleted.
+- **Tests**: unit + integration tests (vitest) covering money math, pricing
   engine (incl. markup≠margin, rounding, floors), validation, order state
   machine, auth (register/login/disable/password-reset single-use tokens),
   rate limiting, settings, cart (stock guards), checkout (idempotency, coupons,
@@ -107,10 +111,9 @@ Indian order-number format, mobile-first UI.
 
 ### C. Requires action from you (cannot be coded for you)
 
-See **[docs/OWNER_RUNBOOK.md](docs/OWNER_RUNBOOK.md)** and **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** — database, admin account, the
-store's own UPI ID (`UPI_VPA`), SMTP credentials, real supplier onboarding,
-domain + deployment, GSTIN/legal review, replacing demo catalog, turning
-demoMode off.
+See **[docs/OWNER_RUNBOOK.md](docs/OWNER_RUNBOOK.md)** — database, admin
+account, the store's own UPI ID (`UPI_VPA`), SMTP credentials, supplier
+onboarding, domain + deployment, GSTIN/legal review.
 
 ### D. Not possible from this environment
 
@@ -120,7 +123,7 @@ demoMode off.
   or tax advice.**
 - Anything requiring your third-party accounts: UPI VPA/bank account, CJ wallet
   funding, SMTP credentials, S3/Cloudinary credentials — exact list in
-  `USER_INPUT_REQUIRED.md` and `docs/ENVIRONMENT.md`.
+  `docs/OWNER_RUNBOOK.md` and `docs/ENVIRONMENT.md`.
 
 ---
 
@@ -181,7 +184,7 @@ src/lib/           all business logic (framework-agnostic, unit-testable)
   admin/reports.ts analytics aggregations
 src/app/           Next.js routes: storefront pages, /admin panel, /api endpoints
 src/components/    UI (storefront, admin, shared primitives)
-tests/unit|integration   vitest suites (194 tests)
+tests/unit|integration   vitest suites
 tests/e2e/               62 HTTP-level E2E specs (real dev server + real DB)
 scripts/production-cleanup.ts  pre-launch demo-data cleanup (dry-run default)
 docs/PRICING_ENGINE.md   pricing engine + margin protection (start here for money logic)
@@ -193,9 +196,7 @@ docs/PAYMENT_SETUP.md    UPI QR + COD + refunds
 docs/DEPLOYMENT.md       Vercel + Neon deploy + post-deploy checks
 docs/TROUBLESHOOTING.md  symptom → cause → fix
 docs/SUPPLIER_API.md     supplier integration contract
-SETUP_CHECKLIST.md       everything you must provide before launch
-USER_INPUT_REQUIRED.md   exactly what the owner must provide (blockers A–F)
-docs/OWNER_RUNBOOK.md    day-one launch, Meesho sourcing, UPI confirmation, alerts
+docs/OWNER_RUNBOOK.md    day-one launch, catalogue strategy, Meesho sourcing, UPI confirmation, alerts
 docs/DESIGN_LANGUAGE.md  the visual system (Noir Atelier) and why it is restrained
 ```
 

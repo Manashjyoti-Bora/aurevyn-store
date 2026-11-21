@@ -199,7 +199,7 @@ async function main() {
     console.log('Dry run complete. Re-run with --execute to apply.');
   } else {
     console.log('Cleanup complete. Verify the storefront, then import your real catalog.');
-    console.log('Reminder: demo cleanup does NOT configure payments/supplier/email — see SETUP_CHECKLIST.md.');
+    console.log('Reminder: demo cleanup does NOT configure payments/supplier/email — see docs/OWNER_RUNBOOK.md.');
   }
 
   await prisma.$disconnect();

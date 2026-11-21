@@ -66,7 +66,7 @@ export default async function WebhookLogPage({
           Rejected = failed signature verification or invalid payload. A sudden burst usually means
           the webhook secret env var does not match the sender&apos;s configuration — check{' '}
           <code>SUPPLIER_WEBHOOK_SECRET</code> / supplier webhook secrets against your provider
-          dashboard (see SETUP_CHECKLIST.md).
+          dashboard (see docs/OWNER_RUNBOOK.md).
         </Alert>
       )}
 

@@ -20,11 +20,8 @@ const GROUPS: NavGroup[] = [
     title: 'Overview',
     items: [
       { href: '/admin', label: 'Dashboard' },
-      { href: '/admin/analytics', label: 'Analytics & profit' },
-      { href: '/admin/health', label: 'System health' },
-      { href: '/admin/operations', label: 'Operations' },
       { href: '/admin/cofounder', label: 'AI Cofounder' },
-      { href: '/admin/ai-ceo', label: 'AI CEO' },
+      { href: '/admin/analytics', label: 'Analytics & profit' },
     ],
   },
   {
@@ -62,6 +59,8 @@ const GROUPS: NavGroup[] = [
   {
     title: 'System',
     items: [
+      { href: '/admin/health', label: 'System health' },
+      { href: '/admin/operations', label: 'Operations' },
       { href: '/admin/settings', label: 'Settings' },
       { href: '/admin/users', label: 'Users & roles' },
       { href: '/admin/logs/jobs', label: 'Job queue' },

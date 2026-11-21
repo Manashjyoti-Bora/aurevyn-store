@@ -889,7 +889,7 @@ export function ProductForm({
               Uploaded files are stored on this server&apos;s disk. On serverless hosts (for
               example Vercel) the disk is ephemeral: uploads can disappear on the next deploy. For
               permanent production images, prefer an external image URL (CDN/object storage) or
-              re-upload after deploys — see SETUP_CHECKLIST.md.
+              re-upload after deploys — see docs/OWNER_RUNBOOK.md.
             </p>
             {fieldErrors.images && (
               <p className="text-sm font-medium text-red-600" role="alert">

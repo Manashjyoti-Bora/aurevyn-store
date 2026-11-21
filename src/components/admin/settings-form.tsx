@@ -300,7 +300,7 @@ export function SettingsForm({ initial }: { initial: StoreSettings }) {
         <Alert tone="warning" className="sm:col-span-2">
           GSTIN, legal name and address are compliance-sensitive: enter your real registered details
           and have them reviewed by your accountant/CA. Placeholder values must not ship to
-          production (see SETUP_CHECKLIST.md).
+          production (see docs/OWNER_RUNBOOK.md).
         </Alert>
         <Field label="Legal business name">
           {(p) => (

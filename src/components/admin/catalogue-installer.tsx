@@ -11,6 +11,7 @@ import { Alert } from '@/components/ui/feedback';
 interface InstallResult {
   created: string[];
   skipped: string[];
+  archived: string[];
   categoriesCreated: number;
   supplierCreated: boolean;
   demoModeDisabled: boolean;
@@ -62,6 +63,9 @@ export function CatalogueInstaller({
           {result.categoriesCreated > 0 ? result.categoriesCreated : 'the existing'} categor
           {result.categoriesCreated === 1 ? 'y' : 'ies'}
           {result.supplierCreated ? ', and the Meesho sourcing partner was created' : ''}.
+          {result.archived.length > 0
+            ? ` ${result.archived.length} retired product${result.archived.length === 1 ? '' : 's'} archived.`
+            : ''}
           {result.demoModeDisabled ? ' Demo mode has been switched off.' : ''}
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -83,11 +87,12 @@ export function CatalogueInstaller({
     <div className="rounded-xl border border-ink-900/10 bg-white p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-ink-900">Launch catalogue</p>
+          <p className="text-sm font-semibold text-ink-900">Meesho launch catalogue</p>
           <p className="mt-1 max-w-xl text-xs leading-relaxed text-ink-500">
-            Publishes twelve ready-to-sell pieces across five categories — studio photography we
-            own, real stock counts, stated sourcing cost and a fixed retail price you can edit
-            afterwards. Nothing is overwritten if a product already exists.
+            Publishes eleven Meesho-sourced bestsellers across six low-return categories, every
+            one under ₹800. Includes studio photography we own, real stock counts, stated sourcing
+            cost and a fixed retail price you can edit afterwards. A fresh production database
+            installs this automatically on deploy. Nothing is overwritten if a product exists.
           </p>
           <p className="mt-2 text-[11px] tabular-nums text-ink-400">
             {activeProducts} active · {totalProducts} total
@@ -101,12 +106,12 @@ export function CatalogueInstaller({
                 Cancel
               </Button>
               <Button size="sm" loading={busy} onClick={install}>
-                Yes, publish 12 pieces
+                Yes, publish 11 pieces
               </Button>
             </>
           ) : (
             <Button size="sm" variant="outline" onClick={() => setConfirming(true)}>
-              {installed ? 'Add missing pieces' : 'Install launch catalogue'}
+              {installed ? 'Add missing pieces' : 'Install Meesho catalogue'}
             </Button>
           )}
         </div>

@@ -165,7 +165,7 @@ export async function dispatchNotification(notificationId: string): Promise<void
         status: 'FAILED',
         provider: 'smtp',
         error:
-          'SMTP is not fully configured (SMTP_HOST/SMTP_USER/SMTP_PASS). See SETUP_CHECKLIST.md.',
+          'SMTP is not fully configured (SMTP_HOST/SMTP_USER/SMTP_PASS). See docs/OWNER_RUNBOOK.md.',
       },
     });
     return;

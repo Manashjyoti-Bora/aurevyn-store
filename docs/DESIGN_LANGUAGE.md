@@ -20,7 +20,7 @@ composition, Linear/Stripe-style motion discipline; nothing copied):
 5. Mobile is the product — most visitors arrive from Instagram on mid-range Androids.
 
 ## 1. Color system — "Petrol & Porcelain" (2026-10-25 refresh; tokens in `tailwind.config.ts` / `globals.css`)
-Full comparison, measured contrast and token map: `docs/DESIGN_SYSTEM.md` §2.
+Full comparison, measured contrast and token map: `docs/DESIGN_LANGUAGE.md` §2.
 Five named colours, each with one job:
 - **Midnight Ink `#111820`** (`ink-900`, `--color-midnight`, `--surface-ink`): branding, dark
   surfaces (announcement, hero, footer, dark glass, toasts), primary text.
@@ -54,7 +54,7 @@ fallback first and adds translucency + `backdrop-filter` only inside `@supports`
 `prefers-reduced-transparency` is not set. Blur values are static tokens (`--glass-blur` 14px,
 `--glass-blur-bar` 10px) and are **never transitioned or animated**. Each role class also
 carries its layer from the z-index ladder (`--z-floating 30 … --z-skip 80`, see
-`docs/DESIGN_SYSTEM.md` §4).
+`docs/DESIGN_LANGUAGE.md` §4).
 
 ## 2. Typography
 Inter Variable, **self-hosted** from `@fontsource-variable/inter` (one `woff2` per unicode

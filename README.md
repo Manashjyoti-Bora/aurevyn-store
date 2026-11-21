@@ -1,131 +1,31 @@
-# NIRVORA — automated reselling / dropshipping store (India, ₹ INR)
+# Nirvora — Indian reselling store
 
-> Store brand: **Nirvora** (set via `APP_NAME` / Admin → Settings). Internal code identifiers (package name, `resellix_*` cookie names, `RX-` order prefix) remain `resellix` — cosmetic only.
+Nirvora is the current storefront name; the GitHub repository remains
+`zenvora-store`. The name has not been checked for trademark, domain, or other
+business conflicts. The app provides a storefront, admin panel, UPI QR and COD
+checkout, a job queue and a **manual Meesho sourcing** adapter. None of these
+should be described as production-verified until tested with real accounts.
 
-A complete, production-oriented e-commerce platform for the reselling/dropshipping
-business model: **supplier cost → your price/margin → customer pays by UPI QR or
-cash on delivery → order auto-sent to supplier → supplier ships → tracking to
-customer → real profit accounting in the admin panel.**
+## Current launch status
 
-Built for the Indian market: INR pricing (integer paise arithmetic), GST-inclusive
-tax model, direct UPI QR payments (no gateway), Indian PIN/address validation,
-Indian order-number format, mobile-first UI.
+**Not 100% ready or fully autonomous.** Meesho ordering, stock verification,
+tracking updates, payment reconciliation and refunds require human action.
+There is no verified Meesho feed in this repository: starter catalogue ideas
+are unverified and now install as **drafts with zero stock**. Previously
+published products are not automatically changed; an owner must audit those
+separately. There is no reliable evidence of bestseller, lowest-price or
+return-rate claims. Illustrations are not proof of an exact product.
 
-> **Honesty rules this codebase follows**
->
-> - No fake functionality: every button is wired to a real server implementation.
-> - No invented credentials, orders, reviews or statistics anywhere.
-> - Simulated flows (TEST payments, Demo supplier) exist **only** for development,
->   are hard-disabled in production builds, and are visibly labelled "DEMO/TEST".
-> - **Gross margin is never presented as profit.** "Actual profit" is a per-order
->   ledger figure: net revenue − supplier cost − shipping paid − gateway fees −
->   other costs − refunds, finalised only on delivery/refund; until then it is
->   explicitly flagged _(est.)_.
+The UPI flow requires a bank-statement match by the owner; a customer-submitted
+UTR alone is not payment confirmation. COD settlement depends on the supplier's
+actual checkout and remittance terms: do not assume that Meesho will remit a
+margin. For prepaid orders do not charge the customer a second time on delivery.
+Enable only fulfilment and payment methods you can actually honour.
 
----
-
-## Implementation status (as shipped in this repo)
-
-### A. Fully implemented & verified (typecheck, lint, unit + integration suites, HTTP-level E2E specs, production build)
-
-- **Storefront (21+ pages)**: home, shop (filters/sort/pagination), product
-  (variants, GST-inclusive pricing, stock states), category, search, cart,
-  checkout (address validation, coupon, COD or prepaid), payment page, order
-  confirmation, public order tracking, about, contact (stored + admin inbox),
-  FAQ, 4 policy pages, cookie preferences, login/register/forgot/reset,
-  customer account (dashboard, profile, addresses, orders, self-service
-  cancel/return within policy windows), sitemap/robots/OG metadata, 404/500 pages.
-- **Admin panel (~30 sections)**: dashboard with alerts; analytics (revenue,
-  costs, gross margin vs **actual profit**, daily trends, top products/customers,
-  coupon usage, refunds/returns, CSV exports); products CRUD + variants + images
-  upload + CSV import + bulk reprice; categories; coupons; pricing rules
-  (GLOBAL/SUPPLIER/CATEGORY/PRODUCT precedence); suppliers (MANUAL / HTTP_REST /
-  DEMO) + catalog sync + product mapping; supplier orders (retry / mark shipped);
-  orders (status actions, cost adjustments, COD collected, refunds, shipment
-  updates); payments ledger (fees, estimated-vs-actual); refunds (gateway-auto +
-  manual settle); returns workflow (approve/reject/receive/close → auto refund);
-  shipments; customers; inventory (quick stock edits, publish/unpublish);
-  messages; settings (store, business/GSTIN, shipping, tax, policies, social);
-  users & roles (CUSTOMER/STAFF/ADMIN, self-demotion + last-admin lockout
-  protection); logs (job queue, webhook log, append-only audit log); system
-  health page (DB latency, gateway/email/queue/webhook/supplier status, launch
-  blockers, env presence check — never values).
-- **Pricing engine**: FIXED_PRICE / FIXED_MARGIN / PERCENT_MARKUP (markup on
-  landed cost — deliberately distinct from margin%), min-profit floor, rounding
-  rules (none / round-up-₹10 / nearest-₹9 / nearest-₹99), GST extraction from
-  tax-inclusive prices, gateway-fee estimate, admin preview API + bulk reprice
-  with dry-run.
-- **Order pipeline & state machine**: PENDING_PAYMENT → PAYMENT_VERIFIED →
-  ORDER_CONFIRMED → SENT_TO_SUPPLIER → SUPPLIER_ACCEPTED → PROCESSING → SHIPPED
-  → OUT_FOR_DELIVERY → DELIVERED (+ PAYMENT_FAILED, CANCELLED,
-  FULFILMENT_FAILED, REFUND_PENDING, REFUNDED, RETURN_REQUESTED, RETURNED),
-  validated transitions, optimistic concurrency, full event audit trail,
-  frozen price/cost snapshots per line, `RX-YYMMDD-XXXXXX` order numbers.
-- **Automation**: PostgreSQL-backed job queue (SKIP LOCKED, dedupe keys,
-  backoff retries, max attempts) driving supplier fulfilment, status sync,
-  cancellations and notification emails; in-process kick + authenticated cron
-  endpoint (`/api/cron/jobs`).
-- **Payments**: **UPI QR** (the QR encodes an NPCI intent paying the store's own
-  VPA for the server-computed amount; the customer submits the UTR and an admin
-  matches it against the bank statement before the order is marked paid) plus
-  **Cash on Delivery** with fee handling and admin "cash collected" settlement.
-  No gateway, no gateway keys, and no card data ever touches this server; a
-  browser can never mark its own order paid. Refunds are recorded manually by an
-  admin. A clearly-labelled TEST provider exists for development only and is
-  hard-disabled in production builds.
-- **Supplier layer**: adapter abstraction (see `docs/SUPPLIER_API.md`), generic
-  HTTP-REST adapter configurable per supplier via JSON (auth styles, endpoint
-  paths, response field mapping, status mapping), signed supplier webhooks
-  (HMAC over raw body, idempotent), manual fulfilment workflow, DEMO simulator
-  for end-to-end development.
-- **Notifications**: templated transactional emails (order confirmation,
-  shipping, delivery, cancellation, refunds, returns, password reset, welcome),
-  frozen-rendered at queue time, provider-pluggable (console / SMTP-nodemailer),
-  delivered through the job queue with dedupe windows and failure visibility.
-- **Security**: bcrypt password hashing; DB-backed sessions with rotation &
-  revocation; double-submit CSRF on all mutations; per-route rate limiting
-  (auth, checkout, contact, webhooks); zod validation on every input;
-  server-side authz (role guards, IDOR-safe ownership checks, guest order access
-  via order-number+email); price manipulation impossible (all totals recomputed
-  server-side from DB); coupon abuse guards (usage/per-user limits, atomic
-  redemption); webhook signature verification (payment + supplier); secure
-  headers & CSP (next.config.mjs); sanitized logs (secrets redacted) + hashed
-  IPs in audit log; npm audit clean (0 vulnerabilities) with pinned overrides.
-- **Catalogue**: a Meesho-sourced launch catalogue (11 items, six low-return
-  categories, every price under ₹800) that installs itself on a fresh
-  production database, plus the admin installer for re-runs. Old high-ticket
-  products are archived, never deleted.
-- **Tests**: unit + integration tests (vitest) covering money math, pricing
-  engine (incl. markup≠margin, rounding, floors), validation, order state
-  machine, auth (register/login/disable/password-reset single-use tokens),
-  rate limiting, settings, cart (stock guards), checkout (idempotency, coupons,
-  COD, guest), finance engine (actual profit incl. fees/costs/refunds,
-  finalisation rules), job queue (dedupe, delivery, failure bookkeeping).
-
-### B. Integration-ready (code complete, needs your accounts/config to go live)
-
-- UPI QR payments (set `UPI_VPA`; admin confirms each UTR against the bank).
-- SMTP email delivery (works today with console provider for dev).
-- Real HTTP-REST suppliers (config-driven; contract in `docs/SUPPLIER_API.md`).
-- Cron-driven job runner safety net (`/api/cron/jobs`).
-
-### C. Requires action from you (cannot be coded for you)
-
-See **[docs/OWNER_RUNBOOK.md](docs/OWNER_RUNBOOK.md)** — database, admin
-account, the store's own UPI ID (`UPI_VPA`), SMTP credentials, supplier
-onboarding, domain + deployment, GSTIN/legal review.
-
-### D. Not possible from this environment
-
-- Deploying to your domain (needs your host/accounts).
-- Business GST registration and legal review of policy pages — these are
-  between you, your CA/lawyer and the providers. **Nothing in this repo is legal
-  or tax advice.**
-- Anything requiring your third-party accounts: UPI VPA/bank account, CJ wallet
-  funding, SMTP credentials, S3/Cloudinary credentials — exact list in
-  `docs/OWNER_RUNBOOK.md` and `docs/ENVIRONMENT.md`.
-
----
+Before accepting orders, review [the Assamese launch guide](docs/ASSAMESE_LAUNCH_GUIDE.md),
+[owner runbook](docs/OWNER_RUNBOOK.md), [payment setup](docs/PAYMENT_SETUP.md),
+and [release process](docs/RELEASE_PROCESS.md). The guide lists the required
+business, supplier, payment, support and testing work and makes no legal claims.
 
 ## Tech stack
 
@@ -139,7 +39,7 @@ computed and stored per order line.
 
 ## Getting started (local)
 
-Requirements: Node 18.18+ (20 recommended), PostgreSQL 14+.
+Requirements: Node 22.12–24 and PostgreSQL 14+. Prisma engine downloads require access to Prisma’s binary host.
 
 ```bash
 cp .env.example .env

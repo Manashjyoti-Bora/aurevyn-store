@@ -1,16 +1,4 @@
-/**
- * Install the Meesho launch catalogue.
- *
- * Runs automatically at the end of `npm run build` (see scripts/release.ts), so
- * a production database with no active products becomes a sellable store in the
- * same deploy. Also safe to run by hand:
- *
- *   npm run catalogue:install
- *
- * Idempotent: products are matched by slug and never overwritten; retired slugs
- * are archived rather than deleted. Set AUTO_INSTALL_CATALOGUE=false to skip it
- * entirely (in the release build and here).
- */
+/** Create unverified starter ideas as drafts; never run automatically on deploy. */
 import { prisma } from '../src/lib/db';
 import { ensureLaunchCatalogue } from '../src/lib/catalog/curated';
 
@@ -22,7 +10,7 @@ async function main(): Promise<void> {
 
   const result = await ensureLaunchCatalogue();
   if (!result) {
-    console.log('[catalogue] skipped — the store is already selling the current catalogue');
+    console.log('[catalogue] skipped — existing active catalogue detected; no drafts created');
     return;
   }
 

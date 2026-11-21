@@ -1,38 +1,15 @@
 import { prisma } from '../db';
 import { auditLog } from '../audit';
-import { updateSettings, getSettings } from '../settings';
-import { saveProduct, archiveProduct } from './products';
+import { getSettings } from '../settings';
+import { saveProduct } from './products';
 import type { Actor } from './types';
 
 /**
- * Meesho launch catalogue.
- *
- * Nirvora resells from Meesho today; CJ Dropshipping is planned for later, so
- * this catalogue is deliberately built for the model that is live now:
- *
- *  - Every piece sits in the ₹249–₹799 band, which is where Meesho converts
- *    (the platform's own sellers report ₹99–₹499 as the volume sweet spot).
- *  - Categories are the low-return ones: kitchen utility, storage and
- *    organisation, mobile accessories, home lighting, stationery, small
- *    personal-care tools. Apparel and footwear are deliberately absent —
- *    size and fit returns are the single biggest margin killer for a reseller,
- *    and no honest "lowest return" claim can be made about them.
- *  - Each item is a plain, demo-able, unisex utility rather than a trend
- *    gimmick, so it keeps selling after the Reel stops trending.
- *
- * Facts the installer stays honest about:
- *  - Prices, costs and stock are the owner's to edit; nothing is locked in.
- *  - Stock is real merchant stock (LOCAL mode) at the stated counts.
- *  - The supplier is "Meesho (own sourcing)", a MEESHO-type partner: paid
- *    orders queue for manual placement from the Meesho app, then tracking is
- *    recorded in Admin → Supplier orders. Meesho has no open ordering API, so
- *    no automated acceptance is pretended.
- *  - Product photos are studio renders the store owns (not supplier CDN
- *    images), labelled as such wherever they are displayed.
- *  - Idempotent: products are matched by slug and never overwritten, so
- *    running it twice cannot clobber edits or duplicate the catalogue.
- *  - Slugs from the earlier, higher-priced launch set are archived, not
- *    deleted, so historical orders keep their product rows.
+ * Starter ideas, not a verified supplier catalogue. These examples must remain
+ * drafts until the owner checks an exact listing, price, stock, specifications,
+ * permitted imagery and fulfilment for the destination. No sales or return-rate
+ * evidence accompanies them. Running this installer never changes existing
+ * products, switches demo mode, or archives products.
  */
 
 export interface CuratedCategory {
@@ -77,7 +54,7 @@ export const CURATED_CATEGORIES: CuratedCategory[] = [
   {
     name: 'Kitchen & Dining',
     slug: 'kitchen-dining',
-    description: 'Small tools that make daily cooking faster — the lowest-return category we sell.',
+    description: 'Small tools for everyday cooking.',
     sortOrder: 0,
   },
   {
@@ -89,7 +66,8 @@ export const CURATED_CATEGORIES: CuratedCategory[] = [
   {
     name: 'Mobile & Tech',
     slug: 'mobile-tech',
-    description: 'Everyday carry electronics and phone accessories, priced to replace without thought.',
+    description:
+      'Everyday carry electronics and phone accessories, priced to replace without thought.',
     sortOrder: 2,
   },
   {
@@ -118,7 +96,8 @@ export const CURATED_PRODUCTS: CuratedProduct[] = [
     slug: 'swiftchop-hand-press-chopper',
     sku: 'ZV-KIT-01',
     categorySlug: 'kitchen-dining',
-    shortDescription: 'Pull-cord chopper that dices onion, garlic and tomato in seconds — no electricity.',
+    shortDescription:
+      'Pull-cord chopper that dices onion, garlic and tomato in seconds — no electricity.',
     description:
       'A 500 ml pull-cord chopper with three stainless steel blades. Two or three pulls dices an onion; a few more handle garlic, ginger, coriander or a tomato for a curry base. No power, no blade guard to misplace, and the bowl doubles as a storage tub with its lid.\n\nAll parts except the cord lid are dishwasher safe. Hand wash the lid — the cord mechanism is not sealed.\n\nNot suitable for hard spices, ice or meat. Ships in 2–4 business days.',
     costPaise: 18500,
@@ -166,7 +145,8 @@ export const CURATED_PRODUCTS: CuratedProduct[] = [
     slug: 'aurora-wireless-earbuds',
     sku: 'ZV-TEC-01',
     categorySlug: 'mobile-tech',
-    shortDescription: 'True-wireless earbuds with a pebble charging case, touch controls and USB-C.',
+    shortDescription:
+      'True-wireless earbuds with a pebble charging case, touch controls and USB-C.',
     description:
       'A pocketable true-wireless pair with a matte pebble case that charges over USB-C. Touch controls on both buds handle play, pause and calls; the microphones are tuned for everyday voice calls rather than studio recording.\n\nIn the box: earbud pair, charging case, USB-C cable, two extra ear-tip sizes.\n\nBattery: roughly 4–5 hours per charge at moderate volume, with three additional top-ups from the case. Charging time is about 90 minutes. Ships in 2–4 business days.',
     costPaise: 46000,
@@ -372,7 +352,7 @@ export async function installCuratedCatalogue(actor: Actor): Promise<InstallResu
           shortDescription: p.shortDescription,
           sku: p.sku,
           brand: settingsBefore.storeName,
-          status: 'ACTIVE',
+          status: 'DRAFT',
           categoryId,
           supplierId: supplier.id,
           supplierSku: p.sku,
@@ -406,58 +386,26 @@ export async function installCuratedCatalogue(actor: Actor): Promise<InstallResu
         },
         actor
       );
-      // Real merchant stock + merchandising order. saveProduct intentionally
-      // does not manage stock counters (that is the inventory surface), so set
-      // them here in the same install step. Storefront "featured" ordering is
-      // sortOrder DESC, so the first item gets the highest number and leads the
-      // homepage hero.
+      // Unknown stock is zero until independently verified by the owner.
+      // The starter price, costs, descriptions and images are unverified too.
       await prisma.product.update({
         where: { slug: p.slug },
-        data: { stock: p.stock, sortOrder: 100 - p.sortOrder },
+        data: { stock: 0, sortOrder: 100 - p.sortOrder },
       });
       created.push(p.slug);
     } catch (err) {
       failed.push(p.slug);
       console.error(
-        `[catalogue] could not publish ${p.slug}:`,
+        `[catalogue] could not create draft ${p.slug}:`,
         err instanceof Error ? err.message.split('\n').slice(-1)[0] : err
       );
     }
   }
 
-  // Retire the previous, higher-priced launch set. Archiving keeps order
-  // history intact and is reversible from Admin → Products.
+  // Importing ideas is not authorisation to change existing merchandise or
+  // claim that the store is live. Preserve both products and settings.
   const archived: string[] = [];
-  for (const slug of RETIRED_SLUGS) {
-    const product = await prisma.product.findUnique({ where: { slug }, select: { id: true, status: true } });
-    if (!product || product.status === 'ARCHIVED') continue;
-    try {
-      await archiveProduct(product.id, actor);
-    } catch (err) {
-      // archiveProduct ends with a storefront revalidation, which throws when
-      // the installer runs outside a request (the release build). The row is
-      // written first, so only fall back if it did not land.
-      const current = await prisma.product.findUnique({
-        where: { id: product.id },
-        select: { status: true },
-      });
-      if (current?.status !== 'ARCHIVED') {
-        await prisma.product.update({ where: { id: product.id }, data: { status: 'ARCHIVED' } });
-      }
-      console.warn(
-        `[catalogue] archived ${slug} without storefront revalidation:`,
-        err instanceof Error ? err.message : err
-      );
-    }
-    archived.push(slug);
-  }
-
-  // A launch-ready catalogue means the storefront is no longer a demo.
-  let demoModeDisabled = false;
-  if (settingsBefore.demoMode) {
-    await updateSettings({ demoMode: false });
-    demoModeDisabled = true;
-  }
+  const demoModeDisabled = false;
 
   await auditLog({
     actor,
@@ -484,17 +432,7 @@ export async function installCuratedCatalogue(actor: Actor): Promise<InstallResu
   };
 }
 
-/**
- * Deploy-time bootstrap. Called by `scripts/install-catalogue.ts` at the end of
- * the release build, so a fresh production database gets the real catalogue
- * without anyone clicking through the admin panel.
- *
- * Deliberately conservative:
- *  - runs when the store has no ACTIVE product at all, or when it is still
- *    selling something from the retired set (i.e. a catalogue migration);
- *  - skippable with AUTO_INSTALL_CATALOGUE=false;
- *  - never throws: a failure is logged and the site still boots.
- */
+/** Optional manual bootstrap; release builds never invoke it. */
 export async function ensureLaunchCatalogue(): Promise<InstallResult | null> {
   const [activeProducts, retiredStillLive] = await Promise.all([
     prisma.product.count({ where: { status: 'ACTIVE' } }),

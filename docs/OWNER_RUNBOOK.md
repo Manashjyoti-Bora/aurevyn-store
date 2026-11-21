@@ -33,13 +33,11 @@ invoices, policy pages and the AI co-founder read from them.
    do it), then `npm run db:create-admin` if no admin exists.
 2. Sign in at `/admin` and set: business identity, support email, COD on/off,
    **store UPI ID**, shipping rates, return/cancellation windows.
-3. **Catalogue.** The deploy build never writes product data — installing the
-   catalogue is your call. Press **Admin → Products → Install Meesho catalogue**
-   once (or run `npm run catalogue:install`): eleven items across six
-   low-return categories, all under ₹800, with studio visuals we own, real stock
-   counts, stated sourcing cost and editable prices. It also switches `demoMode`
-   off and archives any product from the older, higher-priced set. Existing
-   products are never overwritten, so it is safe to run again later.
+3. **Catalogue.** Deploys never install products. The starter installer creates
+   unverified **drafts with zero stock**, not real Meesho listings. Verify the
+   exact supplier URL, price, stock, specifications, delivery and image rights
+   before publishing. Existing products are untouched; audit any already-live
+   products separately. Do not claim bestseller or low-return status without data.
 4. Place one real ₹1 order, pay it by UPI, and confirm it with **Mark received**
    in Admin → Payments (see `docs/PAYMENT_SETUP.md`).
 5. Check `/api/health` returns `status: "ok"`, `paymentsConfigured: true`, and
@@ -62,23 +60,10 @@ Nirvora resells from Meesho today. CJ Dropshipping will be added as a second
 supplier once that account is funded; the supplier layer already supports it, so
 adding it is a supplier record, not a code change.
 
-The catalogue rule is deliberate and worth keeping as you add products:
-
-- **Sell in the ₹249–₹799 band.** Meesho's volume sits at ₹99–₹499; under ₹500
-  converts, above ₹1,000 sits unsold.
-- **Prefer low-return categories.** Kitchen utility, storage and organisation,
-  phone accessories, lighting, stationery and small self-care tools. They are
-  unisex, need no size chart and are hard to return "because it didn't fit".
-- **Avoid apparel and footwear** while the store is small. Size and fit returns
-  are the fastest way to turn a 60% margin into a loss.
-- **Avoid fragile, food, cosmetic and battery-heavy items** until a real returns
-  process and a GST/legal review exist for them.
-- **Source on price, then check quality.** The cheapest Meesho listing is often
-  the one that comes back; read recent reviews and the return rate before
-  ordering stock.
-
-Every product in the catalogue carries a stated sourcing cost and shipping cost,
-so Admin → Analytics shows real profit rather than optimism.
+Choose products based on current, verifiable supplier information and your
+own order and return data. Do not assume any category, price or product has the
+lowest return rate or highest sales. Account for shipping, fees and refunds when
+setting a price. Test fulfilment before selling.
 
 ## 5. Sourcing: buying the stock on Meesho
 
@@ -93,8 +78,7 @@ not publish one — the flow is real, just manual:
    on the same screen. The customer sees the tracking on their order page and
    gets the shipping email automatically.
 
-Delivery estimates on the storefront are your own promise, so keep the promised
-window wider than Meesho's (the catalogue uses 2–4 business days).
+Delivery estimates are your own promise. Check actual supplier availability and delivery estimates for each destination before promising dates.
 
 ## 6. Instant owner alerts
 

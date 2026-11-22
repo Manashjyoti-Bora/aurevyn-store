@@ -1333,3 +1333,102 @@ model SourcingCandidate {
   @@index([status, createdAt])
   @@map("sourcing_candidates")
 }
+
+// ---------------------------------------------------------------------------
+// Jarvis governance (blueprint V3 §2, §15)
+// ---------------------------------------------------------------------------
+
+enum KnowledgeSource {
+  OFFICIAL
+  PRIMARY
+  SECONDARY
+  OWNER_SUPPLIED
+}
+
+enum KnowledgeConfidence {
+  VERIFIED
+  ESTIMATE
+  ASSUMPTION
+  RECOMMENDATION
+}
+
+enum KnowledgeStatus {
+  CURRENT
+  OUTDATED
+  ARCHIVED
+}
+
+/// One sourced piece of operating knowledge. A row labelled VERIFIED must have
+/// a source URL, source title and a verification date; `src/lib/jarvis/knowledge.ts`
+/// enforces that in the API and the UI. `reviewBy` makes staleness visible.
+model KnowledgeEntry {
+  id          String              @id @default(cuid())
+  slug        String              @unique
+  category    String
+  title       String
+  summary     String
+  body        String              @db.Text
+  sourceType  KnowledgeSource     @default(OWNER_SUPPLIED)
+  sourceUrl   String?
+  sourceTitle String?
+  publishedAt DateTime?           @db.Date
+  verifiedAt  DateTime?           @db.Date
+  verifiedBy  String?
+  reviewBy    DateTime?           @db.Date
+  confidence  KnowledgeConfidence @default(ASSUMPTION)
+  status      KnowledgeStatus    @default(CURRENT)
+  version     Int                 @default(1)
+  createdBy   String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([category, status])
+  @@index([reviewBy])
+  @@index([confidence])
+  @@map("knowledge_entries")
+}
+
+enum JarvisIncidentSeverity {
+  SEV1
+  SEV2
+  SEV3
+  SEV4
+}
+
+enum JarvisIncidentStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+/// An operational incident with an ID, detection time, severity, affected
+/// service, evidence and recovery note. Duplicate detections of the same signal
+/// are merged by `fingerprint` and counted in `occurrences`; a resolved
+/// incident is never silently reopened.
+model JarvisIncident {
+  id              String                 @id @default(cuid())
+  reference       String                 @unique
+  fingerprint     String                 @unique
+  severity        JarvisIncidentSeverity
+  status          JarvisIncidentStatus   @default(OPEN)
+  service         String
+  title           String
+  detail          String                 @db.Text
+  detectionSource String
+  evidence        Json?
+  occurrences     Int                    @default(1)
+  detectedAt      DateTime               @default(now())
+  lastSeenAt      DateTime               @default(now())
+  acknowledgedAt  DateTime?
+  acknowledgedBy  String?
+  resolvedAt      DateTime?
+  resolvedBy      String?
+  resolution      String?
+  followUp        String?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  @@index([status, severity])
+  @@index([detectedAt])
+  @@map("jarvis_incidents")
+}

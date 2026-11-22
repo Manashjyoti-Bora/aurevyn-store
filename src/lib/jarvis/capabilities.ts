@@ -347,6 +347,108 @@ export const CAPABILITIES: readonly Capability[] = [
     ownerAction: false,
   },
   {
+    id: 'connector-registry',
+    section: 'V3 §1, §3, §4',
+    title: 'Tool and connector registry with recorded policy checks',
+    status: 'LIVE',
+    reality:
+      'A code-reviewed registry lists every external connector and agent tool. Meesho is DISABLED, every one of its checks is PENDING, and connectorActivation() refuses activation without a source URL, a verification date and a PASSED outcome.',
+    gap: null,
+    evidence: [
+      'src/lib/jarvis/registry.ts',
+      'src/app/admin/jarvis/page.tsx',
+      'tests/unit/jarvis-registry.test.ts',
+    ],
+    ownerAction: false,
+  },
+  {
+    id: 'agent-tool-permissions',
+    section: 'V3 §6, §7',
+    title: 'Agent tool permissions and approval boundary',
+    status: 'PARTIAL',
+    reality:
+      'Every tool declares a permission level, an approval requirement, reversibility and a per-cycle budget; authorizeToolCall() denies unapproved irreversible work and hard-disabled tools (place supplier order, delete production data).',
+    gap: 'The deterministic team planner does not yet dispatch tool calls, so the boundary is enforced at the registry/API level but not exercised by a running agent loop.',
+    evidence: ['src/lib/jarvis/registry.ts', 'src/lib/team/workflow.ts'],
+    ownerAction: false,
+  },
+  {
+    id: 'knowledge-base',
+    section: 'V3 §2',
+    title: 'Sourced knowledge base with verification and recheck dates',
+    status: 'LIVE',
+    reality:
+      'Knowledge entries carry a category, source type, source URL/title, publication date, verification date, confidence and recheck date. A VERIFIED entry is refused without an official/primary source and a date, and stale entries are labelled “Needs recheck”.',
+    gap: null,
+    evidence: [
+      'src/lib/jarvis/knowledge.ts',
+      'src/lib/jarvis/knowledge-service.ts',
+      'src/app/admin/jarvis/knowledge/page.tsx',
+      'tests/unit/jarvis-knowledge.test.ts',
+    ],
+    ownerAction: false,
+  },
+  {
+    id: 'approval-queue',
+    section: 'V3 §7',
+    title: 'Human approval queue derived from live records',
+    status: 'LIVE',
+    reality:
+      'Supplier placements, unverified references, refunds, returns, unmatched UPI payments, drafts and failed jobs are listed with what the owner must do. The queue never performs the action or promises an outcome.',
+    gap: null,
+    evidence: ['src/lib/jarvis/approvals.ts', 'src/app/admin/jarvis/page.tsx'],
+    ownerAction: false,
+  },
+  {
+    id: 'incident-log',
+    section: 'V3 §15',
+    title: 'Incident records with severity, evidence and recovery',
+    status: 'LIVE',
+    reality:
+      'Detection scans open de-duplicated incidents (reference, severity, affected service, evidence, occurrences). Resolution requires a written note and is audited; a resolved incident is never silently reopened.',
+    gap: null,
+    evidence: [
+      'src/lib/jarvis/incidents.ts',
+      'src/app/api/cron/jarvis/route.ts',
+      'prisma/schema.prisma',
+      'tests/unit/jarvis-incidents.test.ts',
+    ],
+    ownerAction: false,
+  },
+  {
+    id: 'daily-report',
+    section: 'V3 §17',
+    title: 'Daily operations report with verified/estimate/unknown basis',
+    status: 'LIVE',
+    reality:
+      'The daily report reads live records and labels every metric VERIFIED, ESTIMATE or UNKNOWN. Realised profit is UNKNOWN when no order finalised; estimates are never summed into verified money.',
+    gap: null,
+    evidence: ['src/lib/jarvis/report.ts', 'src/app/admin/jarvis/report/page.tsx'],
+    ownerAction: false,
+  },
+  {
+    id: 'release-readiness',
+    section: 'V3 §20',
+    title: 'Release status from evidence, not from code existing',
+    status: 'LIVE',
+    reality:
+      'PLANNED / IN DEVELOPMENT / TESTING / BLOCKED / VERIFIED / PRODUCTION READY are computed from recorded checks. A failed check (payments, backup rehearsal) blocks the label; PRODUCTION READY also needs explicit owner sign-off.',
+    gap: null,
+    evidence: ['src/lib/jarvis/readiness.ts', 'src/app/admin/jarvis/page.tsx'],
+    ownerAction: false,
+  },
+  {
+    id: 'cost-controls',
+    section: 'V3 §16',
+    title: 'Provider cost and usage control',
+    status: 'PARTIAL',
+    reality:
+      'Per-tool call budgets and per-route admin rate limits exist, and every AI provider is registered with a pending hard-spend-limit check.',
+    gap: 'No per-model token/usage ledger or provider spend cap is recorded, because no LLM key is configured to measure against.',
+    evidence: ['src/lib/jarvis/registry.ts', 'src/lib/rate-limit.ts'],
+    ownerAction: true,
+  },
+  {
     id: 'trend-intelligence',
     section: '§4',
     title: 'Demand and trend intelligence',

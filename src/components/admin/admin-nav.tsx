@@ -21,6 +21,8 @@ const GROUPS: NavGroup[] = [
     items: [
       { href: '/admin', label: 'Dashboard' },
       { href: '/admin/jarvis', label: 'Jarvis control' },
+      { href: '/admin/jarvis/report', label: 'Daily report' },
+      { href: '/admin/jarvis/knowledge', label: 'Knowledge base' },
       { href: '/admin/team', label: 'The team' },
       { href: '/admin/team/briefings', label: 'Live briefings' },
       { href: '/admin/analytics', label: 'Analytics & profit' },

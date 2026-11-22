@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   NIRVORA — "NOIR ATELIER" DESIGN SYSTEM
+   AUREVYN — "NOIR ATELIER" DESIGN SYSTEM
    Obsidian canvas · Porcelain type · Muted Champagne hairline · one accent.
 
    Direction: a monochrome atelier. Everything is ink, paper and light —
@@ -55,7 +55,7 @@
     /* ── Motion tokens ──
        Micro-interactions 120–240 ms; entrances ≤ 620 ms; transform/opacity
        only (never animated blur, box-shadow or layout properties). */
-    --ease-zenvora: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-aurevyn: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-silk: cubic-bezier(0.65, 0, 0.35, 1);
     --duration-micro: 120ms;
@@ -166,6 +166,19 @@
   h4 {
     @apply text-base font-medium text-ink-900;
   }
+
+  /* Typographic finishing: headings balance their lines instead of leaving one
+     orphaned word, body copy avoids a single trailing word. Progressive
+     enhancement — browsers without support simply wrap as before. */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p,
+  li {
+    text-wrap: pretty;
+  }
 }
 
 @layer components {
@@ -203,9 +216,9 @@
 
   .card-hover {
     transition:
-      transform var(--duration-normal) var(--ease-zenvora),
-      border-color var(--duration-normal) var(--ease-zenvora),
-      box-shadow var(--duration-normal) var(--ease-zenvora);
+      transform var(--duration-normal) var(--ease-aurevyn),
+      border-color var(--duration-normal) var(--ease-aurevyn),
+      box-shadow var(--duration-normal) var(--ease-aurevyn);
   }
   @media (hover: hover) {
     .card-hover:hover {
@@ -221,8 +234,8 @@
   /* ── Button System ───────────────────────────────────────────────────── */
   .btn-press {
     transition:
-      transform var(--duration-fast) var(--ease-zenvora),
-      box-shadow var(--duration-fast) var(--ease-zenvora),
+      transform var(--duration-fast) var(--ease-aurevyn),
+      box-shadow var(--duration-fast) var(--ease-aurevyn),
       background-color var(--duration-fast) ease-out,
       border-color var(--duration-fast) ease-out,
       color var(--duration-fast) ease-out;
@@ -450,7 +463,7 @@
     transform: scaleX(0);
     transform-origin: left;
     background: linear-gradient(90deg, var(--color-champagne), rgba(198, 173, 122, 0));
-    transition: transform 320ms var(--ease-zenvora);
+    transition: transform 320ms var(--ease-aurevyn);
   }
   .link-underline:hover::after,
   .link-underline[aria-current='page']::after {
@@ -475,7 +488,7 @@
   /* ── Image Zoom (desktop fine pointer only) ──────────────────────────── */
   .zoom-hover {
     cursor: zoom-in;
-    transition: transform 600ms var(--ease-zenvora);
+    transition: transform 600ms var(--ease-aurevyn);
   }
   @media (hover: hover) and (pointer: fine) {
     .zoom-hover:hover {
@@ -533,7 +546,7 @@
     mask-composite: exclude;
     pointer-events: none;
     opacity: 0.55;
-    transition: opacity 420ms var(--ease-zenvora);
+    transition: opacity 420ms var(--ease-aurevyn);
   }
   @media (hover: hover) {
     .lux-frame:hover::before {
@@ -728,11 +741,11 @@
     animation: motion-fade var(--duration-fast) ease-out both;
   }
   .motion-pop {
-    animation: motion-pop var(--duration-slow) var(--ease-zenvora) both;
+    animation: motion-pop var(--duration-slow) var(--ease-aurevyn) both;
   }
   .motion-lift {
     transition:
-      transform var(--duration-micro) var(--ease-zenvora),
+      transform var(--duration-micro) var(--ease-aurevyn),
       opacity var(--duration-micro) ease-out;
   }
   @media (hover: hover) {
@@ -746,7 +759,7 @@
     opacity: 0;
     transform: translateY(22px);
     transition:
-      opacity var(--duration-enter) var(--ease-zenvora),
+      opacity var(--duration-enter) var(--ease-aurevyn),
       transform var(--duration-enter) var(--ease-out);
   }
   .js .reveal.is-visible {

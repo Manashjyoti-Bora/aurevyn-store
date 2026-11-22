@@ -5,7 +5,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ── NIRVORA "NOIR ATELIER" palette (2026-11) ─────────────────────
+        // ── AUREVYN "NOIR ATELIER" palette (2026-11) ─────────────────────
         // One monochrome direction: obsidian canvas, porcelain type, a single
         // muted champagne metallic for hairlines and rare emphasis. No second
         // accent hue — restraint is the luxury signal.
@@ -145,7 +145,7 @@ const config: Config = {
         slow: '240ms',
       },
       transitionTimingFunction: {
-        zenvora: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        aurevyn: 'cubic-bezier(0.22, 1, 0.36, 1)',
       },
       keyframes: {
         'fade-in': {

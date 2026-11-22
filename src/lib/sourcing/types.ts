@@ -1,7 +1,7 @@
 /**
  * Meesho sourcing — shared contracts.
  *
- * Nirvora resells Meesho listings. Meesho publishes no public product API
+ * Aurevyn resells Meesho listings. Meesho publishes no public product API
  * (its Supplier/Order API is partner-gated and only for onboarded suppliers),
  * so this module never pretends to scrape or sync Meesho. Instead it scores
  * candidates the owner actually sees in the Meesho app: price, observed

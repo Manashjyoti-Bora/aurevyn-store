@@ -16,7 +16,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log('  NIRVORA CATALOGUE DIAGNOSTIC');
+  console.log('  AUREVYN CATALOGUE DIAGNOSTIC');
   console.log('═══════════════════════════════════════════════════════════════\n');
 
   // Database connectivity

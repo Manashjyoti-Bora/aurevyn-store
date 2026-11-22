@@ -4,15 +4,15 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { focusablesIn, lockBodyScroll, nextFocusTarget } from '@/lib/a11y/focus';
-import type { SessionUser } from '@/lib/auth/session';
+import { useHeaderSession } from '@/hooks/use-header-session';
 
 export function MobileMenu({
   categories,
-  user,
 }: {
   categories: Array<{ name: string; slug: string }>;
-  user: SessionUser | null;
 }) {
+  // Session comes from the client so the shell stays cacheable (see header.tsx).
+  const { user } = useHeaderSession();
   const [open, setOpen] = useState(false);
   const navRef = useRef<HTMLElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);

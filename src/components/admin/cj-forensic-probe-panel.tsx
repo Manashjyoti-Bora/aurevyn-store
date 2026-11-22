@@ -18,10 +18,10 @@ import { Badge } from '@/components/ui/badge';
  * key or token values — safe to run against production while diagnosing.
  */
 
-/** The route answers with the probe result, or a Nirvora-side config gate. */
+/** The route answers with the probe result, or a Aurevyn-side config gate. */
 type ProbeResponse =
   | ({
-      zenvoraSide: true;
+      aurevynSide: true;
       configured: false;
       apiKeyEnvVar?: string | null;
       vercelEnv?: string | null;
@@ -30,7 +30,7 @@ type ProbeResponse =
       conclusion: string;
     } & Partial<CjProbeResult>)
   | ({
-      zenvoraSide: false;
+      aurevynSide: false;
       configured: true;
       apiKeyEnvVar: string | null;
       vercelEnv?: string | null;
@@ -52,7 +52,7 @@ export function CjForensicProbePanel({ supplierId }: { supplierId: string }) {
         `/api/admin/suppliers/${supplierId}/diagnostics/cj`,
         { method: 'POST' }
       );
-      if (result.zenvoraSide === true) {
+      if (result.aurevynSide === true) {
         // Configuration gate: the probe never ran. Surface the exact fix.
         setError(result.adapterError ?? result.conclusion);
         toast(result.conclusion, 'error');

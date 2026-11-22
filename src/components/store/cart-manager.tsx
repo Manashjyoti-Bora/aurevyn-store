@@ -160,7 +160,7 @@ export function CartManager({
               aria-label="Complimentary shipping progress"
             >
               <div
-                className="h-full bg-gradient-to-r from-accent-500/60 to-accent-300 transition-all duration-300 ease-zenvora"
+                className="h-full bg-gradient-to-r from-accent-500/60 to-accent-300 transition-all duration-300 ease-aurevyn"
                 style={{ width: `${freeShippingProgress}%` }}
               />
             </div>

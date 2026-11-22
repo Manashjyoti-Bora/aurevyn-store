@@ -1,6 +1,6 @@
 # Supplier API contract (HTTP_REST adapter)
 
-Resellix is **not hard-wired to any supplier**. Fulfilment goes through a
+Aurevyn is **not hard-wired to any supplier**. Fulfilment goes through a
 `SupplierAdapter` abstraction with three implementations:
 
 | Type        | What it does                                                                                                                                  |
@@ -10,7 +10,7 @@ Resellix is **not hard-wired to any supplier**. Fulfilment goes through a
 | `DEMO`      | Clearly-labelled simulator for development (accepts orders, "ships" on a schedule, reports tracking). **Hard-disabled in production builds.** |
 
 This document specifies exactly what an `HTTP_REST` supplier API must provide,
-how Resellix authenticates, what it sends, what it expects back, and how
+how Aurevyn authenticates, what it sends, what it expects back, and how
 webhooks/status polling keep tracking in sync.
 
 ---
@@ -28,7 +28,7 @@ Admin → Suppliers → _New supplier_ (type **HTTP REST**):
 
 ```jsonc
 {
-  // How Resellix authenticates every outbound call.
+  // How Aurevyn authenticates every outbound call.
   //   bearer   → Authorization: Bearer <value of apiKeyEnvVar>
   //   x-api-key→ <header>: <value of apiKeyEnvVar>   (header name configurable)
   //   basic    → Authorization: Basic base64(apiKeyEnvVar:apiSecretEnvVar)
@@ -68,7 +68,7 @@ Admin → Suppliers → _New supplier_ (type **HTTP REST**):
     "requestRefund": { "path": "/orders/{supplierOrderId}/refunds", "method": "POST" },
   },
 
-  // Supplier status strings → Resellix SupplierOrderStatus enum.
+  // Supplier status strings → Aurevyn SupplierOrderStatus enum.
   "statusMap": {
     "confirmed": "ACCEPTED",
     "rejected": "REJECTED",
@@ -86,7 +86,7 @@ instead of failing).
 
 ## 2. Catalog sync (`products` endpoint)
 
-`GET {baseUrl}{endpoints.products.path}` — Resellix expects a JSON array (or an
+`GET {baseUrl}{endpoints.products.path}` — Aurevyn expects a JSON array (or an
 object with an `items`/`products` array) of:
 
 ```json
@@ -130,7 +130,7 @@ Request body (canonical):
 ```json
 {
   "orderNumber": "RX-260905-AB23CD", // YOUR store's order number (reference)
-  "supplierOrderId": "so_cuid...", // Resellix supplier-order id
+  "supplierOrderId": "so_cuid...", // Aurevyn supplier-order id
   "currency": "INR",
   "items": [
     { "sku": "SUP-123", "externalId": "9981", "quantity": 2, "unitCost": 412.5, "lineTotal": 825.0 }
@@ -168,7 +168,7 @@ Two mechanisms (use either or both):
 
 `GET {baseUrl}{endpoints.orderStatus.path}` (with `{supplierOrderId}` substituted)
 → mapped through `response` (`status`, `trackingNumber`, `carrier`, `trackingUrl`).
-Resellix polls while orders are in-flight via the job queue (`SYNC_SUPPLIER_ORDER`).
+Aurevyn polls while orders are in-flight via the job queue (`SYNC_SUPPLIER_ORDER`).
 
 ### 4b. Push webhooks (preferred)
 
@@ -244,7 +244,7 @@ the env vars that hold them.
 4. Ideally push signed webhooks (`X-Supplier-Signature`, HMAC-SHA256 hex of the
    raw body) for status/tracking changes; include an `eventId` per event.
 5. Provide catalog + stock endpoints so Admin can sync and map products.
-6. Keep customer PII in responses minimal — Resellix only consumes status and
+6. Keep customer PII in responses minimal — Aurevyn only consumes status and
    tracking fields.
 
 ---
@@ -280,7 +280,7 @@ Endpoints used:
 - Status: `GET /shopping/order/getOrderDetail`, `GET /logistic/trackInfo`
 - Webhook registration: `POST /webhook/set` (order + logistics → our callback)
 
-Product mapping: Nirvora product's supplier SKU must hold the CJ **vid** (GUID/snowflake) or a
+Product mapping: Aurevyn product's supplier SKU must hold the CJ **vid** (GUID/snowflake) or a
 CJ SKU (resolved via stock/queryBySku). Idempotency: `storeLineItemId` = `<job idempotency
 key>:<line>`; duplicate createOrder responses fall back to `shopping/order/list` lookup so a
 retry can never create a second CJ order.
@@ -289,8 +289,8 @@ Catalog sync semantics (intentional):
 
 - Sync pulls **My Products only** (`GET /product/myProduct/query`). CJ's general catalogue
   (`/product/listV2`) is deliberately NOT auto-imported: nothing becomes publicly sellable in
-  Nirvora without the owner explicitly adding it to CJ My Products, syncing, and mapping it to
-  a Nirvora product with a reviewed price.
+  Aurevyn without the owner explicitly adding it to CJ My Products, syncing, and mapping it to
+  a Aurevyn product with a reviewed price.
 - Envelope & field normalisation: CJ's `GET /product/myProduct/query` returns a Spring `Page`
   payload inside `data` (`{ pageSize, pageNumber, totalRecords, totalPages, content: [...] }`),
   where each item uses `productId` (or `pid`), `nameEn` (or `productName`/`productNameEn`),

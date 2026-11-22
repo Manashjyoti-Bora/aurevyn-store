@@ -41,16 +41,16 @@ export function ProductCard({ product }: { product: ProductCardData }) {
     product.compareAtPricePaise != null && product.compareAtPricePaise > product.pricePaise;
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-cream-100 transition-[transform,border-color,box-shadow] duration-[320ms] ease-zenvora focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2 focus-within:ring-offset-cream-50 [@media(hover:hover)]:hover:-translate-y-1 [@media(hover:hover)]:hover:border-accent-400/30 [@media(hover:hover)]:hover:shadow-[0_40px_80px_-40px_rgba(0,0,0,0.95)]">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-cream-100 transition-[transform,border-color,box-shadow] duration-[320ms] ease-aurevyn focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2 focus-within:ring-offset-cream-50 [@media(hover:hover)]:hover:-translate-y-1 [@media(hover:hover)]:hover:border-accent-400/30 [@media(hover:hover)]:hover:shadow-[0_40px_80px_-40px_rgba(0,0,0,0.95)]">
       {/* Fracture ticks — two hairlines that draw in on hover, like the light
           catching a cut edge of the frame. Decorative only. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute left-0 top-0 z-10 h-8 w-px origin-top scale-y-0 bg-gradient-to-b from-accent-400/70 to-transparent transition-transform duration-500 ease-zenvora [@media(hover:hover)]:group-hover:scale-y-100"
+        className="pointer-events-none absolute left-0 top-0 z-10 h-8 w-px origin-top scale-y-0 bg-gradient-to-b from-accent-400/70 to-transparent transition-transform duration-500 ease-aurevyn [@media(hover:hover)]:group-hover:scale-y-100"
       />
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 right-0 z-10 h-8 w-px origin-bottom scale-y-0 bg-gradient-to-t from-accent-400/50 to-transparent transition-transform duration-500 ease-zenvora [@media(hover:hover)]:group-hover:scale-y-100"
+        className="pointer-events-none absolute bottom-0 right-0 z-10 h-8 w-px origin-bottom scale-y-0 bg-gradient-to-t from-accent-400/50 to-transparent transition-transform duration-500 ease-aurevyn [@media(hover:hover)]:group-hover:scale-y-100"
       />
 
       <div className="relative aspect-[4/5] overflow-hidden bg-cream-200">
@@ -61,7 +61,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
               alt={product.imageAlt || product.name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover transition-transform duration-[900ms] ease-zenvora group-focus-within:scale-[1.06] [@media(hover:hover)]:group-hover:scale-[1.06]"
+              className="object-cover transition-transform duration-[900ms] ease-aurevyn group-focus-within:scale-[1.06] [@media(hover:hover)]:group-hover:scale-[1.06]"
               loading="lazy"
             />
             {product.imageUrls[1] && (
@@ -70,7 +70,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
                 alt=""
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className="object-cover opacity-0 transition-[opacity,transform] duration-[700ms] ease-zenvora group-focus-within:scale-[1.06] group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:scale-[1.06] [@media(hover:hover)]:group-hover:opacity-100"
+                className="object-cover opacity-0 transition-[opacity,transform] duration-[700ms] ease-aurevyn group-focus-within:scale-[1.06] group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:scale-[1.06] [@media(hover:hover)]:group-hover:opacity-100"
                 loading="lazy"
               />
             )}

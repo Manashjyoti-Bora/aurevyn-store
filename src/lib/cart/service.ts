@@ -18,7 +18,7 @@ import type { Cart } from '@prisma/client';
  * never supplies prices, which makes price manipulation impossible.
  */
 
-export const CART_COOKIE = 'resellix_cart';
+export const CART_COOKIE = 'aurevyn_cart';
 const CART_TTL_DAYS = 30;
 const MAX_QTY_PER_LINE = 20;
 

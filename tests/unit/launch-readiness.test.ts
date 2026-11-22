@@ -10,7 +10,7 @@ const prodEnv = {
   STORAGE_PROVIDER: 'local',
   SUPPORT_EMAIL: 'owner@mailbox.test',
   SMTP_HOST: 'smtp.mailprovider.com',
-  EMAIL_FROM: 'Zenvora <no-reply@zenvora.in>',
+  EMAIL_FROM: 'Aurevyn <no-reply@aurevyn.in>',
 };
 
 describe('collectLaunchReadiness', () => {
@@ -48,9 +48,9 @@ describe('collectLaunchReadiness', () => {
       settings: {
         demoMode: false,
         supportEmail: 'help@store.test',
-        business: { ...business, legalName: 'Zenvora', addressLine: '1 Road', gstin: '18ABCDE1234F1Z5' },
+        business: { ...business, legalName: 'Aurevyn', addressLine: '1 Road', gstin: '18ABCDE1234F1Z5' },
       },
-      env: { ...prodEnv, UPI_VPA: 'zenvora@ybl', STORAGE_PROVIDER: 's3' },
+      env: { ...prodEnv, UPI_VPA: 'aurevyn@ybl', STORAGE_PROVIDER: 's3' },
       paymentConfigured: true,
     });
     expect(r.blockers).toEqual([]);
@@ -60,7 +60,7 @@ describe('collectLaunchReadiness', () => {
   it('flags undeliverable sending domains and a missing SMTP host in production', () => {
     const r = collectLaunchReadiness({
       settings: { demoMode: false, supportEmail: 'help@store.test', business },
-      env: { ...prodEnv, EMAIL_FROM: 'Zenvora <no-reply@zenvora.local>', SMTP_HOST: undefined },
+      env: { ...prodEnv, EMAIL_FROM: 'Aurevyn <no-reply@aurevyn.local>', SMTP_HOST: undefined },
       paymentConfigured: true,
     });
     expect(r.blockers.join(' ')).toMatch(/SMTP_HOST is empty/);

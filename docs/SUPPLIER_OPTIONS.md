@@ -1,8 +1,8 @@
-# Supplier options for Nirvora — general-product reselling (decision of 2026-09-05)
+# Supplier options for Aurevyn — general-product reselling (decision of 2026-09-05)
 
 Owner's model (binding): general-product reselling/dropshipping — source products from
-legitimate suppliers at low cost, list them on Nirvora with own margin, customer pays Nirvora,
-paid orders auto-forward to the supplier, supplier ships direct with tracking, Nirvora records
+legitimate suppliers at low cost, list them on Aurevyn with own margin, customer pays Aurevyn,
+paid orders auto-forward to the supplier, supplier ships direct with tracking, Aurevyn records
 cost/price/fees/margin. **POD suppliers (Printrove/Qikink) are excluded by owner decision.**
 Lowest-cost legitimate route required. No workarounds that violate marketplace terms.
 
@@ -24,10 +24,10 @@ Why (against the owner's checklist):
 - Official public REST API v2 (developers.cjdropshipping.com): auth token exchange/refresh,
   category/product/variant/stock queries, createOrder(V2/V3), order list/detail, wallet
   balance + balance payment, freight calculation, logistics trackInfo, webhook registration.
-- Automated order placement: Nirvora forwards paid orders via `createOrderV2` + wallet payment;
+- Automated order placement: Aurevyn forwards paid orders via `createOrderV2` + wallet payment;
   retries are idempotent (same platform order number; duplicate-create path reuses the
   existing CJ order instead of duplicating).
-- Customer-direct shipping + tracking: trackInfo + ORDER/LOGISTICS webhooks; Nirvora treats
+- Customer-direct shipping + tracking: trackInfo + ORDER/LOGISTICS webhooks; Aurevyn treats
   webhooks as TRIGGERS ONLY and re-verifies status through the authenticated API.
 - Inventory/price sync: stock queries per vid/sku; catalogue import via Admin → supplier sync;
   USD costs convert with an explicit `fxRateInrPerUsd` config (never a hidden rate).
@@ -36,7 +36,7 @@ Why (against the owner's checklist):
   integrations exist), i.e. permitted reseller use.
 
 Honest gaps (documented, not hidden):
-- **COD: CJ does not support cash-on-delivery on India lines.** Nirvora therefore auto-forwards
+- **COD: CJ does not support cash-on-delivery on India lines.** Aurevyn therefore auto-forwards
   prepaid orders; COD orders for CJ-mapped products must be confirmed/forwarded by the admin
   (wallet is debited when forwarded) — the admin UI says exactly this.
 - India delivery 7–15 days from CN warehouses; import duty/GST on cross-border parcels is the

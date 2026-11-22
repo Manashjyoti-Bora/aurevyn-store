@@ -4,7 +4,7 @@ async function generateIcons() {
   const size192 = 192;
   const size512 = 512;
   
-  // Create a base SVG with a simple "Z" logo for Zenvora
+  // Create a base SVG with a simple "Z" logo for Aurevyn
   const svg = (size: number) => `
     <svg width="${size}" height="${size}" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
       <rect width="512" height="512" fill="#174B3A"/>

@@ -1,11 +1,21 @@
-# Nirvora — the autonomous team
+# Aurevyn — the autonomous team
 
 Status: **implemented and tested**. Eight agents read the store on a schedule,
 rank what needs doing and store a briefing per cycle. They do not publish
 products, change prices, refund money, message customers or edit settings.
 
-`/admin/team` is the console. It shows each agent's current briefing, the exact
-limits of its mandate and the stored cycle log.
+`/admin/team/briefings` is the briefing console: each agent's current report,
+the exact limits of its mandate and the stored cycle log.
+
+`/admin/team` is the full operations bench — **119 defined specialists** across
+ten departments — plus the workflow planner. The planner turns an objective
+into ordered, owned work: tasks, dependencies, one owner per task, the resources
+a task needs, the parallel waves it can run in, the critical path and the tasks
+that are owner-only decisions. `src/lib/team/agents.ts` holds the roster and
+`src/lib/team/workflow.ts` the planner; both are pure and unit-tested.
+
+There is no separate voice assistant: one team, one plan. The planner is also
+available as JSON at `POST /api/admin/team/plan` for an external scheduler.
 
 ---
 

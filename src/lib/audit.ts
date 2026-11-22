@@ -20,7 +20,7 @@ export interface AuditEntry {
 export function hashIp(ip: string | null | undefined): string | null {
   if (!ip) return null;
   // One-way hash so we can correlate abuse without storing raw IPs.
-  return sha256(`resellix-ip:${ip}`).slice(0, 32);
+  return sha256(`aurevyn-ip:${ip}`).slice(0, 32);
 }
 
 function clientIpFromRequest(req?: Request): string | null {

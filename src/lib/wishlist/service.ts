@@ -21,7 +21,7 @@ import type { ProductCardData } from '../catalog/storefront';
  * available and remove it cleanly.
  */
 
-export const WISHLIST_COOKIE = 'zenvora_wishlist';
+export const WISHLIST_COOKIE = 'aurevyn_wishlist';
 const WISHLIST_TTL_DAYS = 30;
 const MAX_WISHLIST_ITEMS = 100;
 

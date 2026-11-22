@@ -65,7 +65,7 @@ async function buildExport(req: Request): Promise<Response> {
 
   if (type === 'daily') {
     const series = await dailySeries(range);
-    filename = `resellix-daily-${stamp}.csv`;
+    filename = `aurevyn-daily-${stamp}.csv`;
     csv = toCsv(
       ['date', 'orders', 'confirmed_order_value_inr', 'actual_profit_inr'],
       series.map((d) => [
@@ -77,7 +77,7 @@ async function buildExport(req: Request): Promise<Response> {
     );
   } else if (type === 'financials') {
     const t = await computeFinancialTotals(range);
-    filename = `resellix-financials-${stamp}.csv`;
+    filename = `aurevyn-financials-${stamp}.csv`;
     csv = toCsv(
       ['metric', 'value_inr', 'note'],
       [
@@ -161,7 +161,7 @@ async function buildExport(req: Request): Promise<Response> {
         toPaise(item._sum?.lineSupplierCost ?? 0),
       ])
     );
-    filename = `resellix-products-${stamp}.csv`;
+    filename = `aurevyn-products-${stamp}.csv`;
     csv = toCsv(
       ['product', 'units', 'revenue_inr', 'supplier_cost_inr', 'gross_margin_inr'],
       rows.map((r) => {
@@ -204,7 +204,7 @@ async function buildExport(req: Request): Promise<Response> {
       cur.profit += toPaise(o.actualProfit);
       by.set(key, cur);
     }
-    filename = `resellix-customers-${stamp}.csv`;
+    filename = `aurevyn-customers-${stamp}.csv`;
     csv = toCsv(
       ['email', 'name', 'orders', 'revenue_inr', 'actual_profit_inr'],
       [...by.entries()]
@@ -218,7 +218,7 @@ async function buildExport(req: Request): Promise<Response> {
         ])
     );
   } else {
-    return csvResponse('resellix-report.csv', toCsv(['error'], [['unknown report type']]));
+    return csvResponse('aurevyn-report.csv', toCsv(['error'], [['unknown report type']]));
   }
 
   await auditLog({

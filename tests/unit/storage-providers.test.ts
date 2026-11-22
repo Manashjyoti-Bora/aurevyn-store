@@ -49,7 +49,7 @@ describe('local provider', () => {
 describe('s3 provider (SigV4, no SDK)', () => {
   function stub() {
     vi.stubEnv('STORAGE_PROVIDER', 's3');
-    vi.stubEnv('S3_BUCKET', 'zenvora-img');
+    vi.stubEnv('S3_BUCKET', 'aurevyn-img');
     vi.stubEnv('S3_REGION', 'ap-south-1');
     vi.stubEnv('S3_ACCESS_KEY_ID', 'AKIAEXAMPLE');
     vi.stubEnv('S3_SECRET_ACCESS_KEY', 'secret123');
@@ -68,12 +68,12 @@ describe('s3 provider (SigV4, no SDK)', () => {
     const calls = stub();
     const p = new S3StorageProvider();
     const obj = await p.put({ buffer: Buffer.from('abc'), filename: 'f1.png', mime: 'image/png' });
-    expect(obj.url).toContain('zenvora-img');
+    expect(obj.url).toContain('aurevyn-img');
     expect(obj.key).toBe('uploads/f1.png');
     const auth = String((calls[0].init!.headers as Record<string, string>).Authorization);
     expect(auth).toMatch(/^AWS4-HMAC-SHA256 Credential=AKIAEXAMPLE\/\d{8}\/ap-south-1\/s3\/aws4_request/);
     expect(auth).toContain('SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date');
-    expect(calls[0].url).toBe('https://zenvora-img.s3.ap-south-1.amazonaws.com/uploads/f1.png');
+    expect(calls[0].url).toBe('https://aurevyn-img.s3.ap-south-1.amazonaws.com/uploads/f1.png');
   });
 
   it('sends a valid x-amz-date and content sha256 on every request', async () => {
@@ -107,7 +107,7 @@ describe('cloudinary provider', () => {
       'fetch',
       vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
         sent = init!.body as FormData;
-        return new Response(JSON.stringify({ secure_url: 'https://res.cloudinary.com/x/f.png', public_id: 'zenvora/f' }), { status: 200 });
+        return new Response(JSON.stringify({ secure_url: 'https://res.cloudinary.com/x/f.png', public_id: 'aurevyn/f' }), { status: 200 });
       })
     );
     const p = new CloudinaryStorageProvider();

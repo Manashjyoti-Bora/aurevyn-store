@@ -28,7 +28,7 @@ const optionalNonEmpty = <T extends z.ZodTypeAny>(schema: T) =>
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   APP_URL: z.string().url().default('http://localhost:3000'),
-  APP_NAME: z.string().min(1).default('Nirvora'),
+  APP_NAME: z.string().min(1).default('Aurevyn'),
 
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
 
@@ -39,7 +39,7 @@ const envSchema = z.object({
 
   PAYMENTS_TEST_MODE: boolStr,
   /**
-   * Store-owned UPI Virtual Payment Address (e.g. `zenvora@okhdfcbank`).
+   * Store-owned UPI Virtual Payment Address (e.g. `aurevyn@okhdfcbank`).
    * The customer scans a QR that pays THIS address directly; money never
    * passes through a third-party gateway and no gateway credentials exist.
    * Absent = UPI QR is unavailable and checkout honestly falls back to COD.
@@ -81,7 +81,7 @@ const envSchema = z.object({
   SMTP_SECURE: boolStr,
   SMTP_USER: optionalNonEmpty(z.string()),
   SMTP_PASS: optionalNonEmpty(z.string()),
-  EMAIL_FROM: z.string().default('Nirvora <no-reply@nirvora.local>'),
+  EMAIL_FROM: z.string().default('Aurevyn <no-reply@aurevyn.local>'),
   EMAIL_REPLY_TO: optionalNonEmpty(z.string()),
 
   /**

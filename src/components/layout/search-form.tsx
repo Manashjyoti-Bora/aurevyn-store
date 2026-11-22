@@ -6,7 +6,7 @@ import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type K
 import { formatINR } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
-const STORAGE_KEY = 'zenvora_recent_searches';
+const STORAGE_KEY = 'aurevyn_recent_searches';
 const DEBOUNCE_MS = 220;
 const MIN_CHARS = 2;
 

@@ -78,6 +78,18 @@ const nextConfig = {
     { source: '/account', headers: privateAreaHeaders },
     { source: '/account/:path*', headers: privateAreaHeaders },
     {
+      // Content-hashed build assets never change: let browsers and the CDN keep
+      // them for a year instead of re-validating on every page view.
+      source: '/_next/static/:path*',
+      headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+    },
+    {
+      // Public media is content-addressed by filename; a day of browser cache is
+      // long enough to help repeat visits and short enough to correct a typo.
+      source: '/:path*.(png|jpg|jpeg|webp|avif|svg|ico|woff2)',
+      headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' }],
+    },
+    {
       // Uploaded files must never be interpreted as HTML.
       source: '/uploads/:path*',
       headers: [

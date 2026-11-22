@@ -13,7 +13,7 @@ import type { Role, UserStatus } from '@prisma/client';
  * - Cookies: httpOnly, SameSite=Lax, Secure in production, path=/.
  */
 
-export const SESSION_COOKIE = 'resellix_session';
+export const SESSION_COOKIE = 'aurevyn_session';
 
 export interface SessionUser {
   id: string;

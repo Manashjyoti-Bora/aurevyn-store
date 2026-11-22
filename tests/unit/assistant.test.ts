@@ -10,8 +10,8 @@ import type { AssistantFacts } from '@/lib/assistant/types';
 
 function facts(overrides: Partial<AssistantFacts> = {}): AssistantFacts {
   const base: AssistantFacts = {
-    storeName: 'Zenvora',
-    supportEmail: 'care@zenvora.in',
+    storeName: 'Aurevyn',
+    supportEmail: 'care@aurevyn.in',
     supportPhone: null,
     pricesIncludeTax: true,
     shipping: {
@@ -132,7 +132,7 @@ describe('buildGuidance — grounded in store settings', () => {
   });
 
   it('uses the real support address when one is configured', () => {
-    expect(buildGuidance('CONTACT', facts()).message).toContain('care@zenvora.in');
+    expect(buildGuidance('CONTACT', facts()).message).toContain('care@aurevyn.in');
     expect(
       buildGuidance('CONTACT', facts({ supportEmail: null })).message
     ).toContain('contact form');

@@ -49,11 +49,11 @@ export function ChapterRail({ chapters }: { chapters: { id: string; label: strin
             aria-current={isActive ? 'true' : undefined}
             className="group flex items-center gap-2.5"
           >
-            <span className="max-w-0 overflow-hidden whitespace-nowrap text-[9px] font-medium uppercase tracking-[0.22em] text-ink-400 opacity-0 transition-all duration-300 ease-zenvora group-hover:max-w-[9rem] group-hover:opacity-100 group-focus-visible:max-w-[9rem] group-focus-visible:opacity-100">
+            <span className="max-w-0 overflow-hidden whitespace-nowrap text-[9px] font-medium uppercase tracking-[0.22em] text-ink-400 opacity-0 transition-all duration-300 ease-aurevyn group-hover:max-w-[9rem] group-hover:opacity-100 group-focus-visible:max-w-[9rem] group-focus-visible:opacity-100">
               {chapter.label}
             </span>
             <span
-              className={`h-px transition-all duration-300 ease-zenvora ${
+              className={`h-px transition-all duration-300 ease-aurevyn ${
                 isActive
                   ? 'w-7 bg-accent-400'
                   : 'w-3.5 bg-white/25 group-hover:w-5 group-hover:bg-white/50'

@@ -1,228 +1,203 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/feedback';
-import { TeamRunButton } from '@/components/admin/team-run-button';
-import { getTeamBoard } from '@/lib/team/service';
+import {
+  AUTONOMY_LABELS,
+  SPECIALIST_COUNT,
+  specialistsByDepartment,
+  type Autonomy,
+} from '@/lib/team/agents';
 import { TEAM_ROSTER } from '@/lib/team/roster';
-import { AGENT_STATUS_LABELS, type AgentStatus } from '@/lib/team/types';
+import { formatMinutes, planAllObjectives } from '@/lib/team/workflow';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'The team — Admin', robots: { index: false } };
 
-const STATUS_TONE: Record<AgentStatus, 'red' | 'amber' | 'green'> = {
-  ACT: 'red',
-  WATCH: 'amber',
-  CLEAR: 'green',
+const TONE: Record<Autonomy, 'green' | 'amber' | 'gray'> = {
+  AUTO: 'green',
+  PROPOSE: 'amber',
+  OWNER: 'gray',
 };
 
-function ago(iso: string): string {
-  const ms = Date.now() - new Date(iso).getTime();
-  const minutes = Math.max(1, Math.floor(ms / 60_000));
-  if (minutes < 60) return `${minutes} min ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 48) return `${hours} h ago`;
-  return `${Math.floor(hours / 24)} d ago`;
-}
+const STEPS = [
+  { n: '01', label: 'Objectives', text: 'One measurable question per playbook.' },
+  { n: '02', label: 'Tasks', text: 'Small units that can be finished and checked.' },
+  { n: '03', label: 'Dependencies', text: 'What must finish before a task may start.' },
+  { n: '04', label: 'Ownership', text: 'Exactly one specialist per task.' },
+  { n: '05', label: 'Resources', text: 'The data or access the task needs.' },
+];
 
-/**
- * The team console: eight independent agents, their current briefing and the
- * policy each one operates under. Briefings are recomputed on every page load
- * from live store data, so this page is never a stale dashboard.
- */
-export default async function TeamPage() {
-  const { signals, briefings, counts, cycles } = await getTeamBoard();
-  const lastCycle = cycles[0] ?? null;
+export default function TeamPage() {
+  const plans = planAllObjectives();
+  const departments = specialistsByDepartment();
+  const liveCount = TEAM_ROSTER.length;
+  const taskCount = plans.reduce((sum, plan) => sum + plan.taskCount, 0);
+  const gateCount = plans.reduce((sum, plan) => sum + plan.ownerGates.length, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="eyebrow">Autonomous team</p>
-          <h1>The people who never sleep</h1>
-          <p className="mt-1 max-w-2xl text-sm text-ink-400">
-            Eight specialists, each owning one part of {signals.store.name}. They read the store,
-            rank what matters and brief you — the decisions that move money stay yours.
+          <p className="eyebrow">Operations team</p>
+          <h1>{SPECIALIST_COUNT} specialists, one plan</h1>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-ink-400">
+            Every role below owns one question. The workflow planner turns a business objective into
+            ordered, owned work: what runs in parallel, what waits, and which decisions stay with
+            you. {liveCount} agents are on live duty and produce briefings from real store records.
           </p>
         </div>
-        <TeamRunButton />
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/admin/team/briefings"
+            className="rounded-lg bg-ink-900 px-4 py-2 text-sm font-medium text-white hover:bg-ink-800"
+          >
+            Live briefings
+          </Link>
+          <Link
+            href="/admin/sourcing"
+            className="rounded-lg border border-ink-900/15 px-4 py-2 text-sm font-medium text-ink-700 hover:bg-cream-100"
+          >
+            Meesho sourcing
+          </Link>
+        </div>
       </header>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Card className="p-3.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-400">
-            Action now
-          </p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-red-600">{counts.ACT}</p>
-          <p className="text-[11px] text-ink-500">agents with something urgent</p>
-        </Card>
-        <Card className="p-3.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-400">
-            Watching
-          </p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-amber-700">{counts.WATCH}</p>
-          <p className="text-[11px] text-ink-500">trending the wrong way</p>
-        </Card>
-        <Card className="p-3.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-400">
-            All clear
-          </p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-emerald-700">{counts.CLEAR}</p>
-          <p className="text-[11px] text-ink-500">nothing needed</p>
-        </Card>
-        <Card className="p-3.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-400">
-            Last stored cycle
-          </p>
-          <p className="mt-1 text-sm font-semibold text-ink-900">
-            {lastCycle ? ago(lastCycle.createdAt) : 'not yet run'}
-          </p>
-          <p className="text-[11px] text-ink-500">
-            {lastCycle
-              ? `${lastCycle.trigger.toLowerCase()} · ${lastCycle.durationMs} ms`
-              : 'run one above'}
-          </p>
-        </Card>
-      </div>
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          {
+            label: 'Specialists',
+            value: SPECIALIST_COUNT,
+            sub: `${departments.length} departments`,
+          },
+          { label: 'On live duty', value: liveCount, sub: 'briefings from real records' },
+          { label: 'Planned tasks', value: taskCount, sub: 'across 4 objectives' },
+          { label: 'Owner gates', value: gateCount, sub: 'decisions never delegated' },
+        ].map((item) => (
+          <Card key={item.label} className="p-3.5">
+            <dt className="text-[11px] font-semibold uppercase tracking-wider text-ink-400">
+              {item.label}
+            </dt>
+            <dd className="mt-1 text-2xl font-bold tabular-nums text-ink-900">{item.value}</dd>
+            <p className="text-[11px] text-ink-500">{item.sub}</p>
+          </Card>
+        ))}
+      </dl>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        {briefings.map((briefing) => {
-          const agent = TEAM_ROSTER.find((entry) => entry.id === briefing.agentId);
-          if (!agent) return null;
-          return (
-            <Card key={briefing.agentId} className="p-4 sm:p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent-400/30 bg-cream-100 text-sm font-semibold text-accent-400">
-                    {agent.name.slice(0, 1)}
-                  </span>
-                  <div className="min-w-0">
-                    <h2 className="truncate text-sm font-bold text-ink-900">{agent.name}</h2>
-                    <p className="truncate text-[11px] uppercase tracking-wider text-ink-400">
-                      {agent.role}
-                    </p>
-                  </div>
-                </div>
-                <Badge tone={STATUS_TONE[briefing.status]}>
-                  {AGENT_STATUS_LABELS[briefing.status]}
-                </Badge>
+      <Card title="How a plan is built">
+        <ol className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {STEPS.map((step) => (
+            <li key={step.n} className="rounded-xl border border-ink-900/10 bg-cream-50 p-3">
+              <p className="text-[10px] font-bold uppercase tracking-eyebrow text-accent-400">
+                {step.n} · {step.label}
+              </p>
+              <p className="mt-1 text-[12.5px] leading-relaxed text-ink-500">{step.text}</p>
+            </li>
+          ))}
+        </ol>
+      </Card>
+
+      <section className="space-y-4">
+        <div>
+          <h2>Execution plans</h2>
+          <p className="mt-1 text-sm text-ink-400">
+            Each playbook is a directed graph. Wave 1 starts now; every later wave waits only for
+            what it depends on.
+          </p>
+        </div>
+
+        {plans.map((plan) => (
+          <Card key={plan.objectiveId} className="p-4 sm:p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-base font-semibold text-ink-900">{plan.objectiveTitle}</h3>
+                <p className="mt-0.5 text-[12.5px] italic text-ink-500">“{plan.question}”</p>
               </div>
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-ink-500">
+                <Badge tone="blue">{plan.taskCount} tasks</Badge>
+                <Badge tone="gray">{plan.agentsUsed} agents</Badge>
+                <Badge tone="amber">{plan.ownerGates.length} owner gates</Badge>
+                <Badge tone="green">~{formatMinutes(plan.totalMinutes)} elapsed</Badge>
+                <Badge tone="purple">critical path {formatMinutes(plan.criticalPathMinutes)}</Badge>
+              </div>
+            </div>
 
-              <p className="mt-3 text-[13px] font-semibold leading-snug text-ink-800">
-                {briefing.headline}
-              </p>
-              <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-400">
-                {briefing.summary}
-              </p>
-
-              <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {briefing.findings.slice(0, 6).map((finding) => (
-                  <div
-                    key={finding.label}
-                    className="rounded-lg border border-ink-900/10 bg-cream-50 px-2.5 py-2"
-                  >
-                    <dt className="text-[10px] uppercase tracking-wider text-ink-400">
-                      {finding.label}
-                    </dt>
-                    <dd className="mt-0.5 truncate text-[13px] font-semibold tabular-nums text-ink-900">
-                      {finding.value}
-                    </dd>
+            <ol className="mt-4 space-y-3">
+              {plan.waves.map((wave) => (
+                <li key={wave.wave}>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-ink-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                      Wave {wave.wave}
+                    </span>
+                    <span className="text-[11px] text-ink-400">
+                      {wave.tasks.length} {wave.tasks.length === 1 ? 'task' : 'tasks'} in parallel
+                    </span>
                   </div>
-                ))}
-              </dl>
-
-              {briefing.priorities.length > 0 && (
-                <div className="mt-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-400">
-                    Next actions
-                  </p>
-                  <ol className="mt-1.5 space-y-1 text-[12.5px] leading-relaxed text-ink-700">
-                    {briefing.priorities.map((priority) => (
-                      <li key={priority} className="flex gap-2">
-                        <span aria-hidden="true" className="text-accent-400">
-                          →
-                        </span>
-                        <span>{priority}</span>
+                  <ul className="mt-1.5 space-y-1.5 border-l border-ink-900/10 pl-3">
+                    {wave.tasks.map((task) => (
+                      <li key={task.id} className="rounded-lg border border-ink-900/10 p-2.5">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="text-[13px] font-semibold text-ink-900">{task.title}</p>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {task.gate === 'OWNER' && <Badge tone="red">Your call</Badge>}
+                            <Badge tone="gray">
+                              {task.owner.callsign} · {task.minutes} min
+                            </Badge>
+                          </div>
+                        </div>
+                        <p className="mt-0.5 text-[11px] text-ink-500">
+                          {task.owner.role} — {task.owner.mandate}
+                        </p>
+                        <p className="mt-1 text-[10.5px] text-ink-400">
+                          Needs: {task.resources.join(' · ')}
+                          {task.dependsOn.length > 0 && <> · After: {task.dependsOn.join(', ')}</>}
+                        </p>
                       </li>
                     ))}
-                  </ol>
-                </div>
-              )}
+                  </ul>
+                </li>
+              ))}
+            </ol>
+          </Card>
+        ))}
+      </section>
 
-              <details className="mt-3 border-t border-ink-900/10 pt-2.5">
-                <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-wider text-ink-400">
-                  Mandate &amp; limits
-                </summary>
-                <p className="mt-2 text-[12px] italic text-ink-500">“{agent.mandate}”</p>
-                <p className="mt-2 text-[10px] font-semibold uppercase tracking-wider text-ink-400">
-                  Works on its own
-                </p>
-                <ul className="mt-1 space-y-0.5 text-[12px] text-ink-700">
-                  {agent.decides.map((item) => (
-                    <li key={item}>· {item}</li>
-                  ))}
-                </ul>
-                <p className="mt-2 text-[10px] font-semibold uppercase tracking-wider text-ink-400">
-                  Reserved for the owner
-                </p>
-                <ul className="mt-1 space-y-0.5 text-[12px] text-ink-500">
-                  {agent.escalates.map((item) => (
-                    <li key={item}>· {item}</li>
-                  ))}
-                </ul>
-                <p className="mt-2 text-[11px] text-ink-400">
-                  {agent.schedule.cadence} · cron <code>{agent.schedule.cron}</code>
-                </p>
-              </details>
-            </Card>
-          );
-        })}
-      </div>
-
-      <Card
-        title="Cycle log"
-        action={
-          <span className="text-[11px] text-ink-400">
-            {signals.catalog.active} live products · {signals.orders.placedWindow} orders in{' '}
-            {signals.windowDays} d
-          </span>
-        }
-      >
-        {cycles.length === 0 ? (
-          <p className="text-sm text-ink-500">
-            No stored cycle yet. Run the team above, or wait for the scheduled cron — the first
-            cycle is stored automatically.
+      <section className="space-y-4">
+        <div>
+          <h2>The bench</h2>
+          <p className="mt-1 text-sm text-ink-400">
+            {SPECIALIST_COUNT} defined roles. Autonomy is stated, never implied — nothing publishes,
+            reprices, refunds or messages without you.
           </p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-ink-900/10 text-[11px] uppercase tracking-wider text-ink-400">
-                  <th className="py-2 pr-4 font-semibold">When</th>
-                  <th className="py-2 pr-4 font-semibold">Trigger</th>
-                  <th className="py-2 pr-4 font-semibold">Action</th>
-                  <th className="py-2 pr-4 font-semibold">Watch</th>
-                  <th className="py-2 pr-4 font-semibold">Clear</th>
-                  <th className="py-2 font-semibold">Took</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cycles.map((cycle) => (
-                  <tr key={cycle.id} className="border-b border-ink-900/5 last:border-0">
-                    <td className="py-2 pr-4 text-ink-700">{ago(cycle.createdAt)}</td>
-                    <td className="py-2 pr-4 text-ink-500">{cycle.trigger.toLowerCase()}</td>
-                    <td className="py-2 pr-4 tabular-nums text-red-600">{cycle.counts.ACT}</td>
-                    <td className="py-2 pr-4 tabular-nums text-amber-700">{cycle.counts.WATCH}</td>
-                    <td className="py-2 pr-4 tabular-nums text-emerald-700">
-                      {cycle.counts.CLEAR}
-                    </td>
-                    <td className="py-2 tabular-nums text-ink-500">{cycle.durationMs} ms</td>
-                  </tr>
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-2">
+          {departments.map((group) => (
+            <Card key={group.department} className="p-4">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-bold text-ink-900">{group.department}</h3>
+                <Badge tone="neutral">{group.agents.length}</Badge>
+              </div>
+              <ul className="mt-2 divide-y divide-ink-900/5">
+                {group.agents.map((agent) => (
+                  <li key={agent.id} className="flex items-start gap-2 py-1.5">
+                    <span className="mt-0.5 w-14 shrink-0 text-[10px] font-bold tabular-nums text-accent-400">
+                      {agent.callsign}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[12.5px] font-medium text-ink-900">{agent.role}</p>
+                      <p className="text-[11px] leading-snug text-ink-400">{agent.mandate}</p>
+                    </div>
+                    <span title={AUTONOMY_LABELS[agent.autonomy]}>
+                      <Badge tone={TONE[agent.autonomy]}>{agent.autonomy}</Badge>
+                    </span>
+                  </li>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
+              </ul>
+            </Card>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

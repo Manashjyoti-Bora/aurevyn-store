@@ -19,7 +19,7 @@ type Ctx = { params: Promise<{ id: string }> };
  * fingerprints. NEVER the API key or any token value. No logout, no retries:
  * running the probe never invalidates the currently-working token.
  *
- * Purpose: prove whether a catalog-sync failure is Nirvora-side
+ * Purpose: prove whether a catalog-sync failure is Aurevyn-side
  * (configuration) or CJ-side (credential/authorization), and produce the
  * requestId evidence CJ support asks for.
  */
@@ -33,7 +33,7 @@ export async function POST(req: Request, ctx: Ctx): Promise<Response> {
       throw badRequest(`Supplier ${supplier.name} is of type ${supplier.type}, not CJ.`);
     }
 
-    // Configuration gate first: a record/env problem is Nirvora-side and the
+    // Configuration gate first: a record/env problem is Aurevyn-side and the
     // probe cannot even run without the credential.
     const diag = diagnoseSupplierAdapter(supplier);
     const envVarName = supplier.apiKeyEnvVar?.trim() || null;
@@ -41,21 +41,21 @@ export async function POST(req: Request, ctx: Ctx): Promise<Response> {
     const gitBranch = process.env.VERCEL_GIT_COMMIT_REF?.trim() || null;
     if (!diag.ok || !envVarName) {
       return jsonOk({
-        zenvoraSide: true,
+        aurevynSide: true,
         configured: false,
         apiKeyEnvVar: envVarName,
         vercelEnv,
         gitBranch,
         adapterError: diag.error,
         conclusion:
-          'Nirvora-side configuration problem (see adapterError). Fix this before probing CJ.',
+          'Aurevyn-side configuration problem (see adapterError). Fix this before probing CJ.',
       });
     }
 
     const adapter = new CJDropshippingAdapter(supplier);
     const probe = await adapter.probe();
     return jsonOk({
-      zenvoraSide: false,
+      aurevynSide: false,
       configured: true,
       apiKeyEnvVar: envVarName,
       vercelEnv,

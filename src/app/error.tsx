@@ -15,7 +15,7 @@ export default function Error({
     // trace without leaking details into the UI.
     if (typeof window !== 'undefined') {
       window.dispatchEvent(
-        new CustomEvent('resellix-client-error', {
+        new CustomEvent('aurevyn-client-error', {
           detail: { message: error.message, digest: error.digest },
         })
       );

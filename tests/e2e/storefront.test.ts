@@ -37,7 +37,7 @@ beforeAll(async () => {
     minPrice: variantPrices.length > 0 ? Math.min(...variantPrices) : toPaise(p.sellingPrice),
   };
   categorySlug = p.category?.slug ?? null;
-  // Prime the cookie jar: the middleware issues resellix_csrf on every response.
+  // Prime the cookie jar: the middleware issues aurevyn_csrf on every response.
   await agent.get('/api/health');
 }, 180_000);
 
@@ -50,7 +50,7 @@ describe('storefront pages (real HTTP, real dev DB)', () => {
     const res = await agent.get('/');
     expect(res.status).toBe(200);
     expect(res.body).toContain('width=device-width');
-    expect(res.body).toContain(process.env.APP_NAME ?? 'Resellix');
+    expect(res.body).toContain(process.env.APP_NAME ?? 'Aurevyn');
   });
 
   it('serves /shop and lists a real seeded product', async () => {

@@ -1550,14 +1550,14 @@ describe('CJ My Products envelope + mapping regression (data.content / totalReco
     const prevVercelEnv = process.env.VERCEL_ENV;
     const prevGitRef = process.env.VERCEL_GIT_COMMIT_REF;
     process.env.VERCEL_ENV = 'preview';
-    process.env.VERCEL_GIT_COMMIT_REF = 'arena/feebfc6b-zenvora-store';
+    process.env.VERCEL_GIT_COMMIT_REF = 'arena/feebfc6b-aurevyn-store';
     try {
       const diag = diagnoseSupplierAdapter(
         makeSupplier({ name: 'CJ Dropshipping', apiKeyEnvVar: 'CJ_API_KEY_PREVIEW_MISSING' })
       );
       expect(diag.ok).toBe(false);
       expect(diag.error).toContain(
-        'envVarName: CJ_API_KEY_PREVIEW_MISSING, valuePresent: false, vercelEnv: preview, branch: arena/feebfc6b-zenvora-store'
+        'envVarName: CJ_API_KEY_PREVIEW_MISSING, valuePresent: false, vercelEnv: preview, branch: arena/feebfc6b-aurevyn-store'
       );
       expect(diag.error).toMatch(/Vercel Preview environment.*does not receive Production-only variables/);
 

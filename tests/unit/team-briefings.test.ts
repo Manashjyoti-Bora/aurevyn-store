@@ -10,7 +10,7 @@ function signals(overrides: Partial<TeamSignals> = {}): TeamSignals {
     asOf: AS_OF,
     windowDays: 30,
     store: {
-      name: 'Nirvora',
+      name: 'Aurevyn',
       demoMode: false,
       paymentsKind: 'UPI',
       paymentsConfigured: true,

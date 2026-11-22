@@ -1,4 +1,4 @@
-# Release process — how Nirvora gets to Production safely
+# Release process — how Aurevyn gets to Production safely
 
 This is the operational contract between the code, CI, Vercel and Neon.
 It replaces the previous bare build command
@@ -38,7 +38,7 @@ Rules enforced by the pipeline (not just documented):
 
 1. Neon console → project **`soft-snow-22386582`** (as previously identified) → **Branches**.
    Note the branch names and, for each, the **endpoint host** (`ep-…​.<region>.aws.neon.tech`).
-2. Vercel → `zenvora-store` → **Settings → Environment Variables**:
+2. Vercel → `aurevyn-store` → **Settings → Environment Variables**:
    - Open `DATABASE_URL` and `DIRECT_URL` with the **Production** environment ticked.
      The host inside must be the production branch endpoint (pooled / direct).
    - Open the pair with **Preview** ticked. The host must be the preview branch endpoint.

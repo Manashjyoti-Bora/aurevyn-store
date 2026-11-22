@@ -42,7 +42,7 @@ export async function apiFetch<T = unknown>(url: string, opts: ApiFetchOptions =
   const headers: Record<string, string> = { ...opts.headers };
   if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
   if (method !== 'GET') {
-    const csrf = getCookie('resellix_csrf');
+    const csrf = getCookie('aurevyn_csrf');
     if (csrf) headers['x-csrf-token'] = csrf;
   }
 
@@ -73,7 +73,7 @@ export async function apiFetch<T = unknown>(url: string, opts: ApiFetchOptions =
 /** Generate a per-checkout idempotency key (stable for the page session). */
 export function checkoutIdempotencyKey(): string {
   if (typeof window === 'undefined') return '';
-  const KEY = 'resellix_checkout_key';
+  const KEY = 'aurevyn_checkout_key';
   let key = sessionStorage.getItem(KEY);
   if (!key) {
     key = `chk_${Date.now()}_${crypto.randomUUID()}`;
@@ -84,5 +84,5 @@ export function checkoutIdempotencyKey(): string {
 
 export function clearCheckoutIdempotencyKey(): void {
   if (typeof window === 'undefined') return;
-  sessionStorage.removeItem('resellix_checkout_key');
+  sessionStorage.removeItem('aurevyn_checkout_key');
 }

@@ -20,7 +20,7 @@ const source: PublicProductSource = {
   sku: 'PUB-1',
   description: 'A mouse with a description long enough to be real.',
   shortDescription: 'Ergonomic mouse',
-  seoTitle: 'Wireless Mouse | Zenvora',
+  seoTitle: 'Wireless Mouse | Aurevyn',
   seoDescription: 'Buy the wireless mouse.',
   weightGrams: 250,
   taxRatePercent: '18.0000',

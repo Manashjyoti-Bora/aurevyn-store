@@ -175,15 +175,6 @@ export const contactSchema = z.object({
  * Storefront concierge message. Bounded so a single request can never carry a
  * transcript-sized payload; history is optional and currently informational.
  */
-/** Admin cofounder chat — bounded so one request cannot carry a transcript. */
-export const cofounderChatSchema = z.object({
-  message: z
-    .string()
-    .trim()
-    .min(2, 'Ask a question')
-    .max(400, 'Please keep the question under 400 characters'),
-});
-
 export const assistantChatSchema = z.object({
   message: z
     .string()

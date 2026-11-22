@@ -14,8 +14,8 @@ Symptom → cause → fix. Everything here was hit and solved during development
   `DATABASE_URL` must be the **pooled** host (`-pooler`) with `?sslmode=require&pgbouncer=true&connect_timeout=15`;
   remove `channel_binding=require` (Vercel's driver doesn't support it). `DIRECT_URL` = non-pooler
   host, used by migrations only.
-- **Old project shows 402 DEPLOYMENT_DISABLED** — that is the abandoned `zenvora-store.vercel.app`
-  project. Production is `zenvorastore.vercel.app`; ignore/remove the old one.
+- **Old project shows 402 DEPLOYMENT_DISABLED** — that is the abandoned `aurevyn-store.vercel.app`
+  project. Production is `aurevynstore.vercel.app`; ignore/remove the old one.
 - **Soft 404s (missing pages return 200)** — a `loading.tsx` at the route level makes `notFound()`
   render 200. Root `loading.tsx` was removed for this reason; don't re-add it.
 
@@ -34,7 +34,7 @@ Symptom → cause → fix. Everything here was hit and solved during development
   Renamed extensions of other files are rejected on purpose.
 
 ## CJ Dropshipping
-- **Preview deployment shows `environment variable CJ_API_KEY is not present in this environment (envVarName: CJ_API_KEY, valuePresent: false)` while Production works** — Vercel scopes environment variables separately for **Production**, **Preview**, and **Development**, and bakes them into each deployment at build/deploy time. If `CJ_API_KEY` was added with only **Production** ticked (or added after the Preview deployment was built, or added to the other Vercel project `zenvorastore` vs `zenvora-store`), Preview branch deployments will not have `process.env.CJ_API_KEY`. Fix: in **Vercel → Project Settings → Environment Variables**, edit `CJ_API_KEY` (or add it) with **Preview** enabled (and no branch restriction excluding the preview branch), save, and click **Redeploy** on the Preview deployment.
+- **Preview deployment shows `environment variable CJ_API_KEY is not present in this environment (envVarName: CJ_API_KEY, valuePresent: false)` while Production works** — Vercel scopes environment variables separately for **Production**, **Preview**, and **Development**, and bakes them into each deployment at build/deploy time. If `CJ_API_KEY` was added with only **Production** ticked (or added after the Preview deployment was built, or added to the other Vercel project `aurevynstore` vs `aurevyn-store`), Preview branch deployments will not have `process.env.CJ_API_KEY`. Fix: in **Vercel → Project Settings → Environment Variables**, edit `CJ_API_KEY` (or add it) with **Preview** enabled (and no branch restriction excluding the preview branch), save, and click **Redeploy** on the Preview deployment.
 - **`getAccessToken` succeeds but `setting/get` / `product/myProduct/query` return 401
   (CJ code `1600001`)** — *confirmed root cause, fixed 2026-10-11.* The token was passed
   through the display helper `str()` (500-char cap) on its way into the in-memory cache:
@@ -48,7 +48,7 @@ Symptom → cause → fix. Everything here was hit and solved during development
   (`tokenLength`) plus sha256 fingerprints and requestIds — safe to send to CJ support.
   `tokenLength: 500` = truncation signature; `593` = intact.
 - **Probe says `NETWORK_FAILURE`** — the runtime cannot reach
-  `developers.cjdropshipping.com` (sandboxed/offline environment). Not a Nirvora bug: the
+  `developers.cjdropshipping.com` (sandboxed/offline environment). Not a Aurevyn bug: the
   probe reports transport failures honestly instead of faking success. Re-run from a
   network-connected runtime (Vercel).
 - **Log line `CJ forensic token received/sent length=…` looks redacted** — the logger
@@ -75,5 +75,5 @@ Symptom → cause → fix. Everything here was hit and solved during development
 - **`next dev` OOM** — use `npm run dev` (turbopack) on small machines; run one dev server at a time.
 - **`next start` errors `dataRoutes is not iterable`** — run `npm run build` first after dev sessions.
 - **Tests hit the wrong DB** — integration tests use `TEST_DATABASE_URL`/`.env.test`; point it at
-  `resellix_test`, never your dev or prod database.
+  `aurevyn_test`, never your dev or prod database.
 - **`npx prisma` installs the wrong major** — use `./node_modules/.bin/prisma` (pinned v6).

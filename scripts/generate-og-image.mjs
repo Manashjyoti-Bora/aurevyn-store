@@ -52,7 +52,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" 
 
   <!-- brand mark -->
   <circle cx="92" cy="104" r="9" fill="#C6AD7A"/>
-  <text x="116" y="112" font-family="Inter, Helvetica, Arial, sans-serif" font-size="21" font-weight="600" letter-spacing="7" fill="#F5F3EC">NIRVORA</text>
+  <text x="116" y="112" font-family="Inter, Helvetica, Arial, sans-serif" font-size="21" font-weight="600" letter-spacing="7" fill="#F5F3EC">AUREVYN</text>
   <text x="116" y="140" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" letter-spacing="4.5" fill="#9A9AA2">INDIA · EVERYDAY ESSENTIALS</text>
 
   <!-- headline -->

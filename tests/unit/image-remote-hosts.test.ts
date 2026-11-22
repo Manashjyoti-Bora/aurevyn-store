@@ -17,24 +17,24 @@ describe('resolveImageRemoteHosts', () => {
   });
 
   it('IMAGE_REMOTE_HOSTS replaces the defaults (operators can tighten the list)', () => {
-    expect(resolveImageRemoteHosts({ IMAGE_REMOTE_HOSTS: 'cdn.zenvora.in, **.r2.dev' })).toEqual([
-      'cdn.zenvora.in',
+    expect(resolveImageRemoteHosts({ IMAGE_REMOTE_HOSTS: 'cdn.aurevyn.in, **.r2.dev' })).toEqual([
+      'cdn.aurevyn.in',
       '**.r2.dev',
     ]);
   });
 
   it('appends configured storage hosts and drops garbage entries', () => {
     const hosts = resolveImageRemoteHosts({
-      IMAGE_REMOTE_HOSTS: 'cdn.zenvora.in, not a host!, https://bad',
+      IMAGE_REMOTE_HOSTS: 'cdn.aurevyn.in, not a host!, https://bad',
       S3_PUBLIC_BASE_URL: 'https://media.example.org/assets',
       S3_ENDPOINT: 'https://acct.r2.cloudflarestorage.com',
-      S3_BUCKET: 'zenvora-media',
+      S3_BUCKET: 'aurevyn-media',
     });
     expect(hosts).toEqual([
-      'cdn.zenvora.in',
+      'cdn.aurevyn.in',
       'media.example.org',
       'acct.r2.cloudflarestorage.com',
-      'zenvora-media.acct.r2.cloudflarestorage.com',
+      'aurevyn-media.acct.r2.cloudflarestorage.com',
     ]);
   });
 });

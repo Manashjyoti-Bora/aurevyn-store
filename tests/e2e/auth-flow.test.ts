@@ -32,7 +32,7 @@ describe('registration', () => {
 
     const res = await agent.post('/api/auth/register', { name: 'E2E Customer', email, password: PASSWORD });
     expect([200, 201]).toContain(res.status);
-    expect(agent.cookies.has('resellix_session')).toBe(true);
+    expect(agent.cookies.has('aurevyn_session')).toBe(true);
 
     const me = await agent.get('/api/auth/me');
     expect(me.status).toBe(200);
@@ -70,7 +70,7 @@ describe('login', () => {
     const res = await loginAgent.post('/api/auth/login', { email: user.email, password: 'Wrong!Pass9999' });
     expect(res.status).toBe(401);
     expect(errMessage(res)).toMatch(/invalid email or password/i);
-    expect(loginAgent.cookies.has('resellix_session')).toBe(false);
+    expect(loginAgent.cookies.has('aurevyn_session')).toBe(false);
   });
 
   it('logs in with correct credentials and logs out cleanly', async () => {
@@ -78,7 +78,7 @@ describe('login', () => {
     const agent = new HttpAgent();
     const login = await loginFixture(agent, user);
     expect(login.status).toBe(200);
-    expect(agent.cookies.has('resellix_session')).toBe(true);
+    expect(agent.cookies.has('aurevyn_session')).toBe(true);
 
     const meBefore = await agent.get('/api/auth/me');
     expect(meBefore.status).toBe(200);
@@ -86,7 +86,7 @@ describe('login', () => {
 
     const logout = await agent.post('/api/auth/logout');
     expect([200, 204]).toContain(logout.status);
-    expect(agent.cookies.has('resellix_session')).toBe(false);
+    expect(agent.cookies.has('aurevyn_session')).toBe(false);
 
     // /api/auth/me is intentionally non-throwing: anonymous → 200 { user: null }.
     const meAfter = await agent.get('/api/auth/me');
@@ -134,7 +134,7 @@ describe('password reset (no enumeration)', () => {
 describe('CSRF protection (double-submit cookie)', () => {
   it('rejects an unsafe request that omits the x-csrf-token header', async () => {
     const agent = new HttpAgent();
-    await agent.get('/api/health'); // cookie jar now has resellix_csrf, but we withhold the header
+    await agent.get('/api/health'); // cookie jar now has aurevyn_csrf, but we withhold the header
     expect(agent.csrfToken).toBeTruthy();
     const res = await agent.post('/api/auth/login', { email: 'x@e2e.example', password: 'Y!x1234567' }, { csrf: false });
     expect(res.status).toBe(403);

@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { headers } from 'next/headers';
 // Inter is SELF-HOSTED: the woff2 files ship inside @fontsource-variable/inter
 // and are bundled at build time. It is deliberately NOT loaded through
 // `next/font/google`, which downloads the font from fonts.googleapis.com during
@@ -11,18 +10,16 @@ import '@fontsource-variable/inter';
 import './globals.css';
 import { getSettings } from '@/lib/settings';
 import { env } from '@/lib/env';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
-import { DemoBanner } from '@/components/layout/demo-banner';
-import { CookieConsent } from '@/components/layout/cookie-consent';
-import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
-import { Concierge } from '@/components/store/assistant/concierge';
-import { ScrollProgress } from '@/components/store/scroll-progress';
 import { Toaster } from '@/components/ui/toaster';
-import { jsonLdScript } from '@/lib/utils';
 
-export const dynamic = 'force-dynamic';
-
+/**
+ * Root layout: only what every route needs — the document, the typeface, the
+ * theme bootstrap and toasts.
+ *
+ * Store chrome lives in `(store)/layout.tsx` and admin chrome in
+ * `admin/layout.tsx`, so neither area reads the request path. Without that,
+ * every storefront page was dynamic and could never be cached at the edge.
+ */
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return {
@@ -63,9 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...(env.GOOGLE_SITE_VERIFICATION || env.BING_SITE_VERIFICATION
       ? {
           verification: {
-            ...(env.GOOGLE_SITE_VERIFICATION
-              ? { google: env.GOOGLE_SITE_VERIFICATION }
-              : {}),
+            ...(env.GOOGLE_SITE_VERIFICATION ? { google: env.GOOGLE_SITE_VERIFICATION } : {}),
             ...(env.BING_SITE_VERIFICATION
               ? { other: { 'msvalidate.01': env.BING_SITE_VERIFICATION } }
               : {}),
@@ -94,11 +89,7 @@ export const viewport: Viewport = {
   themeColor: '#08080A',
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const settings = await getSettings();
-  const h = await headers();
-  const isAdminArea = (h.get('x-pathname') ?? '').startsWith('/admin');
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="font-sans">
       <body className="no-page-overflow flex min-h-screen flex-col font-sans">
@@ -111,7 +102,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             delays LCP and can blank the storefront on a slow connection. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: "document.documentElement.classList.add('js');try{if(localStorage.getItem('nirvora-theme')==='light'){document.documentElement.setAttribute('data-theme','light')}}catch(e){}",
+            __html:
+              "document.documentElement.classList.add('js');try{if(localStorage.getItem('aurevyn-theme')==='light'){document.documentElement.setAttribute('data-theme','light')}}catch(e){}",
           }}
         />
         {/* No-JS fallback: scroll-reveal elements must never stay hidden without script. */}
@@ -124,62 +116,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         >
           Skip to main content
         </a>
-        {isAdminArea ? (
-          <>
-            <main id="main-content" className="flex-1">
-              {children}
-            </main>
-            <Toaster />
-          </>
-        ) : (
-          <>
-            {/* Site-wide structured data: real store name + canonical URL only.
-                SearchAction targets the genuine /search?q= endpoint. No logo,
-                address or contact claims the business hasn't configured. */}
-            <script
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{
-                __html: jsonLdScript([
-                  {
-                    '@context': 'https://schema.org',
-                    '@type': 'Organization',
-                    name: settings.storeName,
-                    url: env.APP_URL,
-                  },
-                  {
-                    '@context': 'https://schema.org',
-                    '@type': 'WebSite',
-                    name: settings.storeName,
-                    url: env.APP_URL,
-                    potentialAction: {
-                      '@type': 'SearchAction',
-                      target: `${env.APP_URL}/search?q={search_term_string}`,
-                      'query-input': 'required name=search_term_string',
-                    },
-                  },
-                ]),
-              }}
-            />
-            <ScrollProgress />
-            <div className="grain-page" aria-hidden="true" />
-            <DemoBanner demoMode={settings.demoMode} />
-            {settings.announcement?.enabled && settings.announcement.text && (
-              <div className="bg-brand-700 px-4 py-2 text-center text-xs font-medium tracking-wide text-cream-100">
-                <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-accent-300 align-middle" aria-hidden="true" />
-                {settings.announcement.text}
-              </div>
-            )}
-            <Header />
-            <main id="main-content" className="flex-1 pb-16 lg:pb-0">
-              {children}
-            </main>
-            <Footer />
-            <MobileBottomNav />
-            <Concierge storeName={settings.storeName} />
-            <CookieConsent storeName={settings.storeName} />
-            <Toaster />
-          </>
-        )}
+        {children}
+        <Toaster />
       </body>
     </html>
   );

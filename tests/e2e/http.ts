@@ -4,7 +4,7 @@
  * Mirrors what a real browser does:
  *  - stores every Set-Cookie (including the httpOnly session cookie),
  *  - sends stored cookies on subsequent requests,
- *  - captures the readable `resellix_csrf` cookie issued by the middleware and
+ *  - captures the readable `aurevyn_csrf` cookie issued by the middleware and
  *    echoes it as `x-csrf-token` on unsafe methods (double-submit pattern),
  *  - never follows redirects automatically so specs can assert 307/302 + Location.
  *
@@ -69,7 +69,7 @@ export class HttpAgent {
   async request(method: string, path: string, body?: Json, opts: RequestOptions = {}): Promise<E2EResponse> {
     const headers: Record<string, string> = {
       accept: 'application/json, text/html;q=0.9',
-      'user-agent': 'resellix-e2e/1.0',
+      'user-agent': 'aurevyn-e2e/1.0',
       ...(opts.headers ?? {}),
     };
 
@@ -101,7 +101,7 @@ export class HttpAgent {
         this.jar.set(parsed.name, parsed.value);
       }
     }
-    this.csrfToken = this.jar.get('resellix_csrf') ?? null;
+    this.csrfToken = this.jar.get('aurevyn_csrf') ?? null;
 
     const text = await res.text();
     return {

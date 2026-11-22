@@ -1,6 +1,6 @@
 # Meesho sourcing
 
-Nirvora resells Meesho listings. This document records what Meesho actually
+Aurevyn resells Meesho listings. This document records what Meesho actually
 exposes, why the store does not scrape, and how the sourcing screen works.
 
 ## What Meesho exposes (checked November 2026)
@@ -15,7 +15,7 @@ exposes, why the store does not scrape, and how the sourcing screen works.
 
 GitHub projects that claim a "Meesho API" are unofficial scrapers, browser
 automations or reseller kits. They break on any panel change, violate Meesho's
-terms, and would leave the store's prices and stock silently wrong. Nirvora
+terms, and would leave the store's prices and stock silently wrong. Aurevyn
 therefore does **not** scrape Meesho and does **not** invent a sync.
 
 If the owner is ever onboarded to Meesho's partner Supplier API, the existing
@@ -63,6 +63,6 @@ Meesho has no ordering API, so the owner places the purchase in the Meesho app.
    customer messages that go with them. The owner is only asked again if a
    fulfilment genuinely fails.
 
-The 24×7 co-founder voice (`/admin/cofounder`) reads the same queue and speaks
+The operations team (`/admin/team`) reads the same queue and reports
 the order number, city, customer value and expected margin — so the Meesho
 purchase can be placed without opening the admin on a phone.

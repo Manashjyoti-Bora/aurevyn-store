@@ -49,7 +49,7 @@ export async function Footer() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4 lg:grid-cols-5">
           <div className="col-span-2 lg:col-span-2">
             <Link href="/" className="group inline-flex items-center gap-3" aria-label={`${settings.storeName} home`}>
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-700 text-sm font-semibold text-cream-50 transition-transform duration-500 ease-zenvora group-hover:rotate-[18deg]">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-700 text-sm font-semibold text-cream-50 transition-transform duration-500 ease-aurevyn group-hover:rotate-[18deg]">
                 {settings.storeName.slice(0, 1).toUpperCase()}
               </span>
               <span className="text-sm font-medium uppercase tracking-[0.34em] text-ink-900">

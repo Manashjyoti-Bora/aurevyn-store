@@ -12,7 +12,7 @@ import Link from 'next/link';
  * later, the optional toggle is where they must be gated.
  */
 
-const KEY = 'resellix_cookie_consent_v1';
+const KEY = 'aurevyn_cookie_consent_v1';
 
 export function CookieConsent({ storeName }: { storeName: string }) {
   const [visible, setVisible] = useState(false);

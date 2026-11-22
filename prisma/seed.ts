@@ -1,5 +1,5 @@
 /**
- * Resellix demo seed.
+ * Aurevyn demo seed.
  *
  * WHAT THIS CREATES (all clearly demo data, catalog-only):
  *   - 1 admin user (credentials come from ADMIN_EMAIL / ADMIN_PASSWORD env vars —
@@ -262,7 +262,7 @@ async function main() {
 
   // ── Store settings (demoMode ON) ─────────────────────────────────────────
   await updateSettings({
-    storeName: process.env.APP_NAME ?? 'Resellix',
+    storeName: process.env.APP_NAME ?? 'Aurevyn',
     storeTagline: 'Curated picks, delivered across India',
     supportEmail: adminEmail,
     supportPhone: '',

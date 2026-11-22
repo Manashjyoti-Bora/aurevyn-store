@@ -17,9 +17,9 @@ import type { StoreSettings } from '@/lib/settings';
 
 function settings(over: Record<string, unknown> = {}): StoreSettings {
   return {
-    storeName: 'Zenvora',
+    storeName: 'Aurevyn',
     storeTagline: '',
-    supportEmail: 'support@zenvora.test',
+    supportEmail: 'support@aurevyn.test',
     supportPhone: '',
     currency: 'INR',
     demoMode: false,

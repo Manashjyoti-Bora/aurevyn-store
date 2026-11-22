@@ -5,7 +5,7 @@ live ONLY in **Vercel → Project → Settings → Environment Variables** (neve
 
 | Variable | Required | Secret | Purpose / where to get it |
 | --- | --- | --- | --- |
-| `APP_URL` | ✅ | no | Canonical `https://zenvorastore.vercel.app` — used in emails, webhooks, sitemap |
+| `APP_URL` | ✅ | no | Canonical `https://aurevynstore.vercel.app` — used in emails, webhooks, sitemap |
 | `DATABASE_URL` | ✅ | ✅ | Neon **pooled** connection string + `?sslmode=require&pgbouncer=true&connect_timeout=15` (Neon dashboard → Connection Details; drop `channel_binding` for Vercel) |
 | `DIRECT_URL` | ✅ | ✅ | Same Neon string **without** `-pooler` (used by Prisma migrate) |
 | `SESSION_TTL_DAYS`, `PASSWORD_RESET_TTL_MINUTES` | optional | no | Auth tuning (defaults 30 / 60) |
@@ -26,7 +26,7 @@ live ONLY in **Vercel → Project → Settings → Environment Variables** (neve
 | `STORAGE_PROVIDER` | optional | no | `local` (default; EPHEMERAL on Vercel) · `s3` · `cloudinary` |
 | `IMAGE_REMOTE_HOSTS` | optional | no | Comma-separated hosts the Next.js image optimizer may fetch from (`*`/`**` wildcards). Default: CJ CDNs, `res.cloudinary.com`, `**.amazonaws.com` + configured S3/Cloudinary hosts. Other https hosts still render via `<RemoteImage>` but unoptimized. Build-time value (inlined) — redeploy after changing |
 | `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | for s3 | ✅ | AWS S3 / Cloudflare R2 / MinIO. Optional `S3_ENDPOINT` (R2/MinIO), `S3_PUBLIC_BASE_URL` (CDN) |
-| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | for cloudinary | ✅ | Cloudinary console. Optional `CLOUDINARY_FOLDER` (default `zenvora`) |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | for cloudinary | ✅ | Cloudinary console. Optional `CLOUDINARY_FOLDER` (default `aurevyn`) |
 | `TEST_DATABASE_URL` | dev/test | no | Separate Postgres DB for integration tests |
 | `RATE_LIMIT_STORE` | optional | no | `database` (default — counters shared across instances via `rate_limit_buckets`) or `memory` (process-local; tests/single-process only) |
 

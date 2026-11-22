@@ -1,6 +1,6 @@
-# NIRVORA — automated reselling / dropshipping store (India, ₹ INR)
+# AUREVYN — automated reselling / dropshipping store (India, ₹ INR)
 
-> Store brand: **Nirvora** (set via `APP_NAME` / Admin → Settings). Internal code identifiers (package name, `resellix_*` cookie names, `RX-` order prefix) remain `resellix` — cosmetic only.
+> Store brand: **Aurevyn** (set via `APP_NAME` / Admin → Settings). Internal code identifiers (package name, `aurevyn_*` cookie names, `RX-` order prefix) remain `aurevyn` — cosmetic only.
 
 A complete, production-oriented e-commerce platform for the reselling/dropshipping
 business model: **supplier cost → your price/margin → customer pays by UPI QR or
@@ -144,7 +144,7 @@ Requirements: Node 18.18+ (20 recommended), PostgreSQL 14+.
 ```bash
 cp .env.example .env
 # edit .env → DATABASE_URL, ADMIN_EMAIL, ADMIN_PASSWORD (minimum)
-createdb resellix                       # or use a managed DB
+createdb aurevyn                       # or use a managed DB
 npm install
 npx prisma migrate deploy
 npm run db:seed                         # admin user + clearly-marked demo catalog

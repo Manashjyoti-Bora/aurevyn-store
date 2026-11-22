@@ -5,8 +5,8 @@ route-by-route audit; this file is the summary that must stay true). The 20-item
 checklist below is the 2026-11-18 review.
 
 ## Authentication & authorization
-- Session cookies: httpOnly, sameSite, secure in production (`resellix_*` internal names kept
-  deliberately; brand-facing name is Nirvora).
+- Session cookies: httpOnly, sameSite, secure in production (`aurevyn_*` internal names kept
+  deliberately; brand-facing name is Aurevyn).
 - RBAC roles `USER / ADMIN / SUPER_ADMIN`. **Every** admin API and admin page runs
   `requireAdmin()`/RBAC guards (`src/lib/auth/guards.ts`) — verified 401/307 on live probes
   (`/admin` → 307 login, cron without secret → 401).
@@ -87,7 +87,7 @@ checklist below is the 2026-11-18 review.
 |---|------|--------|--------------------|
 | 1 | SQL injection | Pass | Prisma models/queries are parameterised; the only raw SQL uses tagged templates (`Prisma.sql` / `` $queryRaw``) with bound values — no string interpolation (see `src/lib/rate-limit.ts`, `src/lib/orders/*`, `src/lib/admin/reports.ts`). |
 | 2 | XSS | Pass | React escapes by default; the only `dangerouslySetInnerHTML` sinks are JSON-LD through `jsonLdScript()`, which escapes `<`, `>` and `&`; CSP limits script sources to self + Razorpay. |
-| 3 | CSRF | Pass | Double-submit token (`resellix_csrf` cookie + `x-csrf-token`) enforced by `apiRoute` on every POST/PATCH/PUT/DELETE; session cookies are `httpOnly` + `SameSite=Lax`. Only signature-authenticated webhooks/cron opt out. |
+| 3 | CSRF | Pass | Double-submit token (`aurevyn_csrf` cookie + `x-csrf-token`) enforced by `apiRoute` on every POST/PATCH/PUT/DELETE; session cookies are `httpOnly` + `SameSite=Lax`. Only signature-authenticated webhooks/cron opt out. |
 | 4 | Insecure file uploads | Pass | Admin-only, magic-byte sniffing (JPEG/PNG/WEBP/GIF/AVIF), 5 MB cap, server-generated random filename, extension content-type never trusted, served with `nosniff`; the local provider writes `path.basename(key)` only. |
 | 5 | IDOR / object-level authz | Pass | Every customer query is scoped by `userId`; `assertOwnerOrAdmin()` exists for shared resources; guest endpoints need order number **and** email and answer a uniform 404. |
 | 6 | Missing rate limiting | Pass | Public endpoints have per-IP/per-account limits; admin mutations now also carry a per-admin, per-action write budget (`requireAdminWrite()`), so a stolen session or a runaway client cannot hammer refunds, repricing or AI actions. |

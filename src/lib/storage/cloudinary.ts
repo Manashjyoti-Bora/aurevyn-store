@@ -26,7 +26,7 @@ export class CloudinaryStorageProvider implements StorageProvider {
 
   async put(params: { buffer: Buffer; filename: string; mime: string }): Promise<StorageObject> {
     this.requireConfig();
-    const folder = process.env.CLOUDINARY_FOLDER ?? 'zenvora';
+    const folder = process.env.CLOUDINARY_FOLDER ?? 'aurevyn';
     const publicId = `${folder}/${params.filename.replace(/\.[a-z0-9]+$/i, '')}`;
     const fields: Record<string, string> = {
       public_id: publicId,

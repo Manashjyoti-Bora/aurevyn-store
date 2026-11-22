@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
-const STORAGE_KEY = 'nirvora-theme';
+const STORAGE_KEY = 'aurevyn-theme';
 
 /**
  * Light / dark switch.

@@ -42,7 +42,7 @@ describe('UPI QR configuration', () => {
     const mod = await loadEnvModule({
       ...base,
       NODE_ENV: 'production',
-      UPI_VPA: 'zenvora.store@okhdfcbank',
+      UPI_VPA: 'aurevyn.store@okhdfcbank',
     });
     expect(mod.isUpiConfigured()).toBe(true);
     expect(mod.upiConfigIssue()).toBeNull();
@@ -58,10 +58,10 @@ describe('UPI QR configuration', () => {
     const mod = await loadEnvModule({
       ...base,
       NODE_ENV: 'production',
-      UPI_VPA: 'zenvora@ybl',
-      APP_NAME: 'Zenvora',
+      UPI_VPA: 'aurevyn@ybl',
+      APP_NAME: 'Aurevyn',
     });
-    expect(mod.upiPayeeName()).toBe('Zenvora');
+    expect(mod.upiPayeeName()).toBe('Aurevyn');
   });
 
   it('never allows the TEST provider in production', async () => {
@@ -76,10 +76,10 @@ describe('UPI QR configuration', () => {
 
 describe('UPI payee resolution (environment vs admin setting)', () => {
   it('uses the store setting when no environment override exists', async () => {
-    await loadEnvModule({ ...base, NODE_ENV: 'production', APP_NAME: 'Zenvora' });
+    await loadEnvModule({ ...base, NODE_ENV: 'production', APP_NAME: 'Aurevyn' });
     const { resolveUpiConfig } = await import('@/lib/payments/config');
     const config = resolveUpiConfig({ upiVpa: 'store@ptaxis', upiPayeeName: '' });
-    expect(config).toEqual({ vpa: 'store@ptaxis', payeeName: 'Zenvora', source: 'settings' });
+    expect(config).toEqual({ vpa: 'store@ptaxis', payeeName: 'Aurevyn', source: 'settings' });
   });
 
   it('lets the environment override the stored setting', async () => {
@@ -108,15 +108,15 @@ describe('UPI intent', () => {
   it('encodes the payable amount in rupees and the order note', async () => {
     const { buildUpiUri } = await import('@/lib/payments/upi');
     const uri = buildUpiUri({
-      vpa: 'zenvora@ybl',
-      payeeName: 'Zenvora',
+      vpa: 'aurevyn@ybl',
+      payeeName: 'Aurevyn',
       amountPaise: 129900,
       orderNumber: 'ZV-1001',
     });
     expect(uri.startsWith('upi://pay?')).toBe(true);
     const params = new URLSearchParams(uri.slice('upi://pay?'.length));
-    expect(params.get('pa')).toBe('zenvora@ybl');
-    expect(params.get('pn')).toBe('Zenvora');
+    expect(params.get('pa')).toBe('aurevyn@ybl');
+    expect(params.get('pn')).toBe('Aurevyn');
     expect(params.get('am')).toBe('1299.00');
     expect(params.get('cu')).toBe('INR');
     expect(params.get('tn')).toBe('Order ZV-1001');

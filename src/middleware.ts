@@ -11,8 +11,8 @@ import type { NextRequest } from 'next/server';
  *     authorization are enforced server-side in every layout and API route.
  */
 
-const CSRF_COOKIE = 'resellix_csrf';
-const SESSION_COOKIE = 'resellix_session';
+const CSRF_COOKIE = 'aurevyn_csrf';
+const SESSION_COOKIE = 'aurevyn_session';
 
 export function middleware(req: NextRequest): NextResponse {
   // Expose the pathname to server components (root layout hides the

@@ -152,7 +152,7 @@ describe('automatic variant-level pricing in saveProduct', () => {
           },
         ],
       },
-      { id: null, email: 'test@zenvora.local' }
+      { id: null, email: 'test@aurevyn.local' }
     );
 
     try {
@@ -206,7 +206,7 @@ describe('automated discovery → ranking → quality-gated import → safe bulk
       limit: 50,
       autoImport: false,
       autoPublishEligible: false,
-      actor: { id: null, email: 'admin@zenvora.local' },
+      actor: { id: null, email: 'admin@aurevyn.local' },
     });
 
     expect(report.status).toBe('COMPLETED');
@@ -228,7 +228,7 @@ describe('automated discovery → ranking → quality-gated import → safe bulk
     const bulkRes = await bulkProcessSupplierProducts({
       supplierProductIds: spRows.map((r) => r.id),
       mode: 'SAFE_PUBLISH_ELIGIBLE',
-      actor: { id: null, email: 'admin@zenvora.local' },
+      actor: { id: null, email: 'admin@aurevyn.local' },
     });
 
     // High-potential items pass all 10 quality gates and become PUBLISHED (ACTIVE)

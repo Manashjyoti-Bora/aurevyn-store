@@ -7,7 +7,7 @@ import type { Actor } from './types';
 /**
  * Meesho launch catalogue.
  *
- * Nirvora resells from Meesho today; CJ Dropshipping is planned for later, so
+ * Aurevyn resells from Meesho today; CJ Dropshipping is planned for later, so
  * this catalogue is deliberately built for the model that is live now:
  *
  *  - Every piece sits in the ₹249–₹799 band, which is where Meesho converts

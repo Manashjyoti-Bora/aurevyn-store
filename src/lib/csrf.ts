@@ -5,7 +5,7 @@ import { ApiError } from './errors';
 /**
  * CSRF protection: double-submit cookie pattern.
  *
- * - `middleware.ts` sets a non-httpOnly `resellix_csrf` cookie (random token).
+ * - `middleware.ts` sets a non-httpOnly `aurevyn_csrf` cookie (random token).
  * - Browser JS (only same-origin code can read it) must echo the value in the
  *   `x-csrf-token` header on every unsafe request.
  * - Session cookies are SameSite=Lax, which already blocks classic cross-site
@@ -17,7 +17,7 @@ import { ApiError } from './errors';
  * credentials server-side.
  */
 
-export const CSRF_COOKIE = 'resellix_csrf';
+export const CSRF_COOKIE = 'aurevyn_csrf';
 export const CSRF_HEADER = 'x-csrf-token';
 
 export async function verifyCsrfFromRequest(req: Request): Promise<void> {

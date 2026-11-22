@@ -42,7 +42,7 @@ export function makeSnapshot(overrides: Partial<AiCeoSnapshot> = {}): AiCeoSnaps
     windowDays: 30,
     truncated: false,
     store: {
-      name: 'Zenvora',
+      name: 'Aurevyn',
       demoMode: false,
       supportEmailConfigured: true,
       supportPhoneConfigured: true,
@@ -128,7 +128,7 @@ export function makeSnapshot(overrides: Partial<AiCeoSnapshot> = {}): AiCeoSnaps
 export function makeEmptyStoreSnapshot(): AiCeoSnapshot {
   return makeSnapshot({
     store: {
-      name: 'Zenvora',
+      name: 'Aurevyn',
       demoMode: true,
       supportEmailConfigured: false,
       supportPhoneConfigured: false,

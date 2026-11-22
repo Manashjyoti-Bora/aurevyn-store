@@ -16,7 +16,7 @@ export interface ToastItem {
   tone: ToastTone;
 }
 
-const EVENT = 'resellix-toast';
+const EVENT = 'aurevyn-toast';
 
 export function toast(message: string, tone: ToastTone = 'info'): void {
   if (typeof window === 'undefined') return;

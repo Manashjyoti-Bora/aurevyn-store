@@ -23,7 +23,7 @@ const COMMON_PASSWORDS = new Set([
   'welcome',
   'admin',
   'admin123',
-  'resellix',
+  'aurevyn',
   'india123',
   '111111',
   '000000',

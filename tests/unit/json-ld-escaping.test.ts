@@ -45,7 +45,7 @@ describe('jsonLdScript (safe inline JSON-LD serialization)', () => {
   });
 
   it('leaves ordinary structured data unchanged except the three escapes', () => {
-    const data = { name: 'Zenvora Widget', price: 999, url: 'https://example.test/p/w' };
+    const data = { name: 'Aurevyn Widget', price: 999, url: 'https://example.test/p/w' };
     expect(jsonLdScript(data)).toBe(JSON.stringify(data));
   });
 

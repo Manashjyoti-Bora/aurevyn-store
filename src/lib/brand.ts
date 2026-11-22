@@ -12,10 +12,10 @@
  */
 export const BRAND = {
   /** Current brand. Change here + in Admin → Settings to rename the store. */
-  name: 'Nirvora',
+  name: 'Aurevyn',
   tagline: 'Quietly excellent things for everyday Indian homes',
   /** Names this store has shipped under before. Used only to migrate defaults. */
-  legacyNames: ['Zenvora', 'Resellix'],
+  legacyNames: ['Nirvora', 'Zenvora', 'Resellix'],
   /** Fallback support address until the owner sets a real one (RFC 2606). */
   placeholderSupportEmail: 'support@example.com',
 } as const;

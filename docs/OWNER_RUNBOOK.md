@@ -1,4 +1,4 @@
-# Owner runbook — Nirvora store
+# Owner runbook — Aurevyn store
 
 Everything the owner has to do to run this store, in order. Nothing here needs a
 developer, and no payment API keys exist to manage: payments are UPI QR and Cash
@@ -14,7 +14,7 @@ on Delivery only.
 | Setting | Where | Required | Notes |
 | --- | --- | --- | --- |
 | `DATABASE_URL`, `DIRECT_URL` | host env | yes | PostgreSQL (Neon/Supabase/RDS). Applied with `npm run db:deploy` once per deploy. |
-| `APP_URL` | host env | yes | The real public origin, e.g. `https://zenvorastore.vercel.app`. Used by emails, canonical/OG tags, sitemap. |
+| `APP_URL` | host env | yes | The real public origin, e.g. `https://aurevynstore.vercel.app`. Used by emails, canonical/OG tags, sitemap. |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | host env | yes | First-boot admin account. Change the password after first sign-in. |
 | `SESSION_SECRET` | host env | yes | Random 32+ characters. |
 | **Store UPI ID** | **Admin → Settings → Payments** | to accept prepaid | The QR pays this VPA. Leave blank to offer COD only. `UPI_VPA` in env overrides it. |
@@ -25,7 +25,7 @@ on Delivery only.
 
 Business identity (legal name, GSTIN, address), support email/phone, COD toggle
 and policy windows live in **Admin → Settings**. Fill them before taking money —
-invoices, policy pages and the AI co-founder read from them.
+invoices, policy pages and the operations team read from them.
 
 ## 2. First launch checklist
 
@@ -58,7 +58,7 @@ invoices, policy pages and the AI co-founder read from them.
 
 ## 4. Catalogue strategy: what we list, and why
 
-Nirvora resells from Meesho today. CJ Dropshipping will be added as a second
+Aurevyn resells from Meesho today. CJ Dropshipping will be added as a second
 supplier once that account is funded; the supplier layer already supports it, so
 adding it is a supplier record, not a code change.
 

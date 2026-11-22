@@ -4,7 +4,7 @@ Everything below is implemented **in code** and verified against the running
 build. Nothing here is a "to-do"; the items in *Owner actions* are the only
 steps that need a Google/Bing account or a domain.
 
-Live host: `https://zenvorastore.vercel.app` (set `APP_URL` to the real domain
+Live host: `https://aurevynstore.vercel.app` (set `APP_URL` to the real domain
 the moment a custom domain is attached — every canonical, sitemap entry and
 structured-data URL is derived from it).
 

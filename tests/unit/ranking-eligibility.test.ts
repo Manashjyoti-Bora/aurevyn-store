@@ -10,8 +10,8 @@ import { computePricing } from '@/lib/pricing/engine';
 import { extractCjCategories } from '@/lib/suppliers/cj';
 
 const defaultSettings = settingsSchema.parse({
-  storeName: 'Zenvora Store',
-  supportEmail: 'support@zenvora.local',
+  storeName: 'Aurevyn Store',
+  supportEmail: 'support@aurevyn.local',
   currency: 'INR',
 });
 
@@ -141,8 +141,8 @@ describe('Indian reselling eligibility & ranking engine', () => {
 
   it('respects configurable category exclusions and custom ranking weights', () => {
     const customSettings = settingsSchema.parse({
-      storeName: 'Zenvora Store',
-      supportEmail: 'support@zenvora.local',
+      storeName: 'Aurevyn Store',
+      supportEmail: 'support@aurevyn.local',
       currency: 'INR',
       autoImport: {
         excludedCategories: ['electronics'],

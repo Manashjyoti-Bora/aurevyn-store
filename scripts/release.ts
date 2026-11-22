@@ -1,5 +1,5 @@
 /**
- * Zenvora release pipeline — what `npm run build` actually runs.
+ * Aurevyn release pipeline — what `npm run build` actually runs.
  *
  *   npm run build            (Vercel Production / Preview builds, local builds)
  *   RELEASE_SKIP_MIGRATIONS=1 npm run build

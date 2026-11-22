@@ -90,21 +90,21 @@ describe('isPlaceholderEmail / configuredSupportEmail (settings)', () => {
     expect(isPlaceholderEmail('Care@Sub.Example.ORG')).toBe(true);
     expect(isPlaceholderEmail('')).toBe(true);
     expect(isPlaceholderEmail(undefined)).toBe(true);
-    expect(isPlaceholderEmail('care@zenvora.in')).toBe(false);
+    expect(isPlaceholderEmail('care@aurevyn.in')).toBe(false);
     expect(isPlaceholderEmail('owner@notexample.com')).toBe(false);
     expect(configuredSupportEmail({ supportEmail: 'support@example.com' })).toBeNull();
-    expect(configuredSupportEmail({ supportEmail: ' care@zenvora.in ' })).toBe('care@zenvora.in');
+    expect(configuredSupportEmail({ supportEmail: ' care@aurevyn.in ' })).toBe('care@aurevyn.in');
   });
 });
 
 describe('e-mail footer support line', () => {
   it('links the contact form instead of a placeholder address', async () => {
     const { supportLineHtml } = await import('@/lib/notifications/templates');
-    const unset = supportLineHtml({ storeName: 'Zenvora', supportEmail: '', appUrl: 'https://shop.test/' });
+    const unset = supportLineHtml({ storeName: 'Aurevyn', supportEmail: '', appUrl: 'https://shop.test/' });
     expect(unset).toContain('https://shop.test/contact');
     expect(unset).not.toContain('mailto:');
     expect(unset).not.toContain('example.com');
-    const set = supportLineHtml({ storeName: 'Zenvora', supportEmail: 'help@zenvora.in', appUrl: 'https://shop.test' });
-    expect(set).toContain('mailto:help@zenvora.in');
+    const set = supportLineHtml({ storeName: 'Aurevyn', supportEmail: 'help@aurevyn.in', appUrl: 'https://shop.test' });
+    expect(set).toContain('mailto:help@aurevyn.in');
   });
 });

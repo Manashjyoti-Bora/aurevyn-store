@@ -1,7 +1,7 @@
 import type { AgentDefinition, AgentId } from './types';
 
 /**
- * The Nirvora team.
+ * The Aurevyn team.
  *
  * Every entry is a real, implemented area of the application — an agent that
  * reported on nothing would be theatre. The roster is ordered like a company:

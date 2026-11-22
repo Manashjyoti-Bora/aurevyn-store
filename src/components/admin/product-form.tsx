@@ -222,7 +222,7 @@ export function ProductForm({
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const csrf = document.cookie.match(/(?:^|; )resellix_csrf=([^;]*)/)?.[1];
+      const csrf = document.cookie.match(/(?:^|; )aurevyn_csrf=([^;]*)/)?.[1];
       const res = await fetch('/api/admin/uploads', {
         method: 'POST',
         headers: csrf ? { 'x-csrf-token': decodeURIComponent(csrf) } : undefined,

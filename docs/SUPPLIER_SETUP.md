@@ -1,6 +1,6 @@
 # Supplier setup
 
-Nirvora talks to suppliers through an **adapter abstraction** (`src/lib/suppliers/registry.ts`):
+Aurevyn talks to suppliers through an **adapter abstraction** (`src/lib/suppliers/registry.ts`):
 `CJ`, `HTTP_REST`, `MANUAL`, `DEMO` (never in production). No supplier is hardcoded into business
 logic, and none is invented — every integration below either exists or is labelled honestly.
 

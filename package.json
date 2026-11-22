@@ -1,8 +1,8 @@
 {
-  "name": "resellix",
+  "name": "aurevyn-store",
   "version": "1.0.0",
   "private": true,
-  "description": "Resellix - production-ready automated reselling/dropshipping e-commerce platform (Next.js + PostgreSQL + Prisma + UPI QR / COD payments)",
+  "description": "Aurevyn - production-ready automated reselling/dropshipping e-commerce platform (Next.js + PostgreSQL + Prisma + UPI QR / COD payments)",
   "scripts": {
     "dev": "next dev",
     "build": "tsx scripts/release.ts",

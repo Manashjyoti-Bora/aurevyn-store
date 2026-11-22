@@ -3,12 +3,9 @@ import { prisma } from '../db';
 import { buildSearchWhere } from './search';
 import { toPaise, paiseToDecimalString } from '../money';
 import { clampInt } from '../money';
-import {
-  resolveAvailability,
-  supplierFreshnessCutoff,
-  type Availability,
-} from './availability';
+import { resolveAvailability, supplierFreshnessCutoff, type Availability } from './availability';
 import { ratingsForProducts } from '../reviews/service';
+import { logger } from '../logger';
 
 /**
  * Storefront catalog queries - read-only, ACTIVE products only.
@@ -70,11 +67,12 @@ export function toCardData(p: CardProduct): ProductCardData {
     variantPrices.length > 0
       ? Math.min(...variantPrices, toPaise(p.sellingPrice))
       : toPaise(p.sellingPrice);
-  const stock = p.stockMode === 'LOCAL'
-    ? p.hasVariants
-      ? p.variants.reduce((a, v) => a + v.stock, 0)
-      : p.stock
-    : 0;
+  const stock =
+    p.stockMode === 'LOCAL'
+      ? p.hasVariants
+        ? p.variants.reduce((a, v) => a + v.stock, 0)
+        : p.stock
+      : 0;
   const availability = resolveAvailability({
     isActive: p.status === 'ACTIVE',
     stockMode: p.stockMode,
@@ -208,11 +206,7 @@ export async function listStorefrontProducts(params: ListParams): Promise<ListRe
     // Combine with the text query (if any) via AND so neither filter is lost.
     const existingOr = where.OR;
     if (existingOr) delete where.OR;
-    const existingAnd = where.AND
-      ? Array.isArray(where.AND)
-        ? where.AND
-        : [where.AND]
-      : [];
+    const existingAnd = where.AND ? (Array.isArray(where.AND) ? where.AND : [where.AND]) : [];
     where.AND = [...existingAnd, ...(existingOr ? [{ OR: existingOr }] : []), inStockWhere];
   }
 
@@ -339,23 +333,30 @@ export interface CategoryTile {
 }
 
 export async function listActiveCategories(): Promise<CategoryTile[]> {
-  const cats = await prisma.category.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-    include: {
-      _count: {
-        select: { products: { where: { status: 'ACTIVE', sellingPrice: { gt: '0' } } } },
-      },
-      children: {
-        where: { isActive: true },
-        include: {
-          _count: {
-            select: { products: { where: { status: 'ACTIVE', sellingPrice: { gt: '0' } } } },
+  // Navigation must survive a database blip: the shell renders without
+  // categories rather than taking the whole page down with it.
+  const cats = await prisma.category
+    .findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      include: {
+        _count: {
+          select: { products: { where: { status: 'ACTIVE', sellingPrice: { gt: '0' } } } },
+        },
+        children: {
+          where: { isActive: true },
+          include: {
+            _count: {
+              select: { products: { where: { status: 'ACTIVE', sellingPrice: { gt: '0' } } } },
+            },
           },
         },
       },
-    },
-  });
+    })
+    .catch((error: unknown) => {
+      logger.warn('Active categories unavailable', { error: String(error) });
+      return [];
+    });
   return cats.map((c) => ({
     id: c.id,
     name: c.name,
@@ -363,8 +364,7 @@ export async function listActiveCategories(): Promise<CategoryTile[]> {
     description: c.description,
     parentId: c.parentId,
     productCount:
-      c._count.products +
-      c.children.reduce((sum, child) => sum + child._count.products, 0),
+      c._count.products + c.children.reduce((sum, child) => sum + child._count.products, 0),
   }));
 }
 

@@ -19,7 +19,7 @@ describe('normaliseDbHost', () => {
   });
 
   it('lower-cases hosts and keeps non-Neon hosts untouched', () => {
-    expect(normaliseDbHost('postgres://ci:ci@127.0.0.1:5432/resellix_ci?schema=public')).toBe(
+    expect(normaliseDbHost('postgres://ci:ci@127.0.0.1:5432/aurevyn_ci?schema=public')).toBe(
       '127.0.0.1'
     );
     expect(normaliseDbHost('postgresql://u:p@DB.Example.COM/x')).toBe('db.example.com');

@@ -87,7 +87,7 @@ export function ProductGallery({
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className={cn(
-                'zoom-hover animate-fade-in object-cover transition-opacity duration-300 ease-zenvora',
+                'zoom-hover animate-fade-in object-cover transition-opacity duration-300 ease-aurevyn',
                 loaded[current.url] ? 'opacity-100' : 'opacity-0'
               )}
               onLoad={() => markLoaded(current.url)}

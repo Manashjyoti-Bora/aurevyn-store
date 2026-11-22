@@ -1,5 +1,5 @@
 // ============================================================================
-// Resellix - Prisma Schema (PostgreSQL)
+// Aurevyn - Prisma Schema (PostgreSQL)
 // Money is stored as Decimal(14,2) in the store currency (INR).
 // Percentages are stored as Decimal(10,4) (e.g. 18.0000 = 18%).
 // All models use cuid IDs + createdAt/updatedAt timestamps.

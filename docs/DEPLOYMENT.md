@@ -1,11 +1,11 @@
 # Deployment (Vercel + Neon)
 
-Canonical production URL: **https://zenvorastore.vercel.app** (set as `APP_URL` everywhere —
-emails, webhooks, sitemap). The older `zenvora-store.vercel.app` project is disabled (402) and
+Canonical production URL: **https://aurevynstore.vercel.app** (set as `APP_URL` everywhere —
+emails, webhooks, sitemap). The older `aurevyn-store.vercel.app` project is disabled (402) and
 must be ignored. Full click-by-click history: `docs/DEPLOY_VERCEL_NEON.md`.
 
 ## Pipeline
-1. Push to `main` on GitHub (`Manashjyoti-Bora/zenvora-store`) → Vercel auto-builds & deploys
+1. Push to `main` on GitHub (`Manashjyoti-Bora/aurevyn-store`) → Vercel auto-builds & deploys
    (Next.js standalone output, region `sin1`).
 2. **Migrations are production-safe by policy**: only `prisma migrate deploy` runs against
    production (via `DIRECT_URL`). There are NO `prisma db push`, `migrate reset`, DROP or data-
@@ -27,12 +27,12 @@ The job runner is idempotent, so frequent runs are safe.
 
 ## Post-deploy verification checklist (run every deploy)
 ```
-curl -s https://zenvorastore.vercel.app/api/health        # {"status":"ok","database":true,...}
-curl -sI https://zenvorastore.vercel.app | grep -iE "content-security|strict-transport"
-curl -s -o /dev/null -w "%{http_code}" https://zenvorastore.vercel.app/products/definitely-not-real  # 404
-curl -s -o /dev/null -w "%{http_code}" -X POST https://zenvorastore.vercel.app/api/cron/jobs       # 401
-curl -s -o /dev/null -w "%{http_code}" https://zenvorastore.vercel.app/robots.txt                  # 200
-curl -s -o /dev/null -w "%{http_code}" https://zenvorastore.vercel.app/admin                       # 307
+curl -s https://aurevynstore.vercel.app/api/health        # {"status":"ok","database":true,...}
+curl -sI https://aurevynstore.vercel.app | grep -iE "content-security|strict-transport"
+curl -s -o /dev/null -w "%{http_code}" https://aurevynstore.vercel.app/products/definitely-not-real  # 404
+curl -s -o /dev/null -w "%{http_code}" -X POST https://aurevynstore.vercel.app/api/cron/jobs       # 401
+curl -s -o /dev/null -w "%{http_code}" https://aurevynstore.vercel.app/robots.txt                  # 200
+curl -s -o /dev/null -w "%{http_code}" https://aurevynstore.vercel.app/admin                       # 307
 ```
 All of the above passed on 2026-09-08 against the live deployment.
 

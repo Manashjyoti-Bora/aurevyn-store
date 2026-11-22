@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Sandbox recovery — restores local dev environment after a sandbox reset. Idempotent.
 set -euo pipefail
-cd /home/user/resellix
+cd /home/user/aurevyn
 
 echo "== 1/6 node_modules =="
 [ -x node_modules/.bin/prisma ] || npm install --no-audit --no-fund 2>&1 | tail -1
@@ -21,8 +21,8 @@ echo "== 4/6 role + databases =="
 # Extract dev password from .env (bash parameter expansion — sed keeps unmatched prefixes!)
 LINE=$(grep -E "^DATABASE_URL=" .env); TMP=${LINE#*://app:}; PW=${TMP%%@*}
 sudo -u postgres psql -v ON_ERROR_STOP=1 -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='app') THEN CREATE ROLE app LOGIN PASSWORD '$PW' CREATEDB; ELSE ALTER ROLE app WITH LOGIN PASSWORD '$PW' CREATEDB; END IF; END \$\$;" >/dev/null
-sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='resellix'" | grep -q 1 || sudo -u postgres createdb -O app resellix
-sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='resellix_test'" | grep -q 1 || sudo -u postgres createdb -O app resellix_test
+sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='aurevyn'" | grep -q 1 || sudo -u postgres createdb -O app aurevyn
+sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='aurevyn_test'" | grep -q 1 || sudo -u postgres createdb -O app aurevyn_test
 
 echo "== 5/6 prisma generate + migrations (dev, then test via .env swap) =="
 ./node_modules/.bin/prisma generate >/dev/null 2>&1

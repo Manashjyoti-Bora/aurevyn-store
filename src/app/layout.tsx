@@ -32,6 +32,12 @@ export async function generateMetadata(): Promise<Metadata> {
       settings.storeTagline ||
       `${settings.storeName} - shop quality products online with fast delivery across India.`,
     applicationName: settings.storeName,
+    // iOS ignores the web manifest icons for the home-screen shortcut and uses
+    // apple-touch-icon only; without it Safari shows a blurry page screenshot.
+    icons: {
+      icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+      apple: [{ url: '/icon-192x192.png', sizes: '192x192', type: 'image/png' }],
+    },
     // Default social card for every route that does not supply its own image
     // (product pages override this with the real product photograph). Defined
     // once here so a page can never ship an OG tag with no image.

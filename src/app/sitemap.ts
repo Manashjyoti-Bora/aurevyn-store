@@ -7,7 +7,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = env.APP_URL.replace(/\/$/, '');
-  const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${base}/`, changeFrequency: 'daily', priority: 1 },
@@ -38,6 +37,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   ]);
 
+  // `lastModified` is emitted ONLY where a real database timestamp exists.
+  // Stamping every static route with `new Date()` on each request tells Google
+  // that the about page, the FAQ and the policy pages changed seconds ago, and
+  // repeated false freshness signals cause lastmod to be ignored entirely.
   return [
     ...staticRoutes,
     ...categories.map((c) => ({
@@ -59,8 +62,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: 'weekly' as const,
         priority: 0.8,
       })),
-  ].map((entry) => ({
-    ...entry,
-    lastModified: (entry as { lastModified?: Date }).lastModified ?? now,
-  }));
+  ];
 }

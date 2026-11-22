@@ -14,6 +14,7 @@
  */
 import sharp from 'sharp';
 import path from 'node:path';
+import { stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -24,18 +25,16 @@ const H = 630;
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
-    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#8B5CF6" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/>
-    </linearGradient>
+    <!-- Noir Atelier palette only: obsidian, porcelain, muted champagne.
+         No second accent hue - the restraint is the brand signal. -->
     <linearGradient id="gold" x1="1" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#D9C08A" stop-opacity="0.45"/>
-      <stop offset="1" stop-color="#D9C08A" stop-opacity="0"/>
+      <stop offset="0" stop-color="#C6AD7A" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#C6AD7A" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#C6AD7A"/>
-      <stop offset="0.6" stop-color="#8B5CF6"/>
-      <stop offset="1" stop-color="#22D3EE" stop-opacity="0.2"/>
+      <stop offset="0.55" stop-color="#8E7440"/>
+      <stop offset="1" stop-color="#C6AD7A" stop-opacity="0"/>
     </linearGradient>
     <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
       <stop offset="0" stop-color="#0E0D14"/>
@@ -44,8 +43,8 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" 
   </defs>
 
   <rect width="${W}" height="${H}" fill="url(#glow)"/>
-  <circle cx="1030" cy="70" r="300" fill="url(#violet)"/>
-  <circle cx="150" cy="590" r="280" fill="url(#gold)"/>
+  <circle cx="1030" cy="70" r="300" fill="url(#gold)"/>
+  <circle cx="150" cy="590" r="280" fill="url(#gold)" opacity="0.55"/>
 
   <!-- hairline frame -->
   <rect x="36" y="36" width="${W - 72}" height="${H - 72}" fill="none" stroke="#FFFFFF" stroke-opacity="0.12"/>
@@ -66,11 +65,13 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" 
   <text x="88" y="524" font-family="Inter, Helvetica, Arial, sans-serif" font-size="23" font-weight="400" fill="#B9B9C2">UPI &amp; Cash on Delivery · Tracked fulfilment</text>
 
   <!-- corner ticks -->
-  <path d="M1128 96h-28M1128 96v28" stroke="#8B5CF6" stroke-opacity="0.9" fill="none"/>
+  <path d="M1128 96h-28M1128 96v28" stroke="#C6AD7A" stroke-opacity="0.9" fill="none"/>
   <path d="M72 566h28M72 566v-28" stroke="#C6AD7A" stroke-opacity="0.9" fill="none"/>
 </svg>`;
 
 await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(out);
 
-const { size } = await sharp(out).metadata().then(async (m) => ({ size: m.size ?? 0 }));
+// `sharp().metadata()` reports nothing for a file path, so read the real byte
+// count off disk instead of always logging 0.
+const { size } = await stat(out);
 console.log(`wrote ${path.relative(root, out)} (${W}x${H}, ${size} bytes)`);

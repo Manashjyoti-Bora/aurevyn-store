@@ -25,8 +25,16 @@ jobs:
             exit 0
           fi
           code=$(curl -s -o /tmp/cron-out.json -w '%{http_code}' -X POST \
-            https://zenvorastore.vercel.app/api/cron/jobs \
+            https://aurevynstore.vercel.app/api/cron/jobs \
             -H "Authorization: Bearer $CRON_SECRET")
-          echo "cron endpoint responded HTTP $code"
+          echo "job endpoint responded HTTP $code"
           head -c 300 /tmp/cron-out.json
+          test "$code" = "200"
+
+          # Read-only incident detection. Safe to repeat: fingerprints de-duplicate.
+          code=$(curl -s -o /tmp/jarvis-out.json -w '%{http_code}' -X POST \
+            https://aurevynstore.vercel.app/api/cron/jarvis \
+            -H "Authorization: Bearer $CRON_SECRET")
+          echo "incident endpoint responded HTTP $code"
+          head -c 300 /tmp/jarvis-out.json
           test "$code" = "200"

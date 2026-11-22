@@ -17,6 +17,7 @@ import {
 } from './ranking';
 import { applyEnginePricingToProduct, saveProduct } from './products';
 import { revalidateCatalog } from './revalidate';
+import { isPaused } from '../jarvis/pause';
 import type { PricingRule, Supplier, SupplierProduct } from '@prisma/client';
 
 type Actor = { id?: string | null; email?: string | null };
@@ -899,6 +900,11 @@ export async function syncAndAutoProcessSupplier(params: {
   resumeFromCheckpoint?: boolean;
   actor: Actor;
 }): Promise<SupplierSyncReport> {
+  if (await isPaused('automations')) {
+    throw badRequest(
+      'Automations are paused from the Jarvis panel. Resume automations to run supplier syncs.'
+    );
+  }
   const startedAt = new Date().toISOString();
   const supplier = await prisma.supplier.findUnique({ where: { id: params.supplierId } });
   if (!supplier) throw notFound('Supplier not found');

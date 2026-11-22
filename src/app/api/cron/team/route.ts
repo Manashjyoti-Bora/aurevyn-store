@@ -3,6 +3,7 @@ import { env } from '@/lib/env';
 import { safeEqual } from '@/lib/crypto';
 import { logger } from '@/lib/logger';
 import { runTeamCycle } from '@/lib/team/service';
+import { isPaused } from '@/lib/jarvis/pause';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -27,6 +28,10 @@ async function handleCron(req: Request): Promise<Response> {
   }
 
   try {
+    if (await isPaused('agents')) {
+      logger.warn('Team cron skipped: agents are paused from the Jarvis panel');
+      return NextResponse.json({ ok: true, paused: true, reason: 'agents_paused' });
+    }
     const result = await runTeamCycle({ trigger: 'CRON' });
     return NextResponse.json({
       ok: true,

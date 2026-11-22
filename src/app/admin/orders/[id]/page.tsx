@@ -12,6 +12,7 @@ import {
   GatewayPaymentStatusBadge,
 } from '@/components/ui/badge';
 import { TableWrap, Th, Td } from '@/components/ui/table';
+import { describePlacement } from '@/lib/orders/placement';
 import { OrderAdminActions } from '@/components/admin/order-admin-actions';
 
 export const dynamic = 'force-dynamic';
@@ -199,6 +200,11 @@ export default async function AdminOrderDetail({ params }: Ctx) {
                           <span className="ml-2 font-mono text-xs text-ink-400">
                             {so.supplierOrderId}
                           </span>
+                        ) : null}
+                        {describePlacement(so).state === 'REPORTED' ? (
+                          <Badge tone="amber" className="ml-2 align-middle">
+                            Reference unverified
+                          </Badge>
                         ) : null}
                       </p>
                       <p className="text-[11px] text-ink-400">

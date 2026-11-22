@@ -13,6 +13,11 @@ import { PermanentJobError } from '../jobs/errors';
 import { enqueueJob, kickJobRunner } from '../jobs/queue';
 import { transitionOrder, recordOrderEvent, canTransition } from './state';
 import { recalcOrderFinancials } from './finance';
+import {
+  MIN_PLACEMENT_EVIDENCE_CHARS,
+  isUsableEvidence,
+  parseMeeshoReference,
+} from './placement';
 import { queueNotification } from '../notifications/notify';
 import { renderOrderEmailVars } from '../notifications/order-vars';
 import type { Order, Prisma, ShipmentStatus, SupplierOrder } from '@prisma/client';
@@ -825,22 +830,25 @@ export async function markSupplierOrderShipped(params: {
 }
 
 /**
- * Record the Meesho order ID the owner got after placing the purchase in the
- * Meesho app.
+ * Record the Meesho reference the owner got after placing the purchase.
  *
- * Meesho has no ordering API, so the owner places the order and the store
- * records the real reference it returns. That single ID is what the team needs
- * to resume the hands-free part: the customer is told the order is confirmed,
- * the order advances to supplier-accepted, and later tracking updates attach
- * to the same supplier order.
+ * This is a REPORT, not a confirmation (blueprint §6.10–§6.11). The reference
+ * is stored with who typed it and when, the customer is NOT told the supplier
+ * confirmed, and the order does not advance. Confirmation is a separate,
+ * evidence-backed step — see `confirmSupplierOrderPlacement`.
  */
-export async function recordMeeshoOrderPlacement(params: {
+export async function reportMeeshoOrderReference(params: {
   supplierOrderId: string;
   meeshoOrderId: string;
   adminId: string;
-}): Promise<{ orderId: string; orderNumber: string; meeshoOrderId: string }> {
-  const reference = params.meeshoOrderId.trim().toUpperCase();
-  if (!/^MEESHO-[A-Z0-9-]{4,40}$/.test(reference)) {
+}): Promise<{
+  orderId: string;
+  orderNumber: string;
+  meeshoOrderId: string;
+  state: 'REPORTED';
+}> {
+  const reference = parseMeeshoReference(params.meeshoOrderId);
+  if (!reference) {
     throw new PermanentJobError(
       'Use the Meesho order ID in the form MEESHO-XXXXXXXX (letters, digits and dashes).'
     );
@@ -853,6 +861,9 @@ export async function recordMeeshoOrderPlacement(params: {
   if (!so) throw notFound('Supplier order not found');
   if (so.supplier.type !== 'MEESHO') {
     throw new PermanentJobError('This supplier order is not fulfilled through Meesho.');
+  }
+  if (so.referenceVerifiedAt) {
+    throw conflict('This supplier order is already confirmed. Nothing more to record.');
   }
   if (so.supplierOrderId && so.supplierOrderId !== reference) {
     throw conflict(`A different Meesho order ID (${so.supplierOrderId}) is already recorded.`);
@@ -868,9 +879,10 @@ export async function recordMeeshoOrderPlacement(params: {
     where: { id: so.id },
     data: {
       supplierOrderId: reference,
-      status: 'ACCEPTED',
+      // Deliberately NOT 'ACCEPTED': a typed reference is not supplier proof.
+      referenceReportedAt: new Date(),
+      referenceReportedBy: params.adminId,
       sentAt: so.sentAt ?? new Date(),
-      acceptedAt: so.acceptedAt ?? new Date(),
       attempts: { increment: 1 },
       lastError: null,
     },
@@ -878,30 +890,12 @@ export async function recordMeeshoOrderPlacement(params: {
 
   await recordOrderEvent({
     orderId: so.orderId,
-    type: 'SUPPLIER_ACCEPTED',
-    message: `Meesho order ${reference} placed by the owner`,
+    type: 'SUPPLIER_REFERENCE_REPORTED',
+    message: `Owner recorded supplier reference ${reference} — unverified`,
     data: { supplierOrderId: so.id, meeshoOrderId: reference, adminId: params.adminId },
   });
 
-  await advanceOrderFulfilment(so.orderId, 'SUPPLIER_ACCEPTED', {
-    supplierOrderId: reference,
-    supplier: so.supplier.name,
-  });
-
-  // The customer is told the order is confirmed; the team owns every message
-  // after this point (dispatch, tracking, delivery).
-  const vars = await renderOrderEmailVars(so.orderId);
-  await queueNotification({
-    template: 'ORDER_PROCESSING',
-    email: so.order.guestEmail ?? vars.email,
-    userId: so.order.userId,
-    orderId: so.orderId,
-    vars,
-    skipIfNoEmail: true,
-    dedupeExtra: `meesho-${reference}`,
-  });
-
-  logger.info('Meesho order placement recorded', {
+  logger.info('Meesho reference reported (unverified)', {
     supplierOrderId: so.id,
     orderNumber: so.order.orderNumber,
   });
@@ -910,6 +904,97 @@ export async function recordMeeshoOrderPlacement(params: {
     orderId: so.orderId,
     orderNumber: so.order.orderNumber,
     meeshoOrderId: reference,
+    state: 'REPORTED',
+  };
+}
+
+/**
+ * Confirm a reported supplier reference with evidence.
+ *
+ * Only this step may advance the order to supplier-accepted and tell the
+ * customer the supplier order is confirmed. The note is stored verbatim so the
+ * claim can be audited later.
+ */
+export async function confirmSupplierOrderPlacement(params: {
+  supplierOrderId: string;
+  evidence: string;
+  adminId: string;
+}): Promise<{
+  orderId: string;
+  orderNumber: string;
+  meeshoOrderId: string | null;
+  state: 'VERIFIED';
+}> {
+  if (!isUsableEvidence(params.evidence)) {
+    throw new PermanentJobError(
+      `Record what confirmed the placement (at least ${MIN_PLACEMENT_EVIDENCE_CHARS} characters).`
+    );
+  }
+
+  const so = await prisma.supplierOrder.findUnique({
+    where: { id: params.supplierOrderId },
+    include: { supplier: true, order: true },
+  });
+  if (!so) throw notFound('Supplier order not found');
+  if (so.referenceVerifiedAt) throw conflict('This supplier order is already confirmed.');
+  if (!so.supplierOrderId) {
+    throw conflict('Record the supplier order reference before confirming it.');
+  }
+
+  const evidence = params.evidence.trim().slice(0, 500);
+  const now = new Date();
+
+  await prisma.supplierOrder.update({
+    where: { id: so.id },
+    data: {
+      status: 'ACCEPTED',
+      referenceReportedAt: so.referenceReportedAt ?? now,
+      referenceVerifiedAt: now,
+      referenceEvidence: evidence,
+      acceptedAt: so.acceptedAt ?? now,
+      attempts: { increment: 1 },
+      lastError: null,
+    },
+  });
+
+  await recordOrderEvent({
+    orderId: so.orderId,
+    type: 'SUPPLIER_CONFIRMED',
+    message: `Supplier order ${so.supplierOrderId} confirmed by the owner`,
+    data: {
+      supplierOrderId: so.id,
+      meeshoOrderId: so.supplierOrderId,
+      evidence,
+      adminId: params.adminId,
+    },
+  });
+
+  await advanceOrderFulfilment(so.orderId, 'SUPPLIER_ACCEPTED', {
+    supplierOrderId: so.supplierOrderId,
+    supplier: so.supplier.name,
+  });
+
+  const vars = await renderOrderEmailVars(so.orderId);
+  await queueNotification({
+    template: 'ORDER_PROCESSING',
+    email: so.order.guestEmail ?? vars.email,
+    userId: so.order.userId,
+    orderId: so.orderId,
+    vars,
+    skipIfNoEmail: true,
+    dedupeExtra: `supplier-confirmed-${so.supplierOrderId}`,
+  });
+
+  logger.info('Supplier placement confirmed', {
+    supplierOrderId: so.id,
+    orderNumber: so.order.orderNumber,
+  });
+
+  return {
+    orderId: so.orderId,
+    orderNumber: so.order.orderNumber,
+    meeshoOrderId: so.supplierOrderId,
+    state: 'VERIFIED',
   };
 }
 

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db';
 import { TableWrap, Th, Td, Pagination } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { SupplierOrderActions } from '@/components/admin/supplier-order-actions';
+import { describePlacement } from '@/lib/orders/placement';
 import type { SupplierOrderStatus } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
@@ -175,6 +176,19 @@ export default async function AdminSupplierOrdersPage({
                   <Badge tone={toneFor(so.status) as 'red' | 'green' | 'blue' | 'gray' | 'amber'}>
                     {so.status.replace(/_/g, ' ')}
                   </Badge>
+                  {(() => {
+                    const placement = describePlacement(so);
+                    if (placement.state === 'NOT_PLACED' || placement.state === 'VERIFIED') return null;
+                    return (
+                      <span
+                        className={`mt-0.5 block max-w-[220px] text-[10px] ${
+                          placement.state === 'REPORTED' ? 'text-amber-700' : 'text-red-600'
+                        }`}
+                      >
+                        {placement.label}
+                      </span>
+                    );
+                  })()}
                   {so.cancellationStatus !== 'NONE' ? (
                     <span
                       className={`mt-0.5 block max-w-[260px] truncate text-[10px] ${
@@ -222,6 +236,8 @@ export default async function AdminSupplierOrdersPage({
                     supplierOrderId={so.id}
                     status={so.status}
                     supplierType={so.supplier.type}
+                    referenceReported={Boolean(so.referenceReportedAt || so.supplierOrderId)}
+                    referenceVerified={Boolean(so.referenceVerifiedAt)}
                     manualCancellationRequired={[
                       'MANUAL_ACTION_REQUIRED',
                       'SUBMITTING',

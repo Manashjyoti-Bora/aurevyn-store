@@ -236,6 +236,29 @@ export const settingsSchema = z.object({
    * until an owner deliberately turns it on. `dailyActionLimit = 0` disables
    * execution even when actions are enabled.
    */
+  /**
+   * Jarvis emergency switches (blueprint §11). Each one independently stops a
+   * class of automated action without touching data. Defaults are off, so a
+   * fresh deployment behaves exactly as before this section existed.
+   */
+  jarvis: z
+    .object({
+      /** Blocks publishing new listings and changing live product status. */
+      listingsPaused: z.boolean().default(false),
+      /** Blocks every outbound customer/owner email. */
+      messagesPaused: z.boolean().default(false),
+      /** Blocks autonomous team cycles. */
+      agentsPaused: z.boolean().default(false),
+      /** Blocks scheduled/automated catalogue imports. */
+      automationsPaused: z.boolean().default(false),
+    })
+    .default({
+      listingsPaused: false,
+      messagesPaused: false,
+      agentsPaused: false,
+      automationsPaused: false,
+    }),
+
   aiCeo: z
     .object({
       enabled: z.boolean().default(true),

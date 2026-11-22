@@ -9,23 +9,38 @@ import { Field, Input, Textarea } from '@/components/ui/form';
 import { Modal } from '@/components/ui/modal';
 import { Alert } from '@/components/ui/feedback';
 
+/**
+ * Two-step supplier handoff.
+ *
+ *   1. Record the reference Meesho returned  → REPORTED (unverified)
+ *   2. Confirm it with evidence              → VERIFIED (customer told)
+ *
+ * Keeping the steps separate is what stops a mistyped ID from becoming a
+ * false "supplier confirmed" message to a paying customer.
+ */
 export function SupplierOrderActions({
   supplierOrderId,
   status,
   supplierType,
   manualCancellationRequired = false,
   manualCancellationAvailable = false,
+  referenceReported = false,
+  referenceVerified = false,
 }: {
   supplierOrderId: string;
   status: string;
   supplierType?: string;
   manualCancellationRequired?: boolean;
   manualCancellationAvailable?: boolean;
+  referenceReported?: boolean;
+  referenceVerified?: boolean;
 }) {
   const router = useRouter();
   const [shipOpen, setShipOpen] = useState(false);
   const [meeshoOpen, setMeeshoOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [meeshoOrderId, setMeeshoOrderId] = useState('');
+  const [evidence, setEvidence] = useState('');
   const [manualCancelOpen, setManualCancelOpen] = useState(false);
   const [manualCancelNote, setManualCancelNote] = useState('');
   const [carrier, setCarrier] = useState('');
@@ -37,6 +52,9 @@ export function SupplierOrderActions({
   const canShip =
     !manualCancellationRequired && !['SHIPPED', 'DELIVERED', 'CANCELLED'].includes(status);
   const canRetry = !manualCancellationRequired && ['FAILED', 'REJECTED', 'QUEUED'].includes(status);
+  const isMeesho = supplierType === 'MEESHO';
+  const canReport = isMeesho && !referenceVerified && !['CANCELLED', 'DELIVERED'].includes(status);
+  const canConfirm = isMeesho && referenceReported && !referenceVerified;
 
   async function retry() {
     setBusy(true);
@@ -58,12 +76,30 @@ export function SupplierOrderActions({
       await apiFetch(`/api/admin/supplier-orders/${supplierOrderId}/meesho-id`, {
         body: { meeshoOrderId: meeshoOrderId.trim() },
       });
-      toast('Meesho order recorded — customer notified, team takes over', 'success');
+      toast('Reference recorded — still unverified until you confirm it', 'success');
       setMeeshoOpen(false);
       setMeeshoOrderId('');
       router.refresh();
     } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : 'Could not record the Meesho order');
+      setError(err instanceof ApiClientError ? err.message : 'Could not record the reference');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function confirmPlacement() {
+    setBusy(true);
+    setError(null);
+    try {
+      await apiFetch(`/api/admin/supplier-orders/${supplierOrderId}/confirm-placement`, {
+        body: { evidence: evidence.trim() },
+      });
+      toast('Supplier order confirmed — customer notified', 'success');
+      setConfirmOpen(false);
+      setEvidence('');
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : 'Could not confirm the placement');
     } finally {
       setBusy(false);
     }
@@ -123,16 +159,27 @@ export function SupplierOrderActions({
           {status === 'CANCELLED' ? 'Verify supplier cancellation' : 'Record manual cancellation'}
         </Button>
       )}
-      {supplierType === 'MEESHO' && !['CANCELLED', 'DELIVERED'].includes(status) && (
+      {canConfirm && (
         <Button
           size="sm"
-          variant="outline"
+          onClick={() => {
+            setConfirmOpen(true);
+            setError(null);
+          }}
+        >
+          Confirm placement
+        </Button>
+      )}
+      {canReport && (
+        <Button
+          size="sm"
+          variant={referenceReported ? 'ghost' : 'outline'}
           onClick={() => {
             setMeeshoOpen(true);
             setError(null);
           }}
         >
-          Record Meesho ID
+          {referenceReported ? 'Change reference' : 'Record Meesho ID'}
         </Button>
       )}
       {canRetry && (
@@ -154,25 +201,24 @@ export function SupplierOrderActions({
       <Modal
         open={meeshoOpen}
         onClose={() => setMeeshoOpen(false)}
-        title="Meesho order placed"
+        title="Record the Meesho reference"
         footer={
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setMeeshoOpen(false)} disabled={busy}>
               Cancel
             </Button>
             <Button onClick={saveMeeshoId} loading={busy} disabled={meeshoOrderId.trim().length < 6}>
-              Save & confirm to customer
+              Record reference
             </Button>
           </div>
         }
       >
         <div className="space-y-3">
           {error && <Alert tone="error">{error}</Alert>}
-          <p className="text-sm text-ink-600">
-            Paste the order ID Meesho gave you after placing this purchase (for example
-            MEESHO-123456789). The store uses this single reference to advance the order, email the
-            customer that it is confirmed, and attach every later tracking update.
-          </p>
+          <Alert tone="warning" title="This records, it does not verify">
+            Paste the order ID Meesho gave you after placing the purchase. The customer keeps seeing
+            {' '}&ldquo;supplier confirmation pending&rdquo; until you confirm it in the next step.
+          </Alert>
           <Field label="Meesho order ID" required hint="Format: MEESHO-XXXXXXXX">
             {(p) => (
               <Input
@@ -181,6 +227,48 @@ export function SupplierOrderActions({
                 onChange={(e) => setMeeshoOrderId(e.target.value.toUpperCase())}
                 maxLength={48}
                 placeholder="MEESHO-123456789"
+              />
+            )}
+          </Field>
+        </div>
+      </Modal>
+      <Modal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title="Confirm the supplier order"
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setConfirmOpen(false)} disabled={busy}>
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmPlacement}
+              loading={busy}
+              disabled={evidence.trim().length < 10}
+            >
+              Confirm & notify customer
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-3">
+          {error && <Alert tone="error">{error}</Alert>}
+          <p className="text-sm text-ink-600">
+            Only confirm once Meesho has actually accepted the order. This advances the order to
+            supplier-accepted and sends the customer the processing update.
+          </p>
+          <Field
+            label="What confirmed it?"
+            required
+            hint="For example: Meesho order accepted, status “Order Confirmed”, 22 Nov 14:20."
+          >
+            {(p) => (
+              <Textarea
+                {...p}
+                value={evidence}
+                onChange={(e) => setEvidence(e.target.value)}
+                maxLength={500}
+                placeholder="Meesho shows the order as confirmed…"
               />
             )}
           </Field>

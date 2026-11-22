@@ -6,6 +6,7 @@ import { findApplicablePricingRule } from '../pricing/resolve';
 import { saveProduct } from './products';
 import { revalidateCatalog } from './revalidate';
 import { extractSupplierProductMetadata } from './auto-import';
+import { isPaused } from '../jarvis/pause';
 import type { Actor } from './types';
 import type { SupplierProduct } from '@prisma/client';
 
@@ -72,6 +73,11 @@ function supplierProductName(raw: unknown): string | null {
 export async function publishSupplierProduct(
   input: PublishSupplierProductInput
 ): Promise<PublishSupplierProductResult> {
+  if (await isPaused('listings')) {
+    throw badRequest(
+      'Listings are paused from the Jarvis panel. Resume listings before publishing.'
+    );
+  }
   const sp = await prisma.supplierProduct.findUnique({
     where: { id: input.supplierProductId },
     include: { supplier: { select: { id: true, name: true, type: true } } },

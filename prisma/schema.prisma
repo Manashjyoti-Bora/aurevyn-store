@@ -451,6 +451,13 @@ model SupplierOrder {
   // Guarantees we never send the same fulfilment request twice.
   idempotencyKey  String              @unique
   supplierOrderId String?
+  // Meesho placement provenance. The reference above is typed by the owner, so
+  // it is "reported" until the owner separately confirms it with evidence.
+  // Never treat a pasted reference as supplier confirmation.
+  referenceReportedAt DateTime?
+  referenceReportedBy String?
+  referenceVerifiedAt DateTime?
+  referenceEvidence   String?
   status          SupplierOrderStatus @default(QUEUED)
   attempts        Int                 @default(0)
   lastError       String?

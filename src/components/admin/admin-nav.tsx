@@ -20,6 +20,7 @@ const GROUPS: NavGroup[] = [
     title: 'Overview',
     items: [
       { href: '/admin', label: 'Dashboard' },
+      { href: '/admin/jarvis', label: 'Jarvis control' },
       { href: '/admin/team', label: 'The team' },
       { href: '/admin/team/briefings', label: 'Live briefings' },
       { href: '/admin/analytics', label: 'Analytics & profit' },

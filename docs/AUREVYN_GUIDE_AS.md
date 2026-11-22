@@ -129,9 +129,14 @@ Dashboard, মোৰ অৰ্ডাৰ, ঠিকনা, প্ৰ'ফাইল
 1. গ্ৰাহকে অৰ্ডাৰ দিয়ে।
 2. Admin → Orders ত নতুন অৰ্ডাৰ দেখি।
 3. Meesho ত নিজে অৰ্ডাৰ দিয়ক (ঠিকনা লৈ)।
-4. Meesho ৰ পৰা পোৱা ID (যেনে `MEESHO-12345678`) — Admin → Supplier orders ত লিখক।
-5. ট্ৰেকিং নম্বৰ অহালৈকে অপেক্ষা কৰক, তাৰ পিছত গ্ৰাহকক জনাওক।
-6. UPI পইচা বেংকলৈ অহাৰ পিছত Admin → Payments ত confirm কৰক।
+4. Meesho ৰ পৰা পোৱা ID (যেনে `MEESHO-12345678`) — Admin → Supplier orders ত **Record Meesho ID** ত লিখক। এইখিনিতে অৰ্ডাৰ আগলৈ নাযায়; গ্ৰাহকক এতিয়াও "confirmation pending" দেখুওৱা হয়।
+5. Meesho ত অৰ্ডাৰ **actually confirm** হোৱাৰ পিছত **Confirm placement** টিপক আৰু কি কাৰণে নিশ্চিত হ’ল লিখক (Meesho ৰ status, তাৰিখ)। তেতিয়াহে গ্ৰাহকক confirmed mail যায়।
+6. ট্ৰেকিং নম্বৰ অহালৈকে অপেক্ষা কৰক, তাৰ পিছত গ্ৰাহকক জনাওক।
+7. UPI পইচা বেংকলৈ অহাৰ পিছত Admin → Payments ত confirm কৰক।
+
+কিয় দুটা খোজ? কাৰণ ভুলকৈ পেষ্ট কৰা ID এ গ্ৰাহকক মিছা "supplier confirmed" নকয়।
+
+**জৰুৰী বন্ধ (Admin → Jarvis control):** listing, গ্ৰাহকক যোৱা mail, agent, automation — চাৰিটা সুকীয়া switch. বন্ধ কৰিলে data নষ্ট নহয়।
 
 ষ্ট’ৰে নিজে Meesho ত অৰ্ডাৰ দিয়া নাই — কাৰণ সেইটো মালিকৰ একাউণ্ট আৰু পইচাৰ সিদ্ধান্ত।
 

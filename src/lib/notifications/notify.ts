@@ -5,6 +5,7 @@ import { configuredSupportEmail, getSettings } from '../settings';
 import { sha256 } from '../crypto';
 import { enqueueJob, kickJobRunner } from '../jobs/queue';
 import { renderTemplate, type TemplateVars } from './templates';
+import { isPaused } from '../jarvis/pause';
 import { getEmailProvider } from './providers';
 import type { NotificationTemplate } from '@prisma/client';
 
@@ -50,6 +51,13 @@ function payloadNotificationId(payload: unknown): string | null {
 }
 
 export async function queueNotification(input: QueueNotificationInput): Promise<string | null> {
+  if (await isPaused('messages')) {
+    logger.warn('Outbound messages are paused; notification not queued', {
+      template: input.template,
+      orderId: input.orderId,
+    });
+    return null;
+  }
   const email = input.email?.trim().toLowerCase() ?? '';
   if (!email || !email.includes('@')) {
     if (input.skipIfNoEmail) return null;

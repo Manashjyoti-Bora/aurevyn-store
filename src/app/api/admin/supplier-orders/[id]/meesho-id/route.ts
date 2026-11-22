@@ -1,7 +1,7 @@
 import { apiRoute, jsonOk, badRequest } from '@/lib/errors';
 import { requireAdminWrite } from '@/lib/auth/guards';
 import { readJson } from '@/lib/http';
-import { recordMeeshoOrderPlacement } from '@/lib/orders/fulfilment';
+import { reportMeeshoOrderReference } from '@/lib/orders/fulfilment';
 import { auditLog } from '@/lib/audit';
 import { z } from 'zod';
 
@@ -14,11 +14,10 @@ const schema = z.object({
 });
 
 /**
- * Hand the team the Meesho order ID.
+ * Report the supplier reference the owner got after placing the purchase.
  *
- * This is the one hand-off the owner performs. Everything after it — customer
- * confirmation, dispatch updates, delivery messages — is handled from the
- * order pipeline without another manual step.
+ * Recording it is not verification: the customer page keeps saying supplier
+ * confirmation is pending until `confirm-placement` records the evidence.
  */
 export async function POST(req: Request, ctx: Ctx): Promise<Response> {
   return apiRoute(async () => {
@@ -28,7 +27,7 @@ export async function POST(req: Request, ctx: Ctx): Promise<Response> {
     if (!raw || typeof raw !== 'object') throw badRequest('Invalid request body');
     const body = schema.parse(raw);
 
-    const result = await recordMeeshoOrderPlacement({
+    const result = await reportMeeshoOrderReference({
       supplierOrderId: id,
       meeshoOrderId: body.meeshoOrderId,
       adminId: admin.id,
@@ -36,7 +35,7 @@ export async function POST(req: Request, ctx: Ctx): Promise<Response> {
 
     await auditLog({
       actor: { id: admin.id, email: admin.email },
-      action: 'supplier_order.meesho_placed',
+      action: 'supplier_order.reference_reported',
       entityType: 'SupplierOrder',
       entityId: id,
       data: { meeshoOrderId: result.meeshoOrderId, orderNumber: result.orderNumber },

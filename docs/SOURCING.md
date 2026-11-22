@@ -53,12 +53,16 @@ store code changes, only endpoint and credential configuration.
 
 Meesho has no ordering API, so the owner places the purchase in the Meesho app.
 
-1. A paid order is queued in `Admin → Suppliers → Supplier orders`.
+1. A paid order is queued in `Admin → Suppliers → Supplier orders`, and
+   `Admin → Jarvis control` counts it under **Awaiting your placement**.
 2. The owner places it on Meesho and opens **Record Meesho ID**, entering the
-   reference as `MEESHO-XXXXXXXX`.
-3. `recordMeeshoOrderPlacement` stores the reference, marks the supplier order
-   accepted, advances the customer order, records an order event and emails the
-   customer that the order is confirmed.
+   reference as `MEESHO-XXXXXXXX`. `reportMeeshoOrderReference` stores the
+   reference with who typed it and when — **reported, not verified**. The order
+   does not advance and the customer is not told it is confirmed.
+3. The owner opens **Confirm placement** and writes what confirmed it (Meesho
+   status, date, reference). `confirmSupplierOrderPlacement` stores that
+   evidence, marks the supplier order accepted, advances the customer order,
+   records `SUPPLIER_CONFIRMED` and emails the customer.
 4. From there the team owns the rest: dispatch, tracking, delivery and the
    customer messages that go with them. The owner is only asked again if a
    fulfilment genuinely fails.

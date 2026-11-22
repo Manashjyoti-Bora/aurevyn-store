@@ -4,6 +4,7 @@ import { getSettings } from '@/lib/settings';
 import { env } from '@/lib/env';
 import { PolicyView } from '@/components/policies/policy-view';
 import { formatINR } from '@/lib/money';
+import { defaultOgImage } from '@/lib/seo/og';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: `Terms & Conditions | ${settings.storeName}`,
       url: `${env.APP_URL}/policies/terms`,
+      images: [defaultOgImage(settings.storeName)],
     },
   };
 }

@@ -33,7 +33,8 @@
     "db:promote-admin": "tsx scripts/promote-admin.ts",
     "db:reset-admin-password": "tsx scripts/reset-admin-password.ts",
     "diagnose:catalogue": "tsx --env-file=.env src/scripts/catalogue-diagnostic.ts",
-    "catalogue:install": "tsx --env-file=.env scripts/install-catalogue.ts"
+    "catalogue:install": "tsx --env-file=.env scripts/install-catalogue.ts",
+    "og:image": "node scripts/generate-og-image.mjs"
   },
   "prisma": {
     "seed": "tsx --env-file=.env prisma/seed.ts"

@@ -92,6 +92,15 @@ const envSchema = z.object({
    */
   SUPPORT_EMAIL: optionalNonEmpty(z.string().email().max(160)),
 
+  // --- Search engine ownership verification (optional, public) ---------------
+  // The content value of the HTML-tag verification method. It is public by
+  // design (it only proves domain control when actually served on the site), so
+  // it is rendered straight into <meta name="google-site-verification">.
+  // Absent = the tag is simply not emitted; the DNS and HTML-file methods of
+  // Search Console keep working without it.
+  GOOGLE_SITE_VERIFICATION: optionalNonEmpty(z.string().max(200)),
+  BING_SITE_VERIFICATION: optionalNonEmpty(z.string().max(200)),
+
   // --- Optional AI narrative provider (AI CEO) -------------------------------
   // Absent by default: the AI CEO runs deterministically (see
   // src/lib/ai-ceo/provider.ts). Setting these does NOT enable execution of

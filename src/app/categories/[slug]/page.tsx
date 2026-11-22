@@ -15,6 +15,7 @@ import { ListingControls } from '@/components/store/listing-controls';
 import { Pagination } from '@/components/ui/table';
 import { Breadcrumbs } from '@/components/store/breadcrumbs';
 import { jsonLdScript } from '@/lib/utils';
+import { buildItemListJsonLd } from '@/lib/seo/item-list';
 
 export const dynamic = 'force-dynamic';
 
@@ -66,12 +67,29 @@ export default async function CategoryPage({
     url: `${env.APP_URL}/categories/${category.slug}`,
   };
 
+  // The products actually rendered on this page, in display order, as an
+  // ItemList. Positions continue across pagination so a crawler sees one
+  // ranked list instead of duplicated position 1 entries.
+  const itemListLd = buildItemListJsonLd({
+    name: `${category.name} — page ${result.page}`,
+    urlPath: `/categories/${category.slug}`,
+    items: result.items.map((p) => ({ slug: p.slug, name: p.name })),
+    page: result.page,
+    perPage: result.perPage,
+  });
+
   return (
     <div className="container-store py-6 sm:py-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
+      {itemListLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(itemListLd) }}
+        />
+      )}
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },

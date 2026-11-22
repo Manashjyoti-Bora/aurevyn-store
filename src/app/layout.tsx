@@ -35,18 +35,56 @@ export async function generateMetadata(): Promise<Metadata> {
       settings.storeTagline ||
       `${settings.storeName} - shop quality products online with fast delivery across India.`,
     applicationName: settings.storeName,
+    // Default social card for every route that does not supply its own image
+    // (product pages override this with the real product photograph). Defined
+    // once here so a page can never ship an OG tag with no image.
     openGraph: {
       type: 'website',
       siteName: settings.storeName,
       locale: 'en_IN',
       url: env.APP_URL,
+      images: [
+        {
+          url: '/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: `${settings.storeName} — ${settings.storeTagline || 'Quality products, delivered to you'}`,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: settings.storeName,
       description: settings.storeTagline || undefined,
+      images: ['/og-image.png'],
     },
-    robots: { index: true, follow: true },
+    // Ownership proofs are emitted only when the owner has supplied a token;
+    // an empty <meta> would be a false claim of verification.
+    ...(env.GOOGLE_SITE_VERIFICATION || env.BING_SITE_VERIFICATION
+      ? {
+          verification: {
+            ...(env.GOOGLE_SITE_VERIFICATION
+              ? { google: env.GOOGLE_SITE_VERIFICATION }
+              : {}),
+            ...(env.BING_SITE_VERIFICATION
+              ? { other: { 'msvalidate.01': env.BING_SITE_VERIFICATION } }
+              : {}),
+          },
+        }
+      : {}),
+    // Large image previews + full-length snippets are opt-in; without them
+    // Google trims the snippet and shrinks the thumbnail in results.
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
   };
 }
 

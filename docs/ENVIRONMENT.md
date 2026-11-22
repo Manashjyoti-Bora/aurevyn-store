@@ -21,6 +21,8 @@ live ONLY in **Vercel → Project → Settings → Environment Variables** (neve
 | `EMAIL_PROVIDER` | optional | no | `console` (default — logs, does NOT send) or `smtp` |
 | `SMTP_HOST/PORT/SECURE/USER/PASS`, `EMAIL_FROM`, `EMAIL_REPLY_TO` | for real email | some | Any SMTP provider (Resend/Brevo/SES…). Until set, emails are honestly recorded as not sent |
 | `SUPPORT_EMAIL` | recommended | no | Real support mailbox used while the stored setting is still the `support@example.com` placeholder; a value saved in Admin → Settings overrides it |
+| `GOOGLE_SITE_VERIFICATION` | optional | no (public) | `content` value of the HTML-tag method in Google Search Console; emitted as `<meta name="google-site-verification">` |
+| `BING_SITE_VERIFICATION` | optional | no (public) | Same for Bing Webmaster Tools (`msvalidate.01`) |
 | `STORAGE_PROVIDER` | optional | no | `local` (default; EPHEMERAL on Vercel) · `s3` · `cloudinary` |
 | `IMAGE_REMOTE_HOSTS` | optional | no | Comma-separated hosts the Next.js image optimizer may fetch from (`*`/`**` wildcards). Default: CJ CDNs, `res.cloudinary.com`, `**.amazonaws.com` + configured S3/Cloudinary hosts. Other https hosts still render via `<RemoteImage>` but unoptimized. Build-time value (inlined) — redeploy after changing |
 | `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | for s3 | ✅ | AWS S3 / Cloudflare R2 / MinIO. Optional `S3_ENDPOINT` (R2/MinIO), `S3_PUBLIC_BASE_URL` (CDN) |

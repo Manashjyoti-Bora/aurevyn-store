@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getSettings } from '@/lib/settings';
 import { env } from '@/lib/env';
 import { PolicyView } from '@/components/policies/policy-view';
+import { defaultOgImage } from '@/lib/seo/og';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: `Returns & Refunds | ${settings.storeName}`,
       url: `${env.APP_URL}/policies/returns`,
+      images: [defaultOgImage(settings.storeName)],
     },
   };
 }

@@ -1,6 +1,9 @@
 # AUREVYN — automated reselling / dropshipping store (India, ₹ INR)
 
-> Store brand: **Aurevyn** (set via `APP_NAME` / Admin → Settings). Internal code identifiers (package name, `aurevyn_*` cookie names, `RX-` order prefix) remain `aurevyn` — cosmetic only.
+> Store brand: **Aurevyn** (set via `APP_NAME` / Admin → Settings). The repository, package (`aurevyn-store`), cookie names (`aurevyn_*`) and order prefix (`RX-`) all carry the same name.
+>
+> Assamese owner guide: [`docs/AUREVYN_GUIDE_AS.md`](docs/AUREVYN_GUIDE_AS.md).
+> Operations team (119 specialists + workflow planner): [`docs/AUTONOMOUS_TEAM.md`](docs/AUTONOMOUS_TEAM.md).
 
 A complete, production-oriented e-commerce platform for the reselling/dropshipping
 business model: **supplier cost → your price/margin → customer pays by UPI QR or

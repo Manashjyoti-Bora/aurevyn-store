@@ -11,6 +11,7 @@ import { FilterSidebar } from '@/components/store/filter-sidebar';
 import { ListingControls } from '@/components/store/listing-controls';
 import { Pagination } from '@/components/ui/table';
 import { buildItemListJsonLd } from '@/lib/seo/item-list';
+import { publicOrigin } from '@/lib/site-origin';
 import { jsonLdScript } from '@/lib/utils';
 
 
@@ -61,6 +62,7 @@ export default async function ShopPage({
   // displayed, published products are listed; an empty result emits nothing.
   const itemListLd = buildItemListJsonLd({
     name: 'Shop all products',
+    base: await publicOrigin(),
     urlPath: '/shop',
     items: result.items.map((p) => ({ slug: p.slug, name: p.name })),
     page: result.page,

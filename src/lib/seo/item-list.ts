@@ -23,10 +23,12 @@ export function buildItemListJsonLd(input: {
   page?: number;
   /** Items per page, used to offset positions on later pages. */
   perPage?: number;
+  /** Canonical origin; pass `await publicOrigin()` from a request-scoped page. */
+  base?: string;
 }): Record<string, unknown> | null {
   if (input.items.length === 0) return null;
 
-  const base = env.APP_URL.replace(/\/$/, '');
+  const base = (input.base ?? env.APP_URL).replace(/\/$/, '');
   const offset = Math.max(0, (input.page ?? 1) - 1) * (input.perPage ?? input.items.length);
   const url = input.urlPath.startsWith('http')
     ? input.urlPath

@@ -1,5 +1,5 @@
 import { configuredSupportEmail, getSettings } from '@/lib/settings';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { DemoBanner } from '@/components/layout/demo-banner';
@@ -14,15 +14,13 @@ import { jsonLdScript } from '@/lib/utils';
  *
  * This is a route group, not a URL segment: `/shop` stays `/shop`. Living here
  * instead of the root layout means the admin console no longer needs a
- * `headers()` check to hide store chrome — and, crucially, that the storefront
- * does not depend on the request, so it can be statically generated and served
- * from cache.
+ * `headers()` check to hide its store chrome.
  *
- * `revalidate` is the default for every page in the group. Pages that must be
- * live per visitor (cart, checkout, account, track) still opt out with
- * `export const dynamic = 'force-dynamic'` of their own.
+ * The layout reads the request host once (`publicOrigin`) so the Organization /
+ * WebSite JSON-LD names the host that actually served the page. That is a
+ * deliberate trade: the structured-data URLs cannot go stale after a rename,
+ * and the affected pages are database-driven and per-request anyway.
  */
-export const revalidate = 300;
 
 /**
  * Only genuine, owner-configured values reach the Organization entity. Each
@@ -52,7 +50,8 @@ function socialProfileUrls(social: {
 
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSettings();
-  const base = env.APP_URL.replace(/\/$/, '');
+  const origin = await publicOrigin();
+  const base = origin.replace(/\/$/, '');
   const organizationId = `${base}/#organization`;
   const sameAs = socialProfileUrls(settings.social);
   const supportEmail = configuredSupportEmail(settings);

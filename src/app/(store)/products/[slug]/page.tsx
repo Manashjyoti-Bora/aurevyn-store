@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from '@/components/ui/remote-image';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import { getSettings } from '@/lib/settings';
 import { getStorefrontProduct, getRelatedProducts, availabilityOf } from '@/lib/catalog/storefront';
 import { schemaAvailability } from '@/lib/catalog/availability';
@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: Ctx): Promise<Metadata> {
   // successfully, Next.js can otherwise answer 200 even though the page body
   // renders the not-found UI (soft 404 — bad for SEO and correctness).
   if (!product) notFound();
+  const origin = await publicOrigin();
   const title = product.seoTitle || product.name;
   const description =
     product.seoDescription || product.shortDescription || product.description.slice(0, 155);
@@ -46,9 +47,9 @@ export async function generateMetadata({ params }: Ctx): Promise<Metadata> {
       title,
       description,
       type: 'website',
-      url: `${env.APP_URL}/products/${product.slug}`,
+      url: `${origin}/products/${product.slug}`,
       images: product.images.slice(0, 1).map((i) => ({
-        url: i.url.startsWith('http') ? i.url : `${env.APP_URL}${i.url}`,
+        url: i.url.startsWith('http') ? i.url : `${origin}${i.url}`,
         alt: i.alt || product.name,
       })),
     },
@@ -58,7 +59,7 @@ export async function generateMetadata({ params }: Ctx): Promise<Metadata> {
       description,
       images: product.images
         .slice(0, 1)
-        .map((i) => (i.url.startsWith('http') ? i.url : `${env.APP_URL}${i.url}`)),
+        .map((i) => (i.url.startsWith('http') ? i.url : `${origin}${i.url}`)),
     },
   };
 }
@@ -67,6 +68,7 @@ export default async function ProductPage({ params }: Ctx) {
   const { slug } = await params;
   const product = await getStorefrontProduct(slug);
   if (!product) notFound();
+  const origin = await publicOrigin();
 
   const [settings, related, user, reviewSummary] = await Promise.all([
     getSettings(),
@@ -121,8 +123,8 @@ export default async function ProductPage({ params }: Ctx) {
     description: publicProduct.shortDescription || publicProduct.description.slice(0, 300),
     sku: publicProduct.sku ?? undefined,
     brand: publicProduct.brand ? { '@type': 'Brand', name: publicProduct.brand } : undefined,
-    image: images.map((i) => (i.url.startsWith('http') ? i.url : `${env.APP_URL}${i.url}`)),
-    url: `${env.APP_URL}/products/${publicProduct.slug}`,
+    image: images.map((i) => (i.url.startsWith('http') ? i.url : `${origin}${i.url}`)),
+    url: `${origin}/products/${publicProduct.slug}`,
     // AggregateRating is emitted ONLY when real, verified reviews exist. A
     // zero-review product ships no rating markup at all (Google treats invented
     // ratings as spam and it would be dishonest to the customer).
@@ -146,14 +148,14 @@ export default async function ProductPage({ params }: Ctx) {
             highPrice: Math.max(...variantPrices),
             offerCount: buyBoxVariants.length,
             ...(ldAvailability ? { availability: ldAvailability } : {}),
-            url: `${env.APP_URL}/products/${product.slug}`,
+            url: `${origin}/products/${product.slug}`,
           }
         : {
             '@type': 'Offer',
             priceCurrency: 'INR',
             price: basePricePaise / 100,
             ...(ldAvailability ? { availability: ldAvailability } : {}),
-            url: `${env.APP_URL}/products/${product.slug}`,
+            url: `${origin}/products/${product.slug}`,
           },
   };
 
@@ -174,7 +176,7 @@ export default async function ProductPage({ params }: Ctx) {
       position: i + 1,
       name: c.label,
       // The final (current-page) item omits `item` per schema.org guidance.
-      ...(c.href ? { item: `${env.APP_URL}${c.href}` } : {}),
+      ...(c.href ? { item: `${origin}${c.href}` } : {}),
     })),
   };
 

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getSettings } from '@/lib/settings';
 import { SupportContact } from '@/components/store/support-contact';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import { formatINR } from '@/lib/money';
 import { DemoExplainer } from '@/components/store/demo-explainer';
 import { jsonLdScript } from '@/lib/utils';
@@ -19,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function FaqPage() {
   const s = await getSettings();
+  const origin = await publicOrigin();
 
   const faqs = [
     {
@@ -238,7 +239,7 @@ export default async function FaqPage() {
         text: faqText[f.q] ?? 'See the answer on our FAQ page.',
       },
     })),
-    url: `${env.APP_URL}/faq`,
+    url: `${origin}/faq`,
   };
 
   return (

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import { getSettings } from '@/lib/settings';
 import { resolveAvailability } from '@/lib/catalog/availability';
 
@@ -33,6 +33,9 @@ function money(paise: number): string {
 }
 
 export async function GET(): Promise<Response> {
+  // Feed URLs must name the host that served the feed, or Merchant Center
+  // rejects the item links as unreachable.
+  const origin = await publicOrigin();
   const [products, settings] = await Promise.all([
     prisma.product.findMany({
       where: { status: 'ACTIVE', sellingPrice: { gt: 0 }, images: { some: {} } },
@@ -78,7 +81,7 @@ export async function GET(): Promise<Response> {
         : null,
     });
     const image = p.images[0]?.url ?? '';
-    const imageLink = image.startsWith('http') ? image : `${env.APP_URL}${image}`;
+    const imageLink = image.startsWith('http') ? image : `${origin}${image}`;
     const description = (p.shortDescription || p.description)
       .replace(/<[^>]*>/g, ' ')
       .replace(/\s+/g, ' ')
@@ -90,7 +93,7 @@ export async function GET(): Promise<Response> {
       `<g:id>${xml(p.id)}</g:id>`,
       `<g:title>${xml(p.name.slice(0, 150))}</g:title>`,
       `<g:description>${xml(description)}</g:description>`,
-      `<g:link>${xml(`${env.APP_URL}/products/${p.slug}`)}</g:link>`,
+      `<g:link>${xml(`${origin}/products/${p.slug}`)}</g:link>`,
       `<g:image_link>${xml(imageLink)}</g:image_link>`,
       `<g:price>${money(Math.round(Number(p.sellingPrice) * 100))}</g:price>`,
       `<g:availability>${availability.purchasable ? 'in_stock' : 'out_of_stock'}</g:availability>`,
@@ -117,7 +120,7 @@ export async function GET(): Promise<Response> {
     '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
     '<channel>',
     `<title>${xml(storeName)}</title>`,
-    `<link>${xml(env.APP_URL)}</link>`,
+    `<link>${xml(origin)}</link>`,
     `<description>${xml(settings.storeTagline || `${storeName} product feed`)}</description>`,
     ...items,
     '</channel>',

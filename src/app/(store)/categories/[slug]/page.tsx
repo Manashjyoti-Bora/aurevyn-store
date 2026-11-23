@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import {
   getCategoryBySlug,
   listStorefrontProducts,
@@ -45,6 +45,7 @@ export default async function CategoryPage({
   const sp = await searchParams;
   const category = await getCategoryBySlug(slug);
   if (!category) notFound();
+  const origin = await publicOrigin();
 
   const page = Math.max(1, parseInt(sp.page ?? '1', 10) || 1);
   const [result, categories] = await Promise.all([
@@ -65,7 +66,7 @@ export default async function CategoryPage({
     '@type': 'CollectionPage',
     name: category.name,
     description: category.description ?? undefined,
-    url: `${env.APP_URL}/categories/${category.slug}`,
+    url: `${origin}/categories/${category.slug}`,
   };
 
   // The products actually rendered on this page, in display order, as an
@@ -73,6 +74,7 @@ export default async function CategoryPage({
   // ranked list instead of duplicated position 1 entries.
   const itemListLd = buildItemListJsonLd({
     name: `${category.name} — page ${result.page}`,
+    base: origin,
     urlPath: `/categories/${category.slug}`,
     items: result.items.map((p) => ({ slug: p.slug, name: p.name })),
     page: result.page,

@@ -10,6 +10,7 @@ import '@fontsource-variable/inter';
 import './globals.css';
 import { getSettings } from '@/lib/settings';
 import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import { Toaster } from '@/components/ui/toaster';
 
 /**
@@ -22,8 +23,12 @@ import { Toaster } from '@/components/ui/toaster';
  */
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
+  // Request-derived origin: relative canonicals/OG images resolve against the
+  // host that actually served this page, so a renamed or re-pointed deployment
+  // can never advertise a dead domain. See src/lib/site-origin.ts.
+  const origin = await publicOrigin();
   return {
-    metadataBase: new URL(env.APP_URL),
+    metadataBase: new URL(origin),
     title: {
       default: `${settings.storeName} - ${settings.storeTagline || 'Quality products, delivered to you'}`,
       template: `%s | ${settings.storeName}`,
@@ -45,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
       type: 'website',
       siteName: settings.storeName,
       locale: 'en_IN',
-      url: env.APP_URL,
+      url: origin,
       images: [
         {
           url: '/og-image.png',

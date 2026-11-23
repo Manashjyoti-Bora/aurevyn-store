@@ -1,12 +1,13 @@
 import type { MetadataRoute } from 'next';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import { prisma } from '@/lib/db';
 import { isSitemapEligible, SITEMAP_PRODUCT_WHERE } from '@/lib/catalog/eligibility';
 
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = env.APP_URL.replace(/\/$/, '');
+  // The host that served this sitemap is the host every URL in it must name.
+  const base = (await publicOrigin()).replace(/\/$/, '');
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${base}/`, changeFrequency: 'daily', priority: 1 },

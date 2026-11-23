@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getSettings } from '@/lib/settings';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import { PolicyView, policySettingsContext } from '@/components/policies/policy-view';
 import { formatINR } from '@/lib/money';
 import { defaultOgImage } from '@/lib/seo/og';
@@ -8,13 +8,14 @@ import { defaultOgImage } from '@/lib/seo/og';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
+  const origin = await publicOrigin();
   return {
     title: 'Shipping Policy',
     description: `Delivery times, shipping charges and tracking at ${settings.storeName}.`,
     alternates: { canonical: '/policies/shipping' },
     openGraph: {
       title: `Shipping Policy | ${settings.storeName}`,
-      url: `${env.APP_URL}/policies/shipping`,
+      url: `${origin}/policies/shipping`,
       images: [defaultOgImage(settings.storeName)],
     },
   };

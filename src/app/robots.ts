@@ -1,8 +1,8 @@
 import type { MetadataRoute } from 'next';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 
-export default function robots(): MetadataRoute.Robots {
-  const base = env.APP_URL.replace(/\/$/, '');
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const base = (await publicOrigin()).replace(/\/$/, '');
   return {
     rules: [
       {

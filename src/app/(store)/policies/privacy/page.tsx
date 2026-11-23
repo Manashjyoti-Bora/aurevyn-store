@@ -1,20 +1,21 @@
 import type { Metadata } from 'next';
 import { getSettings } from '@/lib/settings';
 import { SupportContact } from '@/components/store/support-contact';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import { PolicyView } from '@/components/policies/policy-view';
 import { defaultOgImage } from '@/lib/seo/og';
 
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
+  const origin = await publicOrigin();
   return {
     title: 'Privacy Policy',
     description: `How ${settings.storeName} collects, uses and protects your personal data.`,
     alternates: { canonical: '/policies/privacy' },
     openGraph: {
       title: `Privacy Policy | ${settings.storeName}`,
-      url: `${env.APP_URL}/policies/privacy`,
+      url: `${origin}/policies/privacy`,
       images: [defaultOgImage(settings.storeName)],
     },
   };

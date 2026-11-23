@@ -1,20 +1,21 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getSettings } from '@/lib/settings';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import { PolicyView } from '@/components/policies/policy-view';
 import { defaultOgImage } from '@/lib/seo/og';
 
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
+  const origin = await publicOrigin();
   return {
     title: 'Returns & Refunds Policy',
     description: `How to return products and get refunds at ${settings.storeName}.`,
     alternates: { canonical: '/policies/returns' },
     openGraph: {
       title: `Returns & Refunds | ${settings.storeName}`,
-      url: `${env.APP_URL}/policies/returns`,
+      url: `${origin}/policies/returns`,
       images: [defaultOgImage(settings.storeName)],
     },
   };

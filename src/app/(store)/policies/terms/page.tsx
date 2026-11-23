@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getSettings } from '@/lib/settings';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import { PolicyView } from '@/components/policies/policy-view';
 import { formatINR } from '@/lib/money';
 import { defaultOgImage } from '@/lib/seo/og';
@@ -9,13 +9,14 @@ import { defaultOgImage } from '@/lib/seo/og';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
+  const origin = await publicOrigin();
   return {
     title: 'Terms & Conditions',
     description: `The terms governing use of ${settings.storeName} and purchases made on it.`,
     alternates: { canonical: '/policies/terms' },
     openGraph: {
       title: `Terms & Conditions | ${settings.storeName}`,
-      url: `${env.APP_URL}/policies/terms`,
+      url: `${origin}/policies/terms`,
       images: [defaultOgImage(settings.storeName)],
     },
   };

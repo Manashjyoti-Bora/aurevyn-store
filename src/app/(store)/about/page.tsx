@@ -2,20 +2,21 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getSettings } from '@/lib/settings';
 import { SupportContact } from '@/components/store/support-contact';
-import { env } from '@/lib/env';
+import { publicOrigin } from '@/lib/site-origin';
 import { Alert } from '@/components/ui/feedback';
 import { defaultOgImage } from '@/lib/seo/og';
 
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
+  const origin = await publicOrigin();
   return {
     title: 'About us',
     description: `Learn about ${settings.storeName} — how we source products, price them transparently and deliver across India.`,
     alternates: { canonical: '/about' },
     openGraph: {
       title: `About ${settings.storeName}`,
-      url: `${env.APP_URL}/about`,
+      url: `${origin}/about`,
       images: [defaultOgImage(settings.storeName)],
     },
   };

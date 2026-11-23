@@ -47,3 +47,60 @@ export function resolvePublicOrigin(input: {
 function stripTrailingSlash(value: string): string {
   return value.endsWith('/') ? value.slice(0, -1) : value;
 }
+
+// Hostname shapes only; the port is validated separately against its real range.
+const DNS_HOST = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i;
+const IPV4_HOST = /^\d{1,3}(?:\.\d{1,3}){3}$/;
+const IPV6_HOST = /^\[[0-9a-f:]+\]$/i;
+const LOCAL_HOST = /^(?:localhost|127\.0\.0\.1|\[::1\])$/i;
+
+/** Split `host[:port]`, returning null unless the port is a real TCP port. */
+function splitHostPort(value: string): { host: string; port: string | null } | null {
+  const match = /^(.*?)(?::(\d{1,5}))?$/.exec(value);
+  if (!match) return null;
+  const host = match[1] ?? '';
+  const port = match[2] ?? null;
+  if (port !== null && (Number(port) < 1 || Number(port) > 65535)) return null;
+  return { host, port };
+}
+
+/**
+ * Origin from the request's own Host headers.
+ *
+ * This is what makes the canonical tag impossible to get wrong: the page says
+ * "I am this URL" using the exact host that served it. Vercel terminates TLS and
+ * forwards `x-forwarded-host` / `x-forwarded-proto`.
+ *
+ * The Host header is attacker-controlled, so it is validated against a strict
+ * hostname pattern and anything unexpected falls back to the configured origin.
+ * That prevents host-header injection from writing an arbitrary canonical — a
+ * classic cache-poisoning and phishing vector.
+ */
+export function originFromHeaders(input: {
+  forwardedHost?: string | null;
+  host?: string | null;
+  forwardedProto?: string | null;
+  fallback: string;
+}): string {
+  const raw = firstValue(input.forwardedHost) || firstValue(input.host);
+  if (!raw) return input.fallback;
+
+  const candidate = raw.trim().toLowerCase();
+  const parts = splitHostPort(candidate);
+  if (!parts) return input.fallback;
+
+  const isLocal = LOCAL_HOST.test(parts.host);
+  const isHostShape =
+    isLocal || DNS_HOST.test(parts.host) || IPV4_HOST.test(parts.host) || IPV6_HOST.test(parts.host);
+  if (!isHostShape) return input.fallback;
+
+  const proto = firstValue(input.forwardedProto)?.toLowerCase();
+  const scheme = proto === 'http' || proto === 'https' ? proto : isLocal ? 'http' : 'https';
+
+  return `${scheme}://${parts.host}${parts.port ? `:${parts.port}` : ''}`;
+}
+
+function firstValue(value: string | null | undefined): string | undefined {
+  // A proxy may append to these headers: "host1, host2" — the first is ours.
+  return value?.split(',')[0]?.trim() || undefined;
+}

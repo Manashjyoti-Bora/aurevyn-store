@@ -1,4 +1,5 @@
 import { prisma } from '../db';
+import { env } from '../env';
 import { badRequest, conflict, notFound } from '../errors';
 import { toPaise } from '../money';
 import { getSettings } from '../settings';
@@ -120,7 +121,7 @@ export async function requestReturn(params: {
       email: order.user?.email ?? order.guestEmail ?? '-',
       subject: `Return request for ${order.orderNumber}`,
       message: `Reason: ${params.reason}${params.note ? `\nNote: ${params.note}` : ''}`,
-      adminUrl: `${process.env.APP_URL ?? ''}/admin/returns`,
+      adminUrl: `${env.APP_URL}/admin/returns`,
     },
     relatedType: 'ReturnRequest',
     relatedId: ret.id,

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { resolvePublicOrigin } from '@/lib/site-url';
 
 /**
  * Centralised, validated environment configuration.
@@ -125,7 +126,16 @@ function loadEnv(): Env {
       `Invalid environment configuration:\n${issues}\nSee .env.example for guidance.`
     );
   }
-  return parsed.data;
+  // A stale APP_URL silently poisons every canonical, sitemap URL and JSON-LD
+  // `url`. Vercel always knows the current production host, so prefer it unless
+  // APP_URL points at a real custom domain. See src/lib/site-url.ts.
+  return {
+    ...parsed.data,
+    APP_URL: resolvePublicOrigin({
+      appUrl: parsed.data.APP_URL,
+      vercelProductionHost: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    }),
+  };
 }
 
 export const env: Env = loadEnv();

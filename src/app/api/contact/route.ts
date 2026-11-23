@@ -51,7 +51,7 @@ export const POST = apiRoute(async (req: Request) => {
       email: body.email,
       subject: body.subject || '(no subject)',
       message: body.message,
-      adminUrl: `${process.env.APP_URL ?? ''}/admin/messages`,
+      adminUrl: `${env.APP_URL}/admin/messages`,
     },
   });
 

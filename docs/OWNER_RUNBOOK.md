@@ -14,7 +14,7 @@ on Delivery only.
 | Setting | Where | Required | Notes |
 | --- | --- | --- | --- |
 | `DATABASE_URL`, `DIRECT_URL` | host env | yes | PostgreSQL (Neon/Supabase/RDS). Applied with `npm run db:deploy` once per deploy. |
-| `APP_URL` | host env | yes | The real public origin, e.g. `https://aurevynstore.vercel.app`. Used by emails, canonical/OG tags, sitemap. |
+| `APP_URL` | host env | yes | The real public origin, e.g. `https://aurevynstore.vercel.app`. Used by emails, canonical/OG tags, sitemap. On Vercel a stale `*.vercel.app` value is corrected automatically from `VERCEL_PROJECT_PRODUCTION_URL` (see `src/lib/site-url.ts`); a custom domain set here always wins. |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | host env | yes | First-boot admin account. Change the password after first sign-in. |
 | `SESSION_SECRET` | host env | yes | Random 32+ characters. |
 | **Store UPI ID** | **Admin → Settings → Payments** | to accept prepaid | The QR pays this VPA. Leave blank to offer COD only. `UPI_VPA` in env overrides it. |

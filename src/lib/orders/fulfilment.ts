@@ -1,4 +1,5 @@
 import { prisma } from '../db';
+import { env } from '../env';
 import { conflict, notFound } from '../errors';
 import { hashIp } from '../audit';
 import { logger, sanitizeForLog } from '../logger';
@@ -428,7 +429,7 @@ export async function handleFulfilmentFailure(
       orderNumber: order.orderNumber,
       supplier: so.supplier.name,
       error: errorMessage.slice(0, 400),
-      adminUrl: `${process.env.APP_URL ?? ''}/admin/orders/${order.id}`,
+      adminUrl: `${env.APP_URL}/admin/orders/${order.id}`,
     },
   });
   logger.error('Supplier fulfilment failed', {

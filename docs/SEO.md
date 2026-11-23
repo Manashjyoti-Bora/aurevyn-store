@@ -29,7 +29,8 @@ structured-data URL is derived from it).
 | 13 | Image weight | `next.config.mjs` + `RemoteImage` | Optimizer serves AVIF then WebP; each catalogue photo in `public/products/` is already ≤ 124 KB (total 676 KB for 11 products). Uploaded images are size-checked at upload time. |
 | 14 | Core Web Vitals | layout, CSS | Hero image is `priority` (LCP candidate), fonts are self-hosted (no third-party round trip), no layout-shifting banners (heights are fixed), animations are transform/opacity only and respect `prefers-reduced-motion`, and the `.js` reveal class is set before first paint so nothing ships at `opacity:0`. |
 | 15 | Mobile | layout + Tailwind | `viewport` sets `width=device-width, initial-scale=1`; every page is mobile-first, tap targets are ≥ 44 px, and the product page has a sticky mobile buy bar. |
-| 16 | HTTPS | `next.config.mjs`, `src/middleware.ts` | Production builds send `Strict-Transport-Security: max-age=63072000; includeSubDomains` plus CSP `upgrade-insecure-requests`. Vercel serves HTTPS-only for the `.vercel.app` host and any attached domain. |
+| 16 | HTTPS | `next.config.mjs`, `src/middleware.ts` | Production builds send `Strict-Transport-Security: max-age=63072000; includeSubDomains` plus CSP `upgrade-insecure-requests`. Vercel serves HTTPS-only and redirects the `http://` origin automatically; an attached custom domain gets its own certificate. |
+| 16a | **Canonical origin cannot go stale** | `src/lib/site-url.ts`, `src/lib/env.ts` | `APP_URL` is resolved once at load. If it is still a `*.vercel.app` host and Vercel reports a different `VERCEL_PROJECT_PRODUCTION_URL`, the injected production host wins. A hand-set custom domain in `APP_URL` is always respected. This exists because the store was renamed and `APP_URL` kept pointing at `zenvorastore.vercel.app`, which returned `DEPLOYMENT_NOT_FOUND`: every canonical and sitemap entry pointed at a dead origin, which is enough on its own to keep a site out of Google. |
 | 17 | Clean URL slugs | `slugify()` in `src/lib/utils.ts` | Lowercase, NFKD-normalised, accents stripped, non-alphanumerics collapsed to single hyphens, 80-char cap. Slugs are unique per table. |
 | 18 | OG image | `public/og-image.png` + `src/lib/seo/og.ts` | 1200×630 branded PNG (52–90 KB), declared as the default `openGraph.images` and `twitter.images` in the root layout, and re-declared on every page that overrides `openGraph` (about + 4 policies). Product pages use the real product photo instead. Regenerate with `npm run og:image`. |
 | 19 | Search Console | layout `verification` | Set `GOOGLE_SITE_VERIFICATION` (and optionally `BING_SITE_VERIFICATION`) in the environment and the ownership meta tag is emitted automatically. Absent → no tag, so nothing is ever falsely claimed. |
@@ -43,6 +44,34 @@ Additional crawl hygiene that is already in place:
 - Soft 404s are impossible: `generateMetadata` calls `notFound()` for missing
   products and categories, so the response is a real 404.
 - `poweredByHeader: false` and no source maps in production.
+
+---
+
+## 1a. The origin rule (read this before debugging "Google isn't showing my site")
+
+Every absolute URL the crawler sees — `<link rel="canonical">`, `og:url`,
+`sitemap.xml`, `robots.txt` `Host`/`Sitemap`, and JSON-LD `url` — is built from
+one value: `env.APP_URL`.
+
+Resolution order (implemented in `src/lib/site-url.ts`):
+
+1. `APP_URL` that is **not** a `*.vercel.app` host → used as-is (you attached a
+   custom domain on purpose).
+2. Vercel's injected `VERCEL_PROJECT_PRODUCTION_URL` → used when `APP_URL` is a
+   `*.vercel.app` host that no longer matches it.
+3. `APP_URL` as configured → local dev, tests, self-hosting.
+
+How to confirm production is right:
+
+```bash
+curl -s https://YOUR-HOST/ | grep -o '<link rel="canonical"[^>]*>'
+curl -s https://YOUR-HOST/sitemap.xml | head -5
+curl -s https://YOUR-HOST/robots.txt
+```
+
+All three must name the **same host that answers 200**. A canonical pointing at
+a host that returns `DEPLOYMENT_NOT_FOUND` is not a warning; it tells Google the
+real page lives somewhere that does not exist, and the page is dropped.
 
 ---
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { isIndexableDeployment } from '@/lib/site-indexing';
 
 /**
  * Edge middleware:
@@ -31,6 +32,13 @@ export function middleware(req: NextRequest): NextResponse {
       path: '/',
       maxAge: 60 * 60 * 24 * 30,
     });
+  }
+
+  // Preview deployments are public hostnames that render the full storefront.
+  // The page metadata already says noindex; this header also covers JSON, XML
+  // and asset responses, so no crawler can index a preview by any route.
+  if (!isIndexableDeployment(process.env.VERCEL_ENV)) {
+    res.headers.set('X-Robots-Tag', 'noindex, nofollow');
   }
 
   const hasSession = Boolean(req.cookies.get(SESSION_COOKIE)?.value);

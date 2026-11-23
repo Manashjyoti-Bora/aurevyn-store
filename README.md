@@ -197,6 +197,7 @@ docs/SECURITY.md         security posture + verified controls
 docs/SUPPLIER_SETUP.md   CJ / manual / HTTP-REST supplier onboarding
 docs/PAYMENT_SETUP.md    UPI QR + COD + refunds
 docs/DEPLOYMENT.md       Vercel + Neon deploy + post-deploy checks
+docs/DOMAIN_SETUP.md     custom domain + DNS, APP_URL, Neon parent/child branches, Preview vs Production
 docs/TROUBLESHOOTING.md  symptom → cause → fix
 docs/SUPPLIER_API.md     supplier integration contract
 docs/OWNER_RUNBOOK.md    day-one launch, catalogue strategy, Meesho sourcing, UPI confirmation, alerts

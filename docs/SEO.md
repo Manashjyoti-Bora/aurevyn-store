@@ -39,6 +39,11 @@ structured-data URL is derived from it).
 Additional crawl hygiene that is already in place:
 
 - `/search` is `noindex, follow` (infinite user-generated duplicate URLs).
+- **Preview deployments are never indexed**: `robots.txt` returns `Disallow: /`,
+  page metadata is `noindex, nofollow`, and middleware sends
+  `X-Robots-Tag: noindex, nofollow` (`src/lib/site-indexing.ts`). A preview
+  hostname renders the whole store, so indexing one would publish a duplicate
+  that competes with the real domain.
 - Guest order pages are `noindex` and disallowed in `robots.txt` — they contain
   personal data and are reachable only with an order number + email.
 - Soft 404s are impossible: `generateMetadata` calls `notFound()` for missing
@@ -51,9 +56,16 @@ Additional crawl hygiene that is already in place:
 
 Every absolute URL the crawler sees — `<link rel="canonical">`, `og:url`,
 `sitemap.xml`, `robots.txt` `Host`/`Sitemap`, and JSON-LD `url` — is built from
-one value: `env.APP_URL`.
+**the host that actually served the request** (`src/lib/site-origin.ts` +
+`originFromHeaders()` in `src/lib/site-url.ts`). A page therefore cannot
+advertise a host other than the one that answered 200, which is what makes a
+domain move a DNS/`APP_URL` change instead of a code change.
 
-Resolution order (implemented in `src/lib/site-url.ts`):
+The `Host` header is attacker-controlled, so it is validated against a strict
+hostname/port pattern and anything unexpected falls back to `env.APP_URL` —
+host-header injection cannot write an arbitrary canonical.
+
+`env.APP_URL` is resolved once at load (`resolvePublicOrigin()`):
 
 1. `APP_URL` that is **not** a `*.vercel.app` host → used as-is (you attached a
    custom domain on purpose).
@@ -77,9 +89,11 @@ real page lives somewhere that does not exist, and the page is dropped.
 
 ## 2. Owner actions (only you can do these)
 
-1. **Attach the domain.** Add it in Vercel → Settings → Domains, then set
-   `APP_URL=https://yourdomain.com` in Vercel → Settings → Environment Variables
-   and redeploy. Every canonical/sitemap/JSON-LD URL follows automatically.
+1. **Attach the domain.** Add it in Vercel → Settings → Domains (records in
+   Cloudflare, DNS-only), then set `APP_URL=https://yourdomain.com` in Vercel →
+   Settings → Environment Variables (**Production** scope) and redeploy. Canonicals
+   follow the request host automatically; `APP_URL` covers emails, reset links and
+   webhooks. Step-by-step: `docs/DOMAIN_SETUP.md`.
 2. **Verify in Google Search Console.**
    - Either use the **DNS TXT** record (survives redeploys, no code involved), or
    - paste the HTML-tag `content` value into `GOOGLE_SITE_VERIFICATION` and redeploy.

@@ -4,6 +4,13 @@ Canonical production URL: **https://aurevynstore.vercel.app** (set as `APP_URL` 
 emails, webhooks, sitemap). The older `aurevyn-store.vercel.app` project is disabled (402) and
 must be ignored. Full click-by-click history: `docs/DEPLOY_VERCEL_NEON.md`.
 
+**Moving to a custom domain** (DigitalPlat/Cloudflare DNS, `APP_URL`, Neon parent/child branches,
+Preview vs Production scoping): follow `docs/DOMAIN_SETUP.md`. Canonical/sitemap/JSON-LD URLs are
+derived from the request host, so only DNS + `APP_URL` change — no code change.
+
+Preview deployments are `noindex, nofollow` and `Disallow: /` on purpose; only a Vercel
+**Production** deployment is indexable (`src/lib/site-indexing.ts`).
+
 ## Pipeline
 1. Push to `main` on GitHub (`Manashjyoti-Bora/aurevyn-store`) → Vercel auto-builds & deploys
    (Next.js standalone output, region `sin1`).

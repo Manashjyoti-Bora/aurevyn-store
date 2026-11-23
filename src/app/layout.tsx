@@ -11,6 +11,7 @@ import './globals.css';
 import { getSettings } from '@/lib/settings';
 import { env } from '@/lib/env';
 import { publicOrigin } from '@/lib/site-origin';
+import { isIndexableDeployment } from '@/lib/site-indexing';
 import { Toaster } from '@/components/ui/toaster';
 
 /**
@@ -80,17 +81,22 @@ export async function generateMetadata(): Promise<Metadata> {
       : {}),
     // Large image previews + full-length snippets are opt-in; without them
     // Google trims the snippet and shrinks the thumbnail in results.
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-        'max-video-preview': -1,
-      },
-    },
+    // A preview deployment renders every page under its own hostname, so it is
+    // noindex/nofollow: two public copies of the same store compete for the same
+    // query. Only the production deployment claims to be the real one.
+    robots: isIndexableDeployment(process.env.VERCEL_ENV)
+      ? {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+            'max-video-preview': -1,
+          },
+        }
+      : { index: false, follow: false },
   };
 }
 

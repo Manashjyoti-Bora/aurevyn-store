@@ -198,6 +198,8 @@ docs/SUPPLIER_SETUP.md   CJ / manual / HTTP-REST supplier onboarding
 docs/PAYMENT_SETUP.md    UPI QR + COD + refunds
 docs/DEPLOYMENT.md       Vercel + Neon deploy + post-deploy checks
 docs/DOMAIN_SETUP.md     custom domain + DNS, APP_URL, Neon parent/child branches, Preview vs Production
+docs/PRIVACY_RETENTION.md  what the retention sweep deletes, when, and what is never deleted
+docs/BLUEPRINT_V4_V5_STATUS.md  honest V4/V5 blueprint conformance matrix with file evidence
 docs/TROUBLESHOOTING.md  symptom → cause → fix
 docs/SUPPLIER_API.md     supplier integration contract
 docs/OWNER_RUNBOOK.md    day-one launch, catalogue strategy, Meesho sourcing, UPI confirmation, alerts

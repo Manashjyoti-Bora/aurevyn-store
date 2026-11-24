@@ -7,6 +7,7 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { purgeExpiredRateLimitBuckets } from '@/lib/rate-limit';
 import { runTeamCycle } from '@/lib/team/service';
+import { runRetentionSweep } from '@/lib/privacy/service';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +39,15 @@ async function handleCron(req: Request): Promise<Response> {
   });
   const rateLimitBucketsPurged = await purgeExpiredRateLimitBuckets();
 
+  // Data-retention policy (V4 §5, V5 §12.5): a failure here must never stop
+  // job processing or the team cycle.
+  let retention: Awaited<ReturnType<typeof runRetentionSweep>> | null = null;
+  try {
+    retention = await runRetentionSweep();
+  } catch (error) {
+    logger.error('Retention sweep failed during daily cron', { error });
+  }
+
   // The daily cron also drives one autonomous-team cycle, so the team keeps
   // working even if only Vercel Cron is configured. A failure here must never
   // fail the housekeeping run.
@@ -53,6 +63,7 @@ async function handleCron(req: Request): Promise<Response> {
     ok: true,
     jobs: stats,
     housekeeping: { sessionsPurged, cartsPurged: cartsPurged.count, rateLimitBucketsPurged },
+    retention,
     team,
   });
 }
